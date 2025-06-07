@@ -1,0 +1,21 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "css.lint.unknownAtRules": "ignore",
+  "cSpell.words": [
+    "Archivo",
+    "backface",
+    "coverflow",
+    "Dropright",
+    "Noto",
+    "opengraph",
+    "rgba",
+    "uidotdev",
+    "usehooks",
+    "webp"
+  ],
+  "i18n-ally.localesPaths": ["messages", "src/i18n"]
+}
