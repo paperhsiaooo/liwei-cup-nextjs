@@ -1,9 +1,12 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
+import { twMerge } from 'tailwind-merge'
 
+import { loginWithInvitationCodeAPI } from '@/apis/hook/use-user'
 import FormProvider from '@/components/common/hook-form/form-provider'
 import RHFTextField from '@/components/common/hook-form/rhf-text-field'
 
@@ -19,13 +22,24 @@ function InviteCard() {
 
   const { handleSubmit } = methods
 
-  const onSubmit = useCallback(async data => {
-    const payload = {
-      inviteCode: data.inviteCode,
-    }
+  const { mutateAsync, isPending } = useMutation({
+    mutationKey: ['user/loginWithInvitationCode'],
+    mutationFn: payload => loginWithInvitationCodeAPI(payload),
+    onSuccess: data => {
+      console.log('[invite-card] data:', data)
+    },
+  })
 
-    console.log(payload)
-  }, [])
+  const onSubmit = useCallback(
+    async data => {
+      const payload = {
+        invitation_code: data.inviteCode,
+      }
+
+      await mutateAsync(payload)
+    },
+    [mutateAsync],
+  )
 
   return (
     <div className="root">
@@ -38,7 +52,10 @@ function InviteCard() {
             </div>
             <button
               type="submit"
-              className="bg-blue-400 text-sm text-white py-1 px-2 rounded-md"
+              className={twMerge(
+                'bg-blue-400 text-sm text-white py-1 px-2 rounded-md',
+                isPending && 'bg-gray-400',
+              )}
             >
               送出
             </button>
