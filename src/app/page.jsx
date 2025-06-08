@@ -1,3 +1,9 @@
+import InviteCard from '@/sections/inviteCard/invite-card'
+
 export default function Root() {
-  return <div>Root</div>
+  return (
+    <div>
+      <InviteCard />
+    </div>
+  )
 }

@@ -1,4 +1,5 @@
 import './index.css'
+
 import GlobalComponents from '@/components/global-components'
 import { AppProvider } from '@/provider'
 
