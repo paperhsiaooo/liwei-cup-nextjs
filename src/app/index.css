@@ -1,9 +1,11 @@
 @import 'tailwindcss';
 
-.root {
-  @apply w-full bg-gray-200;
-}
+@layer base {
+  .root {
+    @apply w-full bg-gray-200;
+  }
 
-.wrapper {
-  @apply w-full max-w-[1440px] mx-auto px-4;
+  .wrapper {
+    @apply w-full max-w-[1440px] mx-auto px-4;
+  }
 }

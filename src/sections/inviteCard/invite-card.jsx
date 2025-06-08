@@ -42,8 +42,8 @@ function InviteCard() {
   )
 
   return (
-    <div className="root">
-      <div className="wrapper">
+    <section className="root bg-gray-300">
+      <div className="wrapper min-h-[400px]">
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-1">
             <div>
@@ -62,7 +62,7 @@ function InviteCard() {
           </div>
         </FormProvider>
       </div>
-    </div>
+    </section>
   )
 }
 
