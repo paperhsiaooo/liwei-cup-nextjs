@@ -5,7 +5,8 @@ import { AppProvider } from '@/provider'
 
 export const metadata = {
   title: '力維盃',
-  description: '力維盃',
+  description:
+    '力維盃官方網站 - 提供賽事資訊、報名參加、賽程安排與最新消息。歡迎參與這個充滿挑戰與樂趣的競賽活動。',
 }
 
 // import noto sans tc font
