@@ -13,7 +13,7 @@ export default function UserForm({ user }) {
   console.log('[user-form] user:', user)
 
   return (
-    <div className="root">
+    <div className="root bg-gray-300">
       <div className="wrapper py-4 flex flex-col gap-2">
         <div className="flex flex-col">
           <h1 className="text-2xl font-bold">歡迎光臨 {user.name}</h1>
