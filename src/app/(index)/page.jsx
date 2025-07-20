@@ -1,4 +1,4 @@
-import InviteCard from '@/sections/inviteCard/invite-card'
+import { InviteCard } from '@/sections/inviteCard'
 import Main from '@/sections/main/main'
 
 export default function Root() {

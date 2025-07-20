@@ -10,7 +10,7 @@ export default function RHFTextField({ name, type, ...other }) {
       name={name}
       control={control}
       render={({ field, fieldState: { error } }) => (
-        <div>
+        <div className="flex flex-col gap-1">
           <input
             type={type}
             name={name}

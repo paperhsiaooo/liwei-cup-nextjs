@@ -41,7 +41,7 @@ const axs = (apiName, payload, method) =>
       method,
     })
       .then(data => {
-        if (data.data.retStatus.StatusCode === SUCCESS_CODE) {
+        if (data.data.retStatus.code === SUCCESS_CODE) {
           resolve(data.data)
         } else {
           toast.error(
