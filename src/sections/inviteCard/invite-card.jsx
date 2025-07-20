@@ -10,7 +10,7 @@ function InviteCard() {
   return (
     <section className="root bg-gray-300">
       <div className="wrapper min-h-[400px]">
-        {user.isLogin ? <UserForm /> : <InviteForm />}
+        {user.isLogin ? <UserForm user={user} /> : <InviteForm />}
       </div>
     </section>
   )
