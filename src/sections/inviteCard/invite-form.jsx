@@ -2,6 +2,7 @@ import { twMerge } from 'tailwind-merge'
 
 import FormProvider from '@/components/common/hook-form/form-provider'
 import RHFTextField from '@/components/common/hook-form/rhf-text-field'
+import ProgressStep from '@/components/progress-step/progress-step'
 
 import useForm from './hook/useForm'
 
@@ -9,23 +10,30 @@ function InviteForm() {
   const { methods, handleSubmit, onSubmit, isPending } = useForm()
 
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col gap-1">
-        <div>
-          <p>邀請碼</p>
-          <RHFTextField name="inviteCode" type="text" />
-        </div>
-        <button
-          type="submit"
-          className={twMerge(
-            'bg-blue-400 text-sm text-white py-2 px-2 rounded-md cursor-pointer transition-colors duration-200 hover:bg-blue-500',
-            isPending && 'bg-gray-400',
-          )}
-        >
-          送出
-        </button>
+    <div className="flex flex-col gap-y-[110px] pt-16 pb-36">
+      <div className="w-full max-w-[940px] mx-auto">
+        <ProgressStep />
       </div>
-    </FormProvider>
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex flex-col gap-1 max-w-[850px] mx-auto">
+          <h4 className="text-blue-primary text-4xl font-bold text-center">
+            邀請碼輸入
+          </h4>
+          <div className="mt-[18px] mb-6">
+            <RHFTextField name="inviteCode" type="text" className="bg-white" />
+          </div>
+          <button
+            type="submit"
+            className={twMerge(
+              'bg-blue-primary py-4 rounded-[18px] min-h-[68px] cursor-pointer hover:bg-blue-primary/90 transition-colors duration-200',
+              isPending && 'bg-gray-400',
+            )}
+          >
+            <span className="text-white text-[22px]">下一步</span>
+          </button>
+        </div>
+      </FormProvider>
+    </div>
   )
 }
 

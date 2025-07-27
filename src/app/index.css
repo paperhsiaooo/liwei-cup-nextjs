@@ -1,7 +1,12 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-green-primary: #71f57c;
+  --color-blue-primary: #233145;
+}
 
 @layer base {
   .root {
@@ -14,7 +19,6 @@
 }
 
 @theme inline {
-
   --radius-sm: calc(var(--radius) - 4px);
 
   --radius-md: calc(var(--radius) - 2px);
@@ -87,7 +91,6 @@
 }
 
 :root {
-
   --radius: 0.625rem;
 
   --card: oklch(1 0 0);
@@ -154,7 +157,6 @@
 }
 
 .dark {
-
   --background: oklch(0.13 0.028 261.692);
 
   --foreground: oklch(0.985 0.002 247.839);
