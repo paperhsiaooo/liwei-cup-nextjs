@@ -23,7 +23,7 @@ export default function RHFTextField({ name, type, ...other }) {
               }
             }}
             {...other}
-            className="border rounded-sm py-2 px-3 outline-none"
+            className="bg-white/40 rounded-[18px] min-h-[68px] py-4 px-6 outline-none"
           />
           {error && (
             <label className="text-red-500 text-sm">{error?.message}</label>

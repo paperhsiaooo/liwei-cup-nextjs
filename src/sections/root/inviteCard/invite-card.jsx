@@ -8,8 +8,8 @@ function InviteCard() {
   const user = useUserContext(state => state.user)
 
   return (
-    <section className="root bg-gray-300">
-      <div className="wrapper min-h-[400px]">
+    <section className="root bg-green-primary">
+      <div className="wrapper">
         {user.isLogin ? <UserForm user={user} /> : <InviteForm />}
       </div>
     </section>
