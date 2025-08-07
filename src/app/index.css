@@ -6,11 +6,17 @@
 @theme {
   --color-green-primary: #71f57c;
   --color-blue-primary: #233145;
+  --color-orange-primary: #fa7025;
+
+  --font-anton: 'Anton', sans-serif;
+  --font-antonio: 'Antonio', sans-serif;
+  --font-noto-sans-jp: 'Noto Sans JP', sans-serif;
+  --font-noto-sans-tc: 'Noto Sans TC', sans-serif;
 }
 
 @layer base {
   .root {
-    @apply w-full bg-gray-200;
+    @apply relative w-full bg-[#F9F9F9];
   }
 
   .wrapper {
