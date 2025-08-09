@@ -1,11 +1,11 @@
 import { memo } from 'react'
 
-import { Title } from './'
+import { InfoDate, InfoDestination, InfoDistance, InfoDuration } from './'
 
 function Address() {
   return (
     <main className="bg-orange-primary">
-      <div className="py-10">
+      <div className="pt-10">
         {/* 師大 */}
         <div className="relative flex justify-center items-center">
           <p className="font-noto-sans-jp font-black text-white text-[83px] leading-[140px]">
@@ -21,21 +21,16 @@ function Address() {
         </div>
 
         {/* 資訊 */}
-        <div className="flex justify-center max-w-[320px] mx-auto">
+        <div className="relative flex justify-center max-w-[320px] mx-auto">
           <div className="w-full flex flex-row flex-wrap">
-            <div className="w-[160px] p-4 box-border">
-              <Title title="Date" />
-            </div>
-            <div className="w-[160px] p-4 box-border">
-              <Title title="Distance" />
-            </div>
-            <div className="w-[160px] p-4 box-border">
-              <Title title="Destination" />
-            </div>
-            <div className="w-[160px] p-4 box-border">
-              <Title title="Duration" />
-            </div>
+            <InfoDate />
+            <InfoDistance />
+            <InfoDestination />
+            <InfoDuration />
           </div>
+
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-blue-primary" />
+          <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[2px] h-[95%] bg-blue-primary" />
         </div>
       </div>
     </main>
