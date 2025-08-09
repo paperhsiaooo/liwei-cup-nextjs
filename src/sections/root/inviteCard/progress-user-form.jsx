@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 
-export default function UserForm({ user }) {
+function ProgressUserForm({ user }) {
   console.log('[user-form] user:', user)
 
   return (
@@ -94,3 +94,5 @@ export default function UserForm({ user }) {
     </div>
   )
 }
+
+export default ProgressUserForm
