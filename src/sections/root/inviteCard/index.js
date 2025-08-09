@@ -1,3 +1,3 @@
 export { default as InviteCard } from './invite-card'
-export { default as InviteForm } from './invite-form'
-export { default as UserForm } from './user-form'
+export { default as ProgressInviteForm } from './progress-invite-form'
+export { default as ProgressUserForm } from './progress-user-form'

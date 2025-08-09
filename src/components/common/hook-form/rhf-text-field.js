@@ -1,8 +1,9 @@
 import { Controller, useFormContext } from 'react-hook-form'
+import { twMerge } from 'tailwind-merge'
 
 // ----------------------------------------------------------------------
 
-export default function RHFTextField({ name, type, ...other }) {
+export default function RHFTextField({ name, type, className, ...other }) {
   const { control } = useFormContext()
 
   return (
@@ -23,7 +24,10 @@ export default function RHFTextField({ name, type, ...other }) {
               }
             }}
             {...other}
-            className="bg-white/40 rounded-[18px] min-h-[68px] py-4 px-6 outline-none"
+            className={twMerge(
+              'text-xl bg-white/40 rounded-[14px] min-h-[54px] py-2 px-4 outline-none',
+              className,
+            )}
           />
           {error && (
             <label className="text-red-500 text-sm">{error?.message}</label>
