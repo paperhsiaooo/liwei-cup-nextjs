@@ -1,5 +1,7 @@
 import Image from 'next/image'
 
+import { CountDownTimer } from '.'
+
 function Main() {
   return (
     <main className="root overflow-hidden">
@@ -22,18 +24,7 @@ function Main() {
             fill
           />
         </div>
-        <div className="relative z-10">
-          <p className="text-center font-anton font-normal text-4xl text-white flex justify-center items-end flex-row gap-x-3">
-            <span className="text-[30px]">15</span>
-            <span className="text-[14px]">DAYS</span>
-            <span className="text-[30px]">23</span>
-            <span className="text-[14px]">HRS</span>
-            <span className="text-[30px]">51</span>
-            <span className="text-[14px]">MINS</span>
-            <span className="text-[30px]">41</span>
-            <span className="text-[14px]">SEC</span>
-          </p>
-        </div>
+        <CountDownTimer />
       </div>
     </main>
   )
