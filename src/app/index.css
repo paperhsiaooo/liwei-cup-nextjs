@@ -7,6 +7,7 @@
   --color-green-primary: #71f57c;
   --color-blue-primary: #233145;
   --color-orange-primary: #fa7025;
+  --color-gray-primary: #696b70;
 
   --font-anton: 'Anton', sans-serif;
   --font-antonio: 'Antonio', sans-serif;
@@ -21,6 +22,14 @@
 
   .wrapper {
     @apply w-full max-w-[1440px] mx-auto px-4;
+  }
+
+  .btn-primary {
+    @apply w-full bg-blue-primary py-5 rounded-[18px] min-h-[54px] cursor-pointer hover:bg-blue-primary/90 transition-colors duration-200;
+  }
+
+  .progress-title {
+    @apply text-blue-primary text-2xl font-noto-sans-tc font-bold text-center;
   }
 }
 

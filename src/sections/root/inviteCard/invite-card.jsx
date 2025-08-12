@@ -3,7 +3,12 @@
 import ProgressStep from '@/components/progress-step/progress-step'
 import useUserContext from '@/store/user-context'
 
-import { ProgressInviteForm, ProgressUserForm } from '.'
+import {
+  ProgressDeclarations,
+  ProgressInviteForm,
+  ProgressPlayerInfo,
+  ProgressUserForm,
+} from '.'
 import useProgressContext from './store/progress-context'
 
 function InviteCard() {
@@ -17,11 +22,12 @@ function InviteCard() {
         <div className="w-full max-w-[940px] mx-auto py-4">
           <ProgressStep currentStep={currentStep} stepData={stepData} />
         </div>
-        {user.isLogin ? (
+        <ProgressPlayerInfo />
+        {/* {user.isLogin ? (
           <ProgressUserForm user={user} />
         ) : (
           <ProgressInviteForm />
-        )}
+        )} */}
       </div>
     </section>
   )

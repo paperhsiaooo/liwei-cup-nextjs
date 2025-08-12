@@ -2,7 +2,7 @@ import { twMerge } from 'tailwind-merge'
 
 export default function ProgressPoint({ active = false, text = '' }) {
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-1">
       <span
         className={twMerge(
           'w-3 h-3 bg-white rounded-full block',
@@ -11,7 +11,7 @@ export default function ProgressPoint({ active = false, text = '' }) {
       />
       <p
         className={twMerge(
-          'text-white text-base',
+          'text-white text-sm font-bold',
           active && 'text-blue-primary',
         )}
       >
