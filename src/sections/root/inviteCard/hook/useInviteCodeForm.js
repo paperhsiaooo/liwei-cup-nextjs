@@ -6,9 +6,9 @@ import { useForm as useReactHookForm } from 'react-hook-form'
 import { loginWithInvitationCodeAPI } from '@/apis/hook/use-user'
 import useUserStore from '@/store/user-context'
 
-import formSchema from '../form-schema'
+import formSchema from '../schema/invite-code-schema'
 
-function useForm() {
+function useInviteCodeForm() {
   const loginSuccess = useUserStore(state => state.loginSuccess)
 
   const { defaultValues, baseSchema } = formSchema()
@@ -47,4 +47,4 @@ function useForm() {
   }
 }
 
-export default useForm
+export default useInviteCodeForm

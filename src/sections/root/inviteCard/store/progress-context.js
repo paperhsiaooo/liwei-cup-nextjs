@@ -14,6 +14,10 @@ const useProgressContext = create(set => ({
       step: 3,
       title: '參戰宣言',
     },
+    {
+      step: 4,
+      title: '完成！！',
+    },
   ],
   currentStep: 1,
   setCurrentStep: step => set(() => ({ currentStep: step })),

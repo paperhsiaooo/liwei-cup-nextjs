@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-function formSchema() {
+function inviteCodeSchema() {
   const defaultValues = {
     inviteCode: '',
   }
@@ -12,4 +12,4 @@ function formSchema() {
   return { defaultValues, baseSchema }
 }
 
-export default formSchema
+export default inviteCodeSchema
