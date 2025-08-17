@@ -5,7 +5,7 @@ import { QaContainer } from '.'
 function Qa() {
   return (
     <div>
-      <div className="wrapper max-w-[350px] mx-auto py-20 flex flex-col gap-6">
+      <div className="wrapper max-w-[350px] mx-auto py-14 flex flex-col gap-6">
         <div className="flex flex-col justify-start items-start text-blue-primary">
           <h1 className="font-anton font-normal leading-snug text-6xl whitespace-nowrap">
             Q & A

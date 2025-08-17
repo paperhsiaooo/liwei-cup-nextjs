@@ -11,12 +11,19 @@ function QaItem({ question, answer, defaultOpen = false }) {
     setIsOpen(!isOpen)
   }
 
+  // Generate unique IDs for accessibility
+  const questionId = `qa-question-${question.replace(/\s+/g, '-').toLowerCase()}`
+  const answerId = `qa-answer-${question.replace(/\s+/g, '-').toLowerCase()}`
+
   return (
     <div className="border border-blue-primary overflow-hidden">
       {/* Question 部分 - 可點擊 */}
       <button
         onClick={toggleOpen}
-        className="w-full px-4 py-3 cursor-pointer text-left bg-gray-50 hover:bg-gray-100 transition-colors duration-200 flex justify-between items-center group"
+        className="w-full px-4 py-3 cursor-pointer text-left bg-gray-100 hover:bg-gray-200 transition-colors duration-200 flex justify-between items-center group"
+        aria-expanded={isOpen}
+        aria-controls={answerId}
+        id={questionId}
       >
         <span className="font-bold text-base text-blue-primary pr-4">
           {question}
@@ -29,6 +36,7 @@ function QaItem({ question, answer, defaultOpen = false }) {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -41,10 +49,13 @@ function QaItem({ question, answer, defaultOpen = false }) {
 
       {/* Answer 部分 - 可摺疊 */}
       <div
+        id={answerId}
         className={cn(
           'overflow-hidden transition-all duration-300 ease-in-out',
           isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0',
         )}
+        role="region"
+        aria-labelledby={questionId}
       >
         <div
           className="px-4 py-4 bg-white text-blue-primary text-sm leading-relaxed"
