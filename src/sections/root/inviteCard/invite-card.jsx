@@ -22,7 +22,8 @@ function InviteCard() {
         <div className="w-full max-w-[940px] mx-auto py-4">
           <ProgressStep currentStep={currentStep} stepData={stepData} />
         </div>
-        <ProgressPlayerInfo />
+        <ProgressDeclarations />
+        {/* <ProgressPlayerInfo /> */}
         {/* {user.isLogin ? (
           <ProgressUserForm user={user} />
         ) : (
