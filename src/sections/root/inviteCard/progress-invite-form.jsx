@@ -1,4 +1,7 @@
+'use client'
+
 import Image from 'next/image'
+import { useCallback } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 import FormProvider from '@/components/common/hook-form/form-provider'
@@ -6,15 +9,21 @@ import useUserContext from '@/store/user-context'
 
 import RHFTextField from './components/rhf-text-field'
 import useForm from './hook/useInviteCodeForm'
+import useProgressContext, { STEP } from './store/progress-context'
 
 function ProgressInviteForm() {
   const user = useUserContext(state => state.user)
+  const setCurrentStep = useProgressContext(state => state.setCurrentStep)
 
   const { methods, handleSubmit, onSubmit, isPending } = useForm()
 
+  const handleOnLineNextBtnClick = useCallback(() => {
+    setCurrentStep(STEP.PLAYER_INFO)
+  }, [setCurrentStep])
+
   return (
     <div className="flex flex-col gap-y-[110px] pt-6 pb-20">
-      {user.isLogin ? (
+      {!user.isLogin ? (
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-y-4 max-w-[850px] mx-auto">
             <h4 className="progress-title">邀請碼輸入</h4>
@@ -47,6 +56,7 @@ function ProgressInviteForm() {
           <button
             type="button"
             className={twMerge('btn-primary', isPending && 'bg-gray-400')}
+            onClick={handleOnLineNextBtnClick}
           >
             <span className="text-white text-base leading-none">
               下一步 ｜ 填寫資料
