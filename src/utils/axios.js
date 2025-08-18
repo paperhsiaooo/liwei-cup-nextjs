@@ -55,5 +55,19 @@ const axs = (apiName, payload, method) =>
       })
   })
 
+const axsCDN = (fileName, version = 'v1.0.0') =>
+  new Promise((resolve, reject) => {
+    axios()({
+      url: `https://cdn.jsdelivr.net/gh/paperhsiaooo/liwei-cup-static-data@${version}/${fileName}`,
+      method: 'GET',
+    })
+      .then(data => {
+        resolve(data)
+      })
+      .catch(error => {
+        reject(handleCatchError(error))
+      })
+  })
+
 export default axios
-export { axs }
+export { axs, axsCDN }

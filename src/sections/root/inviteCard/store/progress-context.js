@@ -1,25 +1,32 @@
 import { create } from 'zustand'
 
+export const STEP = {
+  INVITE_CODE: 1,
+  PLAYER_INFO: 2,
+  DECLARATIONS: 3,
+  COMPLETE: 4,
+}
+
 const useProgressContext = create(set => ({
   data: [
     {
-      step: 1,
+      step: STEP.INVITE_CODE,
       title: '邀請碼輸入',
     },
     {
-      step: 2,
+      step: STEP.PLAYER_INFO,
       title: '球員資料',
     },
     {
-      step: 3,
+      step: STEP.DECLARATIONS,
       title: '參戰宣言',
     },
     {
-      step: 4,
+      step: STEP.COMPLETE,
       title: '完成！！',
     },
   ],
-  currentStep: 1,
+  currentStep: STEP.INVITE_CODE,
   setCurrentStep: step => set(() => ({ currentStep: step })),
   setData: data => set(() => ({ data })),
 }))
