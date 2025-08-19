@@ -19,7 +19,7 @@ export default function RHFTextFieldYesNo({ title, name }) {
             <button
               type="button"
               className={twMerge(
-                'flex-1 h-full rounded-[10px] text-gray-primary w-[100px] duration-150',
+                'flex-1 h-full rounded-[10px] text-gray-primary w-[100px] duration-150 cursor-pointer',
                 field.value === 0 && 'bg-green-primary text-white',
               )}
               onClick={() => field.onChange(0)}
@@ -29,7 +29,7 @@ export default function RHFTextFieldYesNo({ title, name }) {
             <button
               type="button"
               className={twMerge(
-                'h-full flex-1 rounded-[10px] text-gray-primary w-[100px] duration-150',
+                'h-full flex-1 rounded-[10px] text-gray-primary w-[100px] duration-150 cursor-pointer',
                 field.value === 1 && 'bg-green-primary text-white',
               )}
               onClick={() => field.onChange(1)}
