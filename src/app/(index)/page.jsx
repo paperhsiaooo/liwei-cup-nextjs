@@ -5,11 +5,11 @@ import { Qa } from '@/sections/root/qa'
 
 export default function Root() {
   return (
-    <div className="overflow-hidden">
+    <main className="overflow-hidden">
       <Main />
       <Address />
       <InviteCard />
       <Qa />
-    </div>
+    </main>
   )
 }

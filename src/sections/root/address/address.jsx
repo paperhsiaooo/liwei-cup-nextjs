@@ -4,7 +4,7 @@ import { InfoDate, InfoDestination, InfoDistance, InfoDuration } from './'
 
 function Address() {
   return (
-    <main className="bg-orange-primary">
+    <section className="root bg-orange-primary">
       <div className="pt-10">
         {/* 師大 */}
         <div className="relative flex justify-center items-center">
@@ -33,7 +33,7 @@ function Address() {
           <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[2px] h-[95%] bg-blue-primary" />
         </div>
       </div>
-    </main>
+    </section>
   )
 }
 

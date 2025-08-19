@@ -4,7 +4,7 @@ import { QaContainer } from '.'
 
 function Qa() {
   return (
-    <div className="relative">
+    <section className="root">
       <span className="absolute top-2 left-0 w-full h-2 bg-green-primary" />
       <div className="wrapper max-w-[350px] mx-auto py-14 flex flex-col gap-6">
         <div className="flex flex-col justify-start items-start text-blue-primary">
@@ -17,7 +17,7 @@ function Qa() {
         </div>
         <QaContainer />
       </div>
-    </div>
+    </section>
   )
 }
 
