@@ -20,7 +20,7 @@ export default function RHFTextFieldMultipleSelect({ title, name }) {
               <button
                 type="button"
                 className={twMerge(
-                  'flex-1 h-full rounded-[10px] text-gray-primary w-[100px] duration-150',
+                  'flex-1 h-full rounded-[10px] text-gray-primary w-[100px] duration-150 cursor-pointer',
                   field.value === 'xs' && 'bg-green-primary text-white',
                 )}
                 onClick={() => field.onChange('xs')}
@@ -30,7 +30,7 @@ export default function RHFTextFieldMultipleSelect({ title, name }) {
               <button
                 type="button"
                 className={twMerge(
-                  'h-full flex-1 rounded-[10px] text-gray-primary w-[100px] duration-150',
+                  'h-full flex-1 rounded-[10px] text-gray-primary w-[100px] duration-150 cursor-pointer',
                   field.value === 's' && 'bg-green-primary text-white',
                 )}
                 onClick={() => field.onChange('s')}
@@ -42,7 +42,7 @@ export default function RHFTextFieldMultipleSelect({ title, name }) {
               <button
                 type="button"
                 className={twMerge(
-                  'flex-1 h-full rounded-[10px] text-gray-primary w-[100px] duration-150',
+                  'flex-1 h-full rounded-[10px] text-gray-primary w-[100px] duration-150 cursor-pointer',
                   field.value === 'm' && 'bg-green-primary text-white',
                 )}
                 onClick={() => field.onChange('m')}
@@ -52,7 +52,7 @@ export default function RHFTextFieldMultipleSelect({ title, name }) {
               <button
                 type="button"
                 className={twMerge(
-                  'h-full flex-1 rounded-[10px] text-gray-primary w-[100px] duration-150',
+                  'h-full flex-1 rounded-[10px] text-gray-primary w-[100px] duration-150 cursor-pointer',
                   field.value === 'l' && 'bg-green-primary text-white',
                 )}
                 onClick={() => field.onChange('l')}
@@ -64,12 +64,34 @@ export default function RHFTextFieldMultipleSelect({ title, name }) {
               <button
                 type="button"
                 className={twMerge(
-                  'w-[calc(50%-6px)] h-full rounded-[10px] text-gray-primary duration-150',
+                  'flex-1 h-full rounded-[10px] text-gray-primary w-[100px] duration-150 cursor-pointer',
                   field.value === 'xl' && 'bg-green-primary text-white',
                 )}
                 onClick={() => field.onChange('xl')}
               >
                 XL
+              </button>
+              <button
+                type="button"
+                className={twMerge(
+                  'h-full flex-1 rounded-[10px] text-gray-primary w-[100px] duration-150 cursor-pointer',
+                  field.value === '2xl' && 'bg-green-primary text-white',
+                )}
+                onClick={() => field.onChange('2xl')}
+              >
+                2XL
+              </button>
+            </div>
+            <div className="flex gap-x-2 h-[38px] px-3">
+              <button
+                type="button"
+                className={twMerge(
+                  'w-[calc(50%-6px)] h-full rounded-[10px] text-gray-primary duration-150 cursor-pointer',
+                  field.value === '3xl' && 'bg-green-primary text-white',
+                )}
+                onClick={() => field.onChange('3xl')}
+              >
+                3XL
               </button>
             </div>
           </div>
