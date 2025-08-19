@@ -12,7 +12,9 @@ function usePlayerInfoForm() {
     defaultValues,
   })
 
-  const { handleSubmit } = methods
+  const { handleSubmit, watch } = methods
+
+  const isParticipating = watch('isParticipating')
 
   const onSubmit = useCallback(data => {
     console.log(data)
@@ -20,6 +22,7 @@ function usePlayerInfoForm() {
 
   return {
     methods,
+    isParticipating,
     handleSubmit,
     onSubmit,
   }

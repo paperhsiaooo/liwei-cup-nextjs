@@ -10,7 +10,8 @@ import RHFTextFieldYesNo from './components/rhf-text-field-yes-no'
 import usePlayerInfoForm from './hook/usePlayerInfoForm'
 
 function ProgressPlayerInfo() {
-  const { methods, handleSubmit, onSubmit } = usePlayerInfoForm()
+  const { methods, isParticipating, handleSubmit, onSubmit } =
+    usePlayerInfoForm()
 
   return (
     <div className="flex flex-col pt-6 pb-20">
@@ -29,6 +30,20 @@ function ProgressPlayerInfo() {
             name="isParticipating"
             className="text-right text-blue-primary pl-20 placeholder:font-noto-sans-jp placeholder:text-[#233145]/20 font-normal"
           />
+          {isParticipating === 0 && (
+            <div className="flex flex-col gap-y-1">
+              <RHFTextFieldTitle
+                title="收件地址"
+                name="address"
+                type="text"
+                placeholder="請輸入有效地址"
+                className="text-right text-blue-primary pl-24 placeholder:font-noto-sans-jp placeholder:text-[#233145]/20 font-normal"
+              />
+              <p className="text-sm text-gray-primary px-2">
+                旅外選手請輸入有效的海外收件地址，你將會收到力維周邊神秘小禮物。
+              </p>
+            </div>
+          )}
           <RHFTextFieldMultipleSelect
             title="衣服尺寸"
             name="shirtSize"
