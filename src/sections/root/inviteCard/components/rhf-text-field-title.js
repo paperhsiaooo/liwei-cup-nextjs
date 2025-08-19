@@ -35,7 +35,7 @@ export default function RHFTextFieldTitle({
               }}
               {...other}
               className={twMerge(
-                'text-xl bg-white rounded-[18px] h-[54px] leading-[52px] py-4 px-4 outline-none',
+                'text-base bg-white rounded-[18px] h-[54px] leading-[52px] py-4 px-4 outline-none',
                 className,
               )}
             />
