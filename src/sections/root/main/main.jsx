@@ -4,7 +4,7 @@ import { CountDownTimer } from '.'
 
 function Main() {
   return (
-    <main className="root overflow-hidden">
+    <section className="root overflow-hidden">
       <div className="aspect-[397/250] w-[200px] absolute z-0 left-1/2 -translate-x-1/2">
         <Image
           src="/images/win-01.png"
@@ -26,7 +26,7 @@ function Main() {
         </div>
         <CountDownTimer />
       </div>
-    </main>
+    </section>
   )
 }
 
