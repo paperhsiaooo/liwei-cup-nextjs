@@ -6,16 +6,16 @@ function Address() {
   return (
     <section className="root bg-orange-primary">
       <div className="pt-10">
-        {/* 師大 */}
+        {/* 板橋 */}
         <div className="relative flex justify-center items-center">
           <p className="font-noto-sans-jp font-black text-white text-[83px] leading-[140px]">
-            師<br />大
+            板<br />橋
           </p>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <p className="whitespace-nowrap font-noto-sans-jp font-black text-blue-primary text-[34px] leading-[120%] tracking-[5%] text-center">
-              林口分部
+              僑中分館
               <br />
-              體育館
+              三米線
             </p>
           </div>
         </div>
