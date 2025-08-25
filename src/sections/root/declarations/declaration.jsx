@@ -32,7 +32,6 @@ function Declaration() {
             spaceBetween={10}
             slidesPerView={'auto'}
             centeredSlides={true}
-            onSwiper={swiper => console.log(swiper)}
           >
             <SwiperSlide>
               <Card>
