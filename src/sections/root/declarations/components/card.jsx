@@ -10,7 +10,12 @@ function CardContent({ name = '', declaration = '', no = 0 }) {
       <div className="relative p-5">
         {/* 頭像 */}
         <div className="relative w-[90px] aspect-square">
-          <Image src="/images/avatar.png" alt="avatar" fill />
+          <Image
+            src="/images/avatar.png"
+            alt="avatar"
+            width={182}
+            height={182}
+          />
         </div>
 
         {/* 內容 */}

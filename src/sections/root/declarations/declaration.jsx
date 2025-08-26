@@ -18,7 +18,12 @@ function Declaration() {
             只接發球
           </h3>
           <div className="relative w-full aspect-[2421/1537] my-6">
-            <Image src={'/images/picture/01.jpg'} alt="declaration" fill />
+            <Image
+              src={'/images/picture/01.jpg'}
+              alt="declaration"
+              width={2421}
+              height={1537}
+            />
           </div>
           <h3 className="text-blue-primary text-4xl font-black font-noto-sans-tc text-center">
             不接命運
