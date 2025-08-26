@@ -1,5 +1,7 @@
 import './index.css'
 
+import { GoogleAnalytics } from '@next/third-parties/google'
+
 import GlobalComponents from '@/components/global-components'
 import { AppProvider } from '@/provider'
 
@@ -43,6 +45,7 @@ function RootLayout({ children }) {
         <AppProvider>
           <GlobalComponents>{children}</GlobalComponents>
         </AppProvider>
+        <GoogleAnalytics gaId="G-RMXX7ZVH70" />
       </body>
     </html>
   )
