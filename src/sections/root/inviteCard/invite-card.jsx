@@ -3,11 +3,14 @@
 import ProgressStep from '@/components/progress-step/progress-step'
 
 import { ProgressDeclarations, ProgressInviteForm, ProgressPlayerInfo } from '.'
+import useCheckAuth from './hook/useCheckAuth'
 import useProgressContext, { STEP } from './store/progress-context'
 
 function InviteCard() {
   const currentStep = useProgressContext(state => state.currentStep)
   const stepData = useProgressContext(state => state.data)
+
+  useCheckAuth()
 
   const renderCurrentStep = () => {
     switch (currentStep) {

@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 
 import { axs } from '@/utils/axios'
+import { setSession } from '@/utils/utils'
 
 const prefix = '/user'
 
@@ -14,6 +15,10 @@ function useLoginWithInvitationCode(onSuccess) {
     mutationKey: ['user/loginWithInvitationCode'],
     mutationFn: payload => loginWithInvitationCodeAPI(payload),
     onSuccess: data => {
+      if (data.data.token) {
+        setSession(data.data.token)
+      }
+
       onSuccess(data.data)
     },
   })

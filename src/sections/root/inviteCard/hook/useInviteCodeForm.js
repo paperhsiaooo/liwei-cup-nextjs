@@ -24,6 +24,7 @@ function useInviteCodeForm() {
   const onSubmit = useCallback(
     async data => {
       const payload = {
+        invite_code_from_token: false,
         invitation_code: data.inviteCode,
       }
 
