@@ -10,7 +10,8 @@ function Main() {
           src="/images/win-01.png"
           alt="main-bg"
           className="object-cover"
-          fill
+          width={397}
+          height={250}
         />
       </div>
       <div className="relative z-10 pt-[50px] pb-10">
@@ -21,7 +22,9 @@ function Main() {
             src="/images/main-cover-01.png"
             alt="main-bg"
             className="object-cover"
-            fill
+            priority
+            width={2042}
+            height={1102}
           />
         </div>
         <CountDownTimer />

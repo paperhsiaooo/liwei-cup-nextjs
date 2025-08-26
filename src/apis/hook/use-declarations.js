@@ -4,7 +4,7 @@ import { axsCDN } from '@/utils/axios'
 
 // 獲取參戰宣言選項 API
 async function getDeclarationsOptionsAPI() {
-  const data = await axsCDN(`DeclarationsList.json`, 'v1.0.3')
+  const data = await axsCDN(`DeclarationsList.json`, 'v1.0.4')
   return data
 }
 

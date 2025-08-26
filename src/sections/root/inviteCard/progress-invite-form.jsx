@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useCallback } from 'react'
 import { twMerge } from 'tailwind-merge'
 
@@ -45,14 +46,19 @@ function ProgressInviteForm() {
       ) : (
         <div className="flex flex-col items-center gap-y-6">
           <h4 className="progress-title">加入 Line 群組</h4>
-          <div className="relative w-32 aspect-square">
+          <Link
+            href="https://line.me/ti/g/tjntwUbYwt"
+            className="relative w-32 aspect-square"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Image
               src="/images/qrCode.jpg"
               alt="line-invite-qr-code"
               fill={true}
               objectFit="contain"
             />
-          </div>
+          </Link>
           <button
             type="button"
             className={twMerge('btn-primary', isPending && 'bg-gray-400')}

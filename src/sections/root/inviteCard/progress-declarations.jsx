@@ -5,11 +5,15 @@ import { memo } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 import { useDeclarationsOptions } from '@/apis/hook/use-declarations'
+import FormProvider from '@/components/common/hook-form/form-provider'
 
 import CustomSelect from './components/custom-select'
+import useDeclarationsForm from './hook/useDeclarationsForm'
 
 function ProgressDeclarations() {
   const { data: optionsData, isLoading, error } = useDeclarationsOptions()
+
+  const { methods, handleSubmit, onSubmit } = useDeclarationsForm()
 
   console.log('optionsData: ', optionsData)
 
@@ -41,7 +45,11 @@ function ProgressDeclarations() {
   }
 
   return (
-    <div className="flex flex-col gap-y-6 pt-9 pb-20">
+    <FormProvider
+      className="flex flex-col gap-y-6 pt-9 pb-20"
+      methods={methods}
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <div className="relative rounded-[8px] bg-white px-4 pb-5 pt-3 flex flex-col gap-y-3">
         <div className="absolute top-5 left-5 w-[19px] aspect-square">
           <Image
@@ -54,16 +62,29 @@ function ProgressDeclarations() {
         <h3 className="text-[22px] leading-normal font-bold text-blue-primary text-center">
           我的參戰宣言
         </h3>
+
         <div className="flex flex-col gap-y-3">
-          <CustomSelect placeholder="你的個性" options={options1} />
-          <CustomSelect placeholder="你是誰" options={options2} />
-          <CustomSelect placeholder="要告訴對手的話" options={options3} />
+          <CustomSelect
+            name="declaration1"
+            placeholder="你的個性"
+            options={options1}
+          />
+          <CustomSelect
+            name="declaration2"
+            placeholder="你是誰"
+            options={options2}
+          />
+          <CustomSelect
+            name="declaration3"
+            placeholder="要告訴對手的話"
+            options={options3}
+          />
         </div>
       </div>
       <button type="submit" className={twMerge('btn-primary')}>
         <span className="text-white text-base">完成</span>
       </button>
-    </div>
+    </FormProvider>
   )
 }
 
