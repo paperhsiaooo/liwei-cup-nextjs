@@ -83,7 +83,7 @@ function ProgressDeclarations() {
         />
       </div>
       <button type="submit" className={twMerge('btn-primary')}>
-        <span className="text-white text-base">完成</span>
+        <span className="text-white text-base">送出</span>
       </button>
     </FormProvider>
   )

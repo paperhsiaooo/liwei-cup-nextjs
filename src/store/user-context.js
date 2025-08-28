@@ -4,13 +4,14 @@ const useUserContext = create((set, get) => ({
   user: {
     isLogin: false,
     name: '',
-    isParticipating: 1,
     address: '',
     nickName: '',
     role: null,
     shirtSize: null,
     team: null,
     messageToOrganizer: '',
+    isParticipating: 1,
+    isCheckedIn: false,
   },
   loginSuccess: data =>
     set(() => ({
@@ -25,6 +26,7 @@ const useUserContext = create((set, get) => ({
         messageToOrganizer: data.message_to_organizer,
         battleDeclaration: data.battle_declaration_data,
         isParticipating: data.is_participating,
+        isCheckedIn: data.is_checked_in,
       },
     })),
   setPlayerInfo: data =>

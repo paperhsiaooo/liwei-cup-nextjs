@@ -48,6 +48,7 @@ function usePlayerInfoForm() {
 
   return {
     user,
+    isCheckedIn: user.isCheckedIn,
     methods,
     isParticipating,
     handleSubmit,

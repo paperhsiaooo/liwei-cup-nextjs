@@ -26,6 +26,8 @@ function useLoginWithInvitationCode(onSuccess) {
       } else {
         setSession(null)
       }
+
+      return data
     },
   })
 }

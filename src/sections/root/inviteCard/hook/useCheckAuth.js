@@ -1,12 +1,16 @@
 import { useCallback, useEffect } from 'react'
 
 import { useLoginWithInvitationCode } from '@/apis/hook/use-user'
+import { ROLE } from '@/config/constants'
 import { STORAGE_KEY } from '@/constants/jwt'
 import useUserStore from '@/store/user-context'
 import { isValidToken, jwtDecode } from '@/utils/utils'
 
+import useProgressContext, { STEP } from '../store/progress-context'
+
 function useCheckAuth() {
   const loginSuccess = useUserStore(state => state.loginSuccess)
+  const setCurrentStep = useProgressContext(state => state.setCurrentStep)
   const { mutateAsync } = useLoginWithInvitationCode(loginSuccess)
 
   const checkUserSession = useCallback(async () => {
@@ -19,9 +23,13 @@ function useCheckAuth() {
         invitation_code: jwtPayload.sub,
       }
 
-      await mutateAsync(payload)
+      const res = await mutateAsync(payload)
+
+      if (res.data.role === ROLE.OTHER) {
+        setCurrentStep(STEP.PLAYER_INFO)
+      }
     }
-  }, [mutateAsync])
+  }, [mutateAsync, setCurrentStep])
 
   useEffect(() => {
     checkUserSession()
