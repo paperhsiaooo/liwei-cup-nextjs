@@ -6,6 +6,7 @@ function playerInfoSchema() {
     isParticipating: 1,
     address: '',
     shirtSize: '',
+    messageToOrganizer: '',
   }
 
   const baseSchema = z
@@ -15,10 +16,11 @@ function playerInfoSchema() {
         .number()
         .min(0, '請選擇是否參加')
         .max(1, '請選擇是否參加'),
-      address: z.string().optional(),
+      address: z.string().max(100, '地址最多 100 字').optional(),
       shirtSize: z.enum(['xs', 's', 'm', 'l', 'xl', '2xl', '3xl'], {
         message: '請選擇衣服尺寸',
       }),
+      messageToOrganizer: z.string().max(500, '最多 500 字').optional(),
     })
     .refine(
       data => {

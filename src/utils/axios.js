@@ -2,7 +2,8 @@
 import _axios from 'axios'
 import toast from 'react-hot-toast'
 
-import { SUCCESS_CODE } from '@/apis/constants/api-code'
+import { ERROR_CODE, SUCCESS_CODE } from '@/apis/constants/api-code'
+import { STORAGE_KEY } from '@/constants/jwt'
 
 const handleCatchError = error => {
   if (error.response) {
@@ -14,28 +15,31 @@ const handleCatchError = error => {
   return error
 }
 
-const axios = (
-  baseURL = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://127.0.0.1:8080'}/api`,
-  method = 'POST',
-  credentials = false,
-) => {
-  const instance = _axios.create({
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: credentials,
-    baseURL,
-    method,
-    timeout: 10_000,
-    responseType: 'json',
-  })
+const axiosInstance = _axios.create({
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  baseURL: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://127.0.0.1:8080'}/api`,
+  timeout: 10_000,
+  responseType: 'json',
+})
 
-  return instance
-}
+axiosInstance.interceptors.request.use(config => {
+  if (typeof window !== 'undefined') {
+    const accessToken = sessionStorage.getItem(STORAGE_KEY)
 
-const axs = (apiName, payload, method) =>
+    if (accessToken) {
+      config.headers = config.headers || {}
+      config.headers.Authorization = `Bearer ${accessToken}`
+    }
+  }
+
+  return config
+})
+
+const axs = (apiName, payload, method = 'POST') =>
   new Promise((resolve, reject) => {
-    axios()({
+    axiosInstance({
       url: apiName,
       data: payload,
       method,
@@ -44,9 +48,9 @@ const axs = (apiName, payload, method) =>
         if (data.data.retStatus.code === SUCCESS_CODE) {
           resolve(data.data)
         } else {
-          toast.error(
-            `StatusCode: ${data.data.retStatus.StatusCode} / StatusMsg: ${data.data.retStatus.StatusMsg}`,
-          )
+          const errorMessage =
+            ERROR_CODE[data.data.retStatus.code] || '未知錯誤'
+          toast.error(errorMessage)
           reject(data)
         }
       })
@@ -57,7 +61,7 @@ const axs = (apiName, payload, method) =>
 
 const axsCDN = (fileName, version = 'v1.0.0') =>
   new Promise((resolve, reject) => {
-    axios()({
+    _axios({
       url: `https://cdn.jsdelivr.net/gh/paperhsiaooo/liwei-cup-static-data@${version}/${fileName}`,
       method: 'GET',
     })
@@ -69,5 +73,5 @@ const axsCDN = (fileName, version = 'v1.0.0') =>
       })
   })
 
-export default axios
-export { axs, axsCDN }
+export default axiosInstance
+export { axiosInstance, axs, axsCDN }

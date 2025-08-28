@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-function CustomSelect({ name, placeholder, options = [] }) {
+function CustomSelect({ disabled, name, placeholder, options = [] }) {
   const { control } = useFormContext()
 
   return (
@@ -21,6 +21,7 @@ function CustomSelect({ name, placeholder, options = [] }) {
 
         return (
           <Select
+            disabled={disabled}
             value={value}
             onValueChange={event => {
               field.onChange(event)

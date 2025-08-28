@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { memo } from 'react'
+import { memo, useEffect } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 import { useDeclarationsOptions } from '@/apis/hook/use-declarations'
@@ -11,27 +11,25 @@ import CustomSelect from './components/custom-select'
 import useDeclarationsForm from './hook/useDeclarationsForm'
 
 function ProgressDeclarations() {
-  const { data: optionsData, isLoading, error } = useDeclarationsOptions()
+  const { methods, handleSubmit, onSubmit, onRefreshDeclarationSelect } =
+    useDeclarationsForm()
 
-  const { methods, handleSubmit, onSubmit } = useDeclarationsForm()
+  const {
+    data: optionsData,
+    isLoading,
+    error,
+  } = useDeclarationsOptions({ onSuccess: () => {} })
 
-  console.log('optionsData: ', optionsData)
+  useEffect(() => {
+    if (optionsData && !isLoading) {
+      onRefreshDeclarationSelect()
+    }
+  }, [optionsData, isLoading, onRefreshDeclarationSelect])
 
   // 從 API 資料中獲取選項，假設 API 回傳格式為 { data: { option1: [], option2: [], option3: [] } }
   const options1 = optionsData?.data?.Category1 || []
   const options2 = optionsData?.data?.Category2 || []
   const options3 = optionsData?.data?.Category3 || []
-
-  // 如果正在載入，顯示載入狀態
-  if (isLoading) {
-    return (
-      <div className="flex flex-col gap-y-6 pt-9 pb-20">
-        <div className="relative rounded-[8px] bg-white px-4 pb-5 pt-3 flex flex-col gap-y-3">
-          <div className="text-center text-gray-500">載入中...</div>
-        </div>
-      </div>
-    )
-  }
 
   // 如果有錯誤，顯示錯誤狀態
   if (error) {
@@ -65,16 +63,19 @@ function ProgressDeclarations() {
 
         <div className="flex flex-col gap-y-3">
           <CustomSelect
+            disabled={isLoading}
             name="declaration1"
             placeholder="你的個性"
             options={options1}
           />
           <CustomSelect
+            disabled={isLoading}
             name="declaration2"
             placeholder="你是誰"
             options={options2}
           />
           <CustomSelect
+            disabled={isLoading}
             name="declaration3"
             placeholder="要告訴對手的話"
             options={options3}

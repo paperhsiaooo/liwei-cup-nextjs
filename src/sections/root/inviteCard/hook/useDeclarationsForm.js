@@ -17,7 +17,7 @@ function useDeclarationsForm() {
     defaultValues,
   })
 
-  const { handleSubmit } = methods
+  const { handleSubmit, reset } = methods
 
   const onSubmit = useCallback(
     async data => {
@@ -46,10 +46,24 @@ function useDeclarationsForm() {
     ],
   )
 
+  const onRefreshDeclarationSelect = useCallback(() => {
+    if (!user?.isLogin) return
+
+    const [d1, d2, d3] = user.battleDeclaration.split(',')
+
+    reset({
+      declaration1: String(d1 ?? ''),
+      declaration2: String(d2 ?? ''),
+      declaration3: String(d3 ?? ''),
+    })
+  }, [reset, user])
+
   return {
+    onRefreshDeclarationSelect,
     methods,
     handleSubmit,
     onSubmit,
+    isPending,
   }
 }
 

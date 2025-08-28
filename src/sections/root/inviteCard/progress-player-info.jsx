@@ -4,7 +4,6 @@ import { memo } from 'react'
 
 import FormProvider from '@/components/common/hook-form/form-provider'
 import { ROLE } from '@/config/constants'
-import useUserContext from '@/store/user-context'
 
 import RHFTextFieldMultipleSelect from './components/rhf-text-field-multiple-select'
 import RHFTextFieldTitle from './components/rhf-text-field-title'
@@ -12,8 +11,7 @@ import RHFTextFieldYesNo from './components/rhf-text-field-yes-no'
 import usePlayerInfoForm from './hook/usePlayerInfoForm'
 
 function ProgressPlayerInfo() {
-  const user = useUserContext(state => state.user)
-  const { methods, isParticipating, handleSubmit, onSubmit } =
+  const { user, methods, isParticipating, handleSubmit, onSubmit } =
     usePlayerInfoForm()
 
   return (
