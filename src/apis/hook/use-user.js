@@ -1,12 +1,15 @@
 import { useMutation } from '@tanstack/react-query'
 
 import { axs } from '@/utils/axios'
+import { setSession } from '@/utils/utils'
 
 const prefix = '/user'
 
 async function loginWithInvitationCodeAPI(payload) {
-  const data = await axs(`${prefix}/loginWithInvitationCode`, payload)
-  return data
+  try {
+    const data = await axs(`${prefix}/loginWithInvitationCode`, payload)
+    return data
+  } catch (error) {}
 }
 
 function useLoginWithInvitationCode(onSuccess) {
@@ -14,7 +17,15 @@ function useLoginWithInvitationCode(onSuccess) {
     mutationKey: ['user/loginWithInvitationCode'],
     mutationFn: payload => loginWithInvitationCodeAPI(payload),
     onSuccess: data => {
-      onSuccess(data.data)
+      if (data) {
+        if (data.data.token) {
+          setSession(data.data.token)
+        }
+
+        onSuccess(data.data)
+      } else {
+        setSession(null)
+      }
     },
   })
 }

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useForm as useReactHookForm } from 'react-hook-form'
 
 import useUserContext from '@/store/user-context'
@@ -9,6 +9,7 @@ import useProgressContext, { STEP } from '../store/progress-context'
 
 function usePlayerInfoForm() {
   const { defaultValues, baseSchema } = playerInfoSchema()
+  const user = useUserContext(state => state.user)
   const setCurrentStep = useProgressContext(state => state.setCurrentStep)
   const setPlayerInfo = useUserContext(state => state.setPlayerInfo)
 
@@ -17,20 +18,31 @@ function usePlayerInfoForm() {
     defaultValues,
   })
 
-  const { handleSubmit, watch } = methods
+  const { handleSubmit, watch, reset } = methods
 
   const isParticipating = watch('isParticipating')
 
   const onSubmit = useCallback(
     data => {
-      console.log(data)
       setPlayerInfo(data)
       setCurrentStep(STEP.DECLARATIONS)
     },
     [setCurrentStep, setPlayerInfo],
   )
 
+  useEffect(() => {
+    if (!user?.isLogin) return
+
+    reset({
+      nickName: user.nickName,
+      isParticipating: user.isParticipating ? 1 : 0,
+      address: user.address,
+      shirtSize: user.shirtSize,
+    })
+  }, [reset, user])
+
   return {
+    user,
     methods,
     isParticipating,
     handleSubmit,

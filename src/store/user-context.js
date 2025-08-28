@@ -17,11 +17,14 @@ const useUserContext = create((set, get) => ({
       user: {
         isLogin: true,
         name: data.name,
-        nickName: data.nickName,
+        address: data.address,
+        nickName: data.nick_name,
         role: data.role,
-        shirtSize: data.shirtSize,
+        shirtSize: data.shirt_size,
         team: data.team,
-        messageToOrganizer: data.messageToOrganizer,
+        messageToOrganizer: data.message_to_organizer,
+        battleDeclaration: data.battle_declaration_data,
+        isParticipating: data.is_participating,
       },
     })),
   setPlayerInfo: data =>
