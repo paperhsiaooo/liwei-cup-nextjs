@@ -21,8 +21,6 @@ function useDeclarationsForm() {
 
   const onSubmit = useCallback(
     async data => {
-      console.log('data: ', data)
-
       const payload = {
         nick_name: user.nickName,
         address: user.address,
@@ -50,13 +48,18 @@ function useDeclarationsForm() {
   const onRefreshDeclarationSelect = useCallback(() => {
     if (!user?.isLogin) return
 
-    const [d1, d2, d3] = user.battleDeclaration.split(',')
+    let battleDeclaration = []
+
+    if (user.battleDeclaration) {
+      const [d1, d2, d3] = user.battleDeclaration.split(',')
+      battleDeclaration = [d1, d2, d3]
+    }
 
     reset({
-      declaration1: String(d1 ?? ''),
-      declaration2: String(d2 ?? ''),
-      declaration3: String(d3 ?? ''),
-      messageToOrganizer: user.messageToOrganizer,
+      declaration1: String(battleDeclaration[0] ?? ''),
+      declaration2: String(battleDeclaration[1] ?? ''),
+      declaration3: String(battleDeclaration[2] ?? ''),
+      messageToOrganizer: user.messageToOrganizer || '',
     })
   }, [reset, user])
 

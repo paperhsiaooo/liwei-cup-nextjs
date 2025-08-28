@@ -33,11 +33,16 @@ function usePlayerInfoForm() {
   useEffect(() => {
     if (!user?.isLogin) return
 
+    let isParticipating = 1
+    if (user.isParticipating === null || user.isParticipating === 0) {
+      isParticipating = 0
+    }
+
     reset({
-      nickName: user.nickName,
-      isParticipating: user.isParticipating ? 1 : 0,
-      address: user.address,
-      shirtSize: user.shirtSize,
+      nickName: user.nickName || '',
+      isParticipating,
+      address: user.address || '',
+      shirtSize: user.shirtSize || 'm',
     })
   }, [reset, user])
 
