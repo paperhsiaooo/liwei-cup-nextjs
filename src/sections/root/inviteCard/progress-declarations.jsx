@@ -8,6 +8,7 @@ import { useDeclarationsOptions } from '@/apis/hook/use-declarations'
 import FormProvider from '@/components/common/hook-form/form-provider'
 
 import CustomSelect from './components/custom-select'
+import CustomTextarea from './components/custom-textarea'
 import useDeclarationsForm from './hook/useDeclarationsForm'
 
 function ProgressDeclarations() {
@@ -18,13 +19,7 @@ function ProgressDeclarations() {
     data: optionsData,
     isLoading,
     error,
-  } = useDeclarationsOptions({ onSuccess: () => {} })
-
-  useEffect(() => {
-    if (optionsData && !isLoading) {
-      onRefreshDeclarationSelect()
-    }
-  }, [optionsData, isLoading, onRefreshDeclarationSelect])
+  } = useDeclarationsOptions({ onSuccess: onRefreshDeclarationSelect })
 
   // 從 API 資料中獲取選項，假設 API 回傳格式為 { data: { option1: [], option2: [], option3: [] } }
   const options1 = optionsData?.data?.Category1 || []
@@ -81,6 +76,11 @@ function ProgressDeclarations() {
             options={options3}
           />
         </div>
+        <CustomTextarea
+          disabled={isLoading}
+          name="messageToOrganizer"
+          placeholder="預計要跟主辦方說的話"
+        />
       </div>
       <button type="submit" className={twMerge('btn-primary')}>
         <span className="text-white text-base">完成</span>

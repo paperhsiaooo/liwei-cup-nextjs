@@ -21,12 +21,14 @@ function useDeclarationsForm() {
 
   const onSubmit = useCallback(
     async data => {
+      console.log('data: ', data)
+
       const payload = {
         nick_name: user.nickName,
         address: user.address,
         is_participating: user.isParticipating === 1 ? true : false,
         shirt_size: user.shirtSize,
-        message_to_organizer: user.messageToOrganizer,
+        message_to_organizer: data.messageToOrganizer,
         battle_declaration_list: [
           Number(data.declaration1),
           Number(data.declaration2),
@@ -40,7 +42,6 @@ function useDeclarationsForm() {
       mutateAsync,
       user.address,
       user.isParticipating,
-      user.messageToOrganizer,
       user.nickName,
       user.shirtSize,
     ],
@@ -55,6 +56,7 @@ function useDeclarationsForm() {
       declaration1: String(d1 ?? ''),
       declaration2: String(d2 ?? ''),
       declaration3: String(d3 ?? ''),
+      messageToOrganizer: user.messageToOrganizer,
     })
   }, [reset, user])
 
