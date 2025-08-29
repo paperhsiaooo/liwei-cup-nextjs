@@ -3,6 +3,7 @@
 import 'swiper/css'
 import '../style/index.css'
 
+import { Autoplay } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { Card, CardContent } from '..'
@@ -32,7 +33,15 @@ function CardList({ battleDeclarations = {}, declarationsOptions = [] }) {
 
   return (
     <div className="relative z-10">
-      <Swiper spaceBetween={10} slidesPerView={'auto'} centeredSlides={true}>
+      <Swiper
+        spaceBetween={10}
+        slidesPerView={'auto'}
+        centeredSlides={true}
+        autoplay={{
+          delay: 1000 * 5,
+        }}
+        modules={[Autoplay]}
+      >
         {battleDeclarations?.map(declaration => {
           const [declaration1, declaration2, declaration3] =
             parseDeclarationData(declaration.declaration_data)
