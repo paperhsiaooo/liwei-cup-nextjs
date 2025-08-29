@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { CACHE_KEY } from '@/constants/cache-key'
 import { URL } from '@/constants/url'
 import { VERSION } from '@/constants/version'
