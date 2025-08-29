@@ -28,10 +28,6 @@ function QaContainer() {
         '本活動不接受任何形式的現金贊助，僅開放實物或服務協助。您的支持，將成為力維盃更加熱血、更加難忘的重要力量！<br /><br /> 👉🏼 <a href="https://forms.gle/33AnQWEcQsF3KQZn9" target="_blank" rel="noopener noreferrer">點此填寫贊助表單</a>',
     },
     {
-      question: '關於比賽規則與分隊',
-      answer: '本此',
-    },
-    {
       question: '比賽結束後會有比賽照片或影片嗎？會在哪裡公布？',
       answer:
         '將會有夥伴協助拍攝動態與靜態影像。照片與影片將於比賽結束後，陸續公布於「力維盃」活動群組，供選手與觀眾瀏覽及下載。',

@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 
 import { ERROR_CODE, SUCCESS_CODE } from '@/apis/constants/api-code'
 import { STORAGE_KEY } from '@/constants/jwt'
+import { URL } from '@/constants/url'
 
 const handleCatchError = error => {
   if (error.response) {
@@ -62,7 +63,7 @@ const axs = (apiName, payload, method = 'POST') =>
 const axsCDN = (fileName, version = 'v1.0.0') =>
   new Promise((resolve, reject) => {
     _axios({
-      url: `https://cdn.jsdelivr.net/gh/paperhsiaooo/liwei-cup-static-data@${version}/${fileName}`,
+      url: `${URL.BattleListCDN}${version}/${fileName}`,
       method: 'GET',
     })
       .then(data => {

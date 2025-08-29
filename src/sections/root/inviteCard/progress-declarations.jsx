@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { memo, useEffect } from 'react'
+import { memo } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 import { useDeclarationsOptions } from '@/apis/hook/use-declarations'
