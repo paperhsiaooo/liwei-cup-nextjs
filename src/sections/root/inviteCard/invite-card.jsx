@@ -2,7 +2,12 @@
 
 import ProgressStep from '@/components/progress-step/progress-step'
 
-import { ProgressDeclarations, ProgressInviteForm, ProgressPlayerInfo } from '.'
+import {
+  ProgressDeclarations,
+  ProgressFinish,
+  ProgressInviteForm,
+  ProgressPlayerInfo,
+} from '.'
 import useCheckAuth from './hook/useCheckAuth'
 import useProgressContext, { STEP } from './store/progress-context'
 
@@ -21,7 +26,7 @@ function InviteCard() {
       case STEP.DECLARATIONS:
         return <ProgressDeclarations />
       case STEP.COMPLETE:
-        return <ProgressPlayerInfo />
+        return <ProgressFinish />
       default:
         return null
     }

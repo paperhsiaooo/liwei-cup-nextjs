@@ -3,12 +3,15 @@ import { useCallback } from 'react'
 import { useForm as useReactHookForm } from 'react-hook-form'
 
 import { useLoginWithInvitationCode } from '@/apis/hook/use-user'
+import { ROLE } from '@/config/constants'
 import useUserStore from '@/store/user-context'
 
 import formSchema from '../schema/invite-code-schema'
+import useProgressContext, { STEP } from '../store/progress-context'
 
 function useInviteCodeForm() {
   const loginSuccess = useUserStore(state => state.loginSuccess)
+  const setCurrentStep = useProgressContext(state => state.setCurrentStep)
 
   const { defaultValues, baseSchema } = formSchema()
 
@@ -28,9 +31,13 @@ function useInviteCodeForm() {
         invitation_code: data.inviteCode,
       }
 
-      await mutateAsync(payload)
+      const res = await mutateAsync(payload)
+
+      if (res.data.role === ROLE.OTHER) {
+        setCurrentStep(STEP.PLAYER_INFO)
+      }
     },
-    [mutateAsync],
+    [mutateAsync, setCurrentStep],
   )
 
   return {

@@ -1,13 +1,8 @@
-'use client'
-
-import 'swiper/css'
-import './style/index.css'
-
 import Image from 'next/image'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import { Suspense } from 'react'
 
 import { CountDownTimer } from '../main'
-import { Card, CardContent } from '.'
+import CardContainer from './components/card-container'
 
 function Declaration() {
   return (
@@ -32,56 +27,10 @@ function Declaration() {
 
         <CountDownTimer type="secondary" />
 
-        <div className="relative z-10">
-          <Swiper
-            spaceBetween={10}
-            slidesPerView={'auto'}
-            centeredSlides={true}
-          >
-            <SwiperSlide>
-              <Card>
-                <CardContent
-                  name="以龍"
-                  declaration="拚盡每一球，不為勝負，只為無悔揮灑的汗水與熱血！球場，就是我的戰場！"
-                  no="23"
-                />
-              </Card>
-            </SwiperSlide>
-
-            <SwiperSlide>
-              <Card>
-                <CardContent
-                  name="以龍"
-                  declaration="拚盡每一球，不為勝負，只為無悔揮灑的汗水與熱血！球場，就是我的戰場！"
-                  no="23"
-                />
-              </Card>
-            </SwiperSlide>
-
-            <SwiperSlide>
-              <Card>
-                <CardContent
-                  name="以龍"
-                  declaration="拚盡每一球，不為勝負，只為無悔揮灑的汗水與熱血！球場，就是我的戰場！"
-                  no="23"
-                />
-              </Card>
-            </SwiperSlide>
-
-            <SwiperSlide>
-              <Card>
-                <CardContent
-                  name="以龍"
-                  declaration="拚盡每一球，不為勝負，只為無悔揮灑的汗水與熱血！球場，就是我的戰場！"
-                  no="23"
-                />
-              </Card>
-            </SwiperSlide>
-          </Swiper>
-        </div>
+        <Suspense fallback={<div>Loading...</div>}>
+          <CardContainer />
+        </Suspense>
       </div>
-
-      <div className="absolute bottom-0 z-0 w-full bg-green-primary h-24" />
     </section>
   )
 }

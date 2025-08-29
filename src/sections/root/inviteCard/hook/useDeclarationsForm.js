@@ -6,10 +6,12 @@ import { useSendFormData } from '@/apis/hook/use-user'
 import useUserContext from '@/store/user-context'
 
 import formSchema from '../schema/declaration-schema'
+import useProgressContext, { STEP } from '../store/progress-context'
 
 function useDeclarationsForm() {
   const { defaultValues, baseSchema } = formSchema()
   const user = useUserContext(state => state.user)
+  const setCurrentStep = useProgressContext(state => state.setCurrentStep)
   const { mutateAsync, isPending } = useSendFormData(() => {})
 
   const methods = useReactHookForm({
@@ -21,25 +23,27 @@ function useDeclarationsForm() {
 
   const onSubmit = useCallback(
     async data => {
-      console.log('data: ', data)
+      try {
+        const payload = {
+          nick_name: user.nickName,
+          address: user.address,
+          is_participating: user.isParticipating === 1 ? true : false,
+          shirt_size: user.shirtSize,
+          message_to_organizer: data.messageToOrganizer,
+          battle_declaration_list: [
+            Number(data.declaration1),
+            Number(data.declaration2),
+            Number(data.declaration3),
+          ],
+        }
 
-      const payload = {
-        nick_name: user.nickName,
-        address: user.address,
-        is_participating: user.isParticipating === 1 ? true : false,
-        shirt_size: user.shirtSize,
-        message_to_organizer: data.messageToOrganizer,
-        battle_declaration_list: [
-          Number(data.declaration1),
-          Number(data.declaration2),
-          Number(data.declaration3),
-        ],
-      }
-
-      await mutateAsync(payload)
+        await mutateAsync(payload)
+        setCurrentStep(STEP.COMPLETE)
+      } catch (error) {}
     },
     [
       mutateAsync,
+      setCurrentStep,
       user.address,
       user.isParticipating,
       user.nickName,
@@ -50,13 +54,18 @@ function useDeclarationsForm() {
   const onRefreshDeclarationSelect = useCallback(() => {
     if (!user?.isLogin) return
 
-    const [d1, d2, d3] = user.battleDeclaration.split(',')
+    let battleDeclaration = []
+
+    if (user.battleDeclaration) {
+      const [d1, d2, d3] = user.battleDeclaration.split(',')
+      battleDeclaration = [d1, d2, d3]
+    }
 
     reset({
-      declaration1: String(d1 ?? ''),
-      declaration2: String(d2 ?? ''),
-      declaration3: String(d3 ?? ''),
-      messageToOrganizer: user.messageToOrganizer,
+      declaration1: String(battleDeclaration[0] ?? ''),
+      declaration2: String(battleDeclaration[1] ?? ''),
+      declaration3: String(battleDeclaration[2] ?? ''),
+      messageToOrganizer: user.messageToOrganizer || '',
     })
   }, [reset, user])
 

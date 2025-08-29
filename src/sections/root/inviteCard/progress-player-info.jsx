@@ -55,7 +55,9 @@ function ProgressPlayerInfo() {
             className="text-right text-blue-primary pl-20 placeholder:font-noto-sans-jp placeholder:text-[#233145]/20 font-normal"
           />
           <button type="submit" className={'btn-primary'}>
-            <span className="text-white text-base">下一步</span>
+            <span className="text-white text-base">
+              {user.isCheckedIn ? '更新資料' : '下一步'}
+            </span>
           </button>
         </div>
       </FormProvider>
