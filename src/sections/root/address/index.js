@@ -1,0 +1,6 @@
+export { default as Address } from './address'
+export { default as InfoDate } from './infoDate'
+export { default as InfoDestination } from './infoDestination'
+export { default as InfoDistance } from './infoDistance'
+export { default as InfoDuration } from './infoDuration'
+export { default as Title } from './title'
