@@ -14,7 +14,7 @@ function CardContent({
   no = 0,
 }) {
   return (
-    <div className="bg-yellow-primary rounded-3xl">
+    <div className="bg-yellow-primary rounded-3xl h-[286px]">
       <div className="relative p-5">
         {/* 頭像 */}
         <div className="relative w-[90px] aspect-square">
@@ -27,14 +27,14 @@ function CardContent({
         </div>
 
         {/* 內容 */}
-        <div className="relative z-10 space-y-1">
+        <div className="relative z-10 space-y-1 min-w-0 flex-1">
           <div className="flex flex-row justify-start items-end gap-x-3">
-            <h3 className="text-2xl font-bold text-blue-primary font-noto-sans-jp">
+            <h3 className="text-2xl font-bold text-blue-primary font-noto-sans-jp break-words">
               {name}
             </h3>
           </div>
           <p
-            className="text-sm font-bold text-blue-primary font-noto-sans-jp"
+            className="text-sm font-bold text-blue-primary font-noto-sans-jp whitespace-normal"
             dangerouslySetInnerHTML={{
               __html: `我是${declaration1}、${declaration2}。<br /><br />我告訴你們「${declaration3}」`,
             }}
