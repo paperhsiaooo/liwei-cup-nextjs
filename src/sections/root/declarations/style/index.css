@@ -1,3 +1,66 @@
 .swiper-slide {
   width: 282px;
 }
+
+/* 跑馬燈動畫 */
+@keyframes marquee-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.33%);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-33.33%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* 針對不同行數的動畫變體 */
+@keyframes marquee-left-long {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-20%);
+  }
+}
+
+@keyframes marquee-right-long {
+  0% {
+    transform: translateX(-20%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-marquee-left {
+  animation-name: marquee-left;
+}
+
+.animate-marquee-right {
+  animation-name: marquee-right;
+}
+
+/* 確保卡片內容不會超出邊界 */
+.bg-yellow-primary {
+  overflow: hidden;
+}
+
+/* 文字溢出處理 */
+.text-sm {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 名字斷行處理 */
+.break-words {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
