@@ -1,9 +1,8 @@
 'use client'
 
-import { DialogClose } from '@radix-ui/react-dialog'
-
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
