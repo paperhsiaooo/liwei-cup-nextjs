@@ -9,7 +9,9 @@ async function loginWithInvitationCodeAPI(payload) {
   try {
     const data = await axs(`${prefix}/loginWithInvitationCode`, payload)
     return data
-  } catch (error) {}
+  } catch (error) {
+    throw error
+  }
 }
 
 function useLoginWithInvitationCode(onSuccess) {
