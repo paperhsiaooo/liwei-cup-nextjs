@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react'
 
+import { ERROR_CODE } from '@/apis/constants/api-code'
 import { useLoginWithInvitationCode } from '@/apis/hook/use-user'
 import { ROLE } from '@/config/constants'
 import { STORAGE_KEY } from '@/constants/jwt'
@@ -18,15 +19,21 @@ function useCheckAuth() {
 
     if (accessToken && isValidToken(accessToken)) {
       const jwtPayload = jwtDecode(accessToken)
-      const payload = {
-        invite_code_from_token: true,
-        invitation_code: jwtPayload.sub,
-      }
+      try {
+        const payload = {
+          invite_code_from_token: true,
+          invitation_code: jwtPayload.sub,
+        }
 
-      const res = await mutateAsync(payload)
+        const res = await mutateAsync(payload)
 
-      if (res.data.role === ROLE.OTHER) {
-        setCurrentStep(STEP.PLAYER_INFO)
+        if (res.data.role === ROLE.OTHER) {
+          setCurrentStep(STEP.PLAYER_INFO)
+        }
+      } catch (error) {
+        if (error.data.retStatus.code === ERROR_CODE[112008].code) {
+          sessionStorage.removeItem(STORAGE_KEY)
+        }
       }
     }
   }, [mutateAsync, setCurrentStep])
