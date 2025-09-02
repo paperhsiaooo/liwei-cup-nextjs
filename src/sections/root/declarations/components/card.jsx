@@ -1,6 +1,7 @@
 import Image from 'next/image'
 
 import { URL } from '@/constants/url'
+import { VERSION } from '@/constants/version'
 
 function Card({ children }) {
   return <div className="w-full">{children}</div>
@@ -19,7 +20,7 @@ function CardContent({
         {/* 頭像 */}
         <div className="relative w-[90px] aspect-square">
           <Image
-            src={`${URL.BattleListCDN}v1.0.6/avatar/${no}.png`}
+            src={`${URL.BattleListCDN}${VERSION.AvatarCDN}/avatar/${no}.png`}
             alt="avatar"
             width={1024}
             height={1024}
