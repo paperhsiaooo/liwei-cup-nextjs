@@ -53,7 +53,7 @@ const axs = (apiName, payload, method = 'POST') =>
             ERROR_CODE[data.data.retStatus.code] || '未知錯誤'
 
           if (ERROR_CODE[data.data.retStatus.code].isShow) {
-            toast.error(errorMessage)
+            toast.error(errorMessage.message)
           }
 
           reject(data)
