@@ -4,6 +4,7 @@ import { Address } from '@/sections/root/address'
 import { Declaration } from '@/sections/root/declarations'
 import { InviteCard } from '@/sections/root/inviteCard'
 import { Main } from '@/sections/root/main'
+import { Memory } from '@/sections/root/memory'
 import { Qa } from '@/sections/root/qa'
 import { Slogan } from '@/sections/root/slogan'
 
@@ -19,6 +20,7 @@ export default function Root() {
       <div className="relative z-10">
         <Slogan />
       </div>
+      <Memory />
       <Address />
       <Declaration />
       <InviteCard />
