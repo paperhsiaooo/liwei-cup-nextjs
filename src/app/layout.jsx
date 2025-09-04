@@ -9,7 +9,7 @@ export const metadata = {
   title: '2025 力維盃錦標賽',
   description:
     '聲音與氣味會淡去，唯有拚搏的樣子留存在最後。力維盃，用一場比賽，把青春刻進記憶深處。這不只是排球賽，更是一場關於熱血、友情與信念的旅程。每一次奔跑與吶喊，都將成為日後回望時，最難忘的光影殘影。',
-  keywords: 'li wei,li-wei,paper,paperhsiaooo',
+  keywords: 'li wei,li-wei,paper,paperhsiaooo,排球,錦標賽,力維盃',
   metadataBase: new URL('https://liwei-cup.com/'),
 }
 
@@ -24,6 +24,8 @@ const notoSansJP = Noto_Sans_JP({
 const notoSansTC = Noto_Sans_TC({
   subsets: ['latin'],
   weight: ['400', '700', '900'],
+  display: 'swap',
+  preload: true,
 })
 
 const anton = Anton({

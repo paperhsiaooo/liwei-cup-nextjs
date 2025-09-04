@@ -6,7 +6,7 @@ import { twMerge } from 'tailwind-merge'
 
 function CountDownTimer({ type = 'primary' | 'secondary' }) {
   const { days, hours, minutes, seconds } = useTimer({
-    expiryTimestamp: new Date(2025, 11, 15, 12, 0, 0),
+    expiryTimestamp: new Date(2025, 10, 15, 12, 20, 0),
   })
 
   return (
