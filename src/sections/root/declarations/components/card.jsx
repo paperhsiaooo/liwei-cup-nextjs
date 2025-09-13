@@ -34,12 +34,11 @@ function CardContent({
               {name}
             </h3>
           </div>
-          <p
-            className="text-sm font-bold text-blue-primary font-noto-sans-jp whitespace-normal"
-            dangerouslySetInnerHTML={{
-              __html: `我是${declaration1}、${declaration2}。<br /><br />我告訴你們「${declaration3}」`,
-            }}
-          />
+          <p className="text-sm font-bold text-blue-primary font-noto-sans-jp whitespace-normal">
+            我是{declaration1}、{declaration2}。<br />
+            <br />
+            我告訴你們「{declaration3}」
+          </p>
         </div>
 
         {/* 序號 */}

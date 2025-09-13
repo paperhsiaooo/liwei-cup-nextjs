@@ -8,15 +8,13 @@ import CardList from './card-list'
 
 const getUserBattleDeclarations = async () => {
   try {
-    const res = await fetch(
-      `${process.env.BASE_URL}/api/list/getBattleDeclarationList`,
-      {
-        next: {
-          revalidate: 60 * 5,
-          tags: [CACHE_KEY.BATTLE_DECLARATIONS],
-        },
+    const origin = process.env.BASE_URL || ''
+    const res = await fetch(`${origin}/api/list/getBattleDeclarationList`, {
+      next: {
+        revalidate: 60 * 5,
+        tags: [CACHE_KEY.BATTLE_DECLARATIONS],
       },
-    )
+    })
 
     if (!res.ok) {
       throw new Error('Failed to fetch battle declarations')
