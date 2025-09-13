@@ -1,7 +1,6 @@
 import './index.css'
 
 import { GoogleAnalytics } from '@next/third-parties/google'
-
 import GlobalComponents from '@/components/global-components'
 import { AppProvider } from '@/provider'
 
