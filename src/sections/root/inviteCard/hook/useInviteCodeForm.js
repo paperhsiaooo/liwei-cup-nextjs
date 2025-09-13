@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import posthog from 'posthog-js'
 import { useCallback } from 'react'
 import { useForm as useReactHookForm } from 'react-hook-form'
 
@@ -29,6 +30,7 @@ function useInviteCodeForm() {
 
   const onSubmit = useCallback(
     async data => {
+      posthog.capture('Click invite code button.')
       try {
         const payload = {
           invite_code_from_token: false,
