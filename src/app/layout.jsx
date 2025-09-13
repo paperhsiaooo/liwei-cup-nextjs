@@ -1,6 +1,7 @@
 import './index.css'
 
 import { GoogleAnalytics } from '@next/third-parties/google'
+
 import GlobalComponents from '@/components/global-components'
 import { AppProvider } from '@/provider'
 
@@ -50,7 +51,8 @@ function RootLayout({ children }) {
             <GlobalComponents>{children}</GlobalComponents>
           </PostHogProvider>
         </AppProvider>
-        {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_GA_ID ? (
+        {process.env.NODE_ENV === 'production' &&
+        process.env.NEXT_PUBLIC_GA_ID ? (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         ) : null}
       </body>
