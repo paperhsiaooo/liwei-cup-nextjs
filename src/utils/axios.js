@@ -16,11 +16,19 @@ const handleCatchError = error => {
   return error
 }
 
+// Resolve base URL for both server and client. Default to same-origin when unset.
+const apiBase =
+  typeof window === 'undefined'
+    ? process.env.BASE_URL
+    : process.env.NEXT_PUBLIC_BASE_URL
+
+const resolvedBase = apiBase && apiBase.trim().length > 0 ? apiBase : ''
+
 const axiosInstance = _axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  baseURL: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://127.0.0.1:8080'}/api`,
+  baseURL: `${resolvedBase}/api`,
   timeout: 10_000,
   responseType: 'json',
 })

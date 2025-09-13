@@ -51,7 +51,10 @@ function RootLayout({ children }) {
             <GlobalComponents>{children}</GlobalComponents>
           </PostHogProvider>
         </AppProvider>
-        <GoogleAnalytics gaId="G-RMXX7ZVH70" />
+        {process.env.NODE_ENV === 'production' &&
+        process.env.NEXT_PUBLIC_GA_ID ? (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        ) : null}
       </body>
     </html>
   )
