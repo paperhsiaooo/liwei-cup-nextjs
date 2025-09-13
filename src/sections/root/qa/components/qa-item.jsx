@@ -2,6 +2,7 @@
 
 import DOMPurify from 'isomorphic-dompurify'
 import { useState } from 'react'
+
 import { cn } from '@/lib/utils'
 
 function QaItem({ question, answer, defaultOpen = false }) {

@@ -4,10 +4,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request) {
   const token = request.headers.get('x-revalidate-token')
   if (!token || token !== process.env.REVALIDATE_SECRET) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 },
-    )
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
