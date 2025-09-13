@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import DOMPurify from 'isomorphic-dompurify'
 
 import { cn } from '@/lib/utils'
 
@@ -59,10 +60,8 @@ function QaItem({ question, answer, defaultOpen = false }) {
       >
         <div
           className="px-4 py-4 bg-white text-blue-primary text-sm leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: answer }}
-        >
-          {/* {answer} */}
-        </div>
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(answer) }}
+        />
       </div>
     </div>
   )
