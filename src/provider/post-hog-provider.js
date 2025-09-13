@@ -6,12 +6,16 @@ import { useEffect } from 'react'
 
 export default function PostHogProvider({ children }) {
   useEffect(() => {
-    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-      api_host:
-        process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
-      person_profiles: 'identified_only',
-      defaults: '2025-05-24',
-    })
+    if (
+      process.env.NODE_ENV === 'production' &&
+      process.env.NEXT_PUBLIC_POSTHOG_KEY
+    ) {
+      posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+        api_host:
+          process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+        person_profiles: 'identified_only',
+      })
+    }
   }, [])
 
   return <PHProvider client={posthog}>{children}</PHProvider>
