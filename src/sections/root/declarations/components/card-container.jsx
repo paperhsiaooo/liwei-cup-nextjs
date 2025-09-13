@@ -50,15 +50,19 @@ const getDeclarationsOptions = async () => {
 }
 
 async function CardContainer() {
-  const battleDeclarations = await getUserBattleDeclarations()
-  const declarationsOptions = await getDeclarationsOptions()
+  try {
+    const battleDeclarations = await getUserBattleDeclarations()
+    const declarationsOptions = await getDeclarationsOptions()
 
-  return (
-    <CardList
-      battleDeclarations={battleDeclarations}
-      declarationsOptions={declarationsOptions}
-    />
-  )
+    return (
+      <CardList
+        battleDeclarations={battleDeclarations}
+        declarationsOptions={declarationsOptions}
+      />
+    )
+  } catch {
+    return <div>Card Container</div>
+  }
 }
 
 export default CardContainer

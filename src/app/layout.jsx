@@ -16,6 +16,8 @@ export const metadata = {
 // import noto sans tc font
 import { Anton, Antonio, Noto_Sans_JP, Noto_Sans_TC } from 'next/font/google'
 
+import PostHogProvider from '@/provider/post-hog-provider'
+
 const notoSansJP = Noto_Sans_JP({
   subsets: ['latin'],
   weight: ['400', '700', '900'],
@@ -45,7 +47,9 @@ function RootLayout({ children }) {
         className={`${notoSansJP.className} ${notoSansTC.className} ${anton.className} ${antonio.className}`}
       >
         <AppProvider>
-          <GlobalComponents>{children}</GlobalComponents>
+          <PostHogProvider>
+            <GlobalComponents>{children}</GlobalComponents>
+          </PostHogProvider>
         </AppProvider>
         <GoogleAnalytics gaId="G-RMXX7ZVH70" />
       </body>
