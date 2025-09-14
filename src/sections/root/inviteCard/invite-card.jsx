@@ -1,5 +1,7 @@
 'use client'
 
+import { useFeatureFlagEnabled } from 'posthog-js/react'
+
 import ProgressStep from '@/components/progress-step/progress-step'
 
 import {
@@ -12,12 +14,17 @@ import useCheckAuth from './hook/useCheckAuth'
 import useProgressContext, { STEP } from './store/progress-context'
 
 function InviteCard() {
+  const flagEnabled = useFeatureFlagEnabled('open-form-field')
   const currentStep = useProgressContext(state => state.currentStep)
   const stepData = useProgressContext(state => state.data)
 
   useCheckAuth()
 
   const renderCurrentStep = () => {
+    if (!flagEnabled) {
+      return <div>form field is not enabled</div>
+    }
+
     switch (currentStep) {
       case STEP.INVITE_CODE:
         return <ProgressInviteForm />
@@ -35,10 +42,14 @@ function InviteCard() {
   return (
     <section className="root bg-green-primary">
       <div className="wrapper max-w-[350px] mx-auto">
-        <div className="w-full max-w-[940px] mx-auto py-4">
-          <ProgressStep currentStep={currentStep} stepData={stepData} />
-        </div>
-        {renderCurrentStep()}
+        {flagEnabled && (
+          <>
+            <div className="w-full max-w-[940px] mx-auto py-4">
+              <ProgressStep currentStep={currentStep} stepData={stepData} />
+            </div>
+            {renderCurrentStep()}
+          </>
+        )}
       </div>
     </section>
   )
