@@ -1,6 +1,7 @@
 import './index.css'
 
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { headers } from 'next/headers'
 
 import GlobalComponents from '@/components/global-components'
 import { AppProvider } from '@/provider'
@@ -41,6 +42,7 @@ const antonio = Antonio({
 })
 
 function RootLayout({ children }) {
+  const nonce = headers().get('x-nonce') || undefined
   return (
     <html lang="zh-TW">
       <body
@@ -53,7 +55,7 @@ function RootLayout({ children }) {
         </AppProvider>
         {process.env.NODE_ENV === 'production' &&
         process.env.NEXT_PUBLIC_GA_ID ? (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} nonce={nonce} />
         ) : null}
       </body>
     </html>

@@ -45,21 +45,6 @@ const nextConfig = {
             key: 'Cross-Origin-Resource-Policy',
             value: 'same-site',
           },
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "base-uri 'none'",
-              "frame-ancestors 'none'",
-              "object-src 'none'",
-              "img-src 'self' data: blob: https://cdn.jsdelivr.net",
-              "font-src 'self' data: https://fonts.gstatic.com",
-              "style-src 'self' 'unsafe-inline'",
-              `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://us.i.posthog.com https://us-assets.i.posthog.com`,
-              `connect-src 'self' ${process.env.NODE_ENV === 'production' ? 'https:' : 'http: https: ws: wss:'} https://www.google-analytics.com https://us.i.posthog.com ${process.env.NEXT_PUBLIC_BASE_URL || ''} ${process.env.BASE_URL || ''}`.trim(),
-              'upgrade-insecure-requests',
-            ].join('; '),
-          },
         ],
       },
     ]
