@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
@@ -24,5 +24,27 @@ export async function POST(req) {
   )
 
   // 303 導向支付導轉頁
-  return NextResponse.redirect(new URL('/checkout/pay', req.url), 303)
+  // 雲端環境可能位於反向代理後方（host 會變成 localhost:PORT），改用 forwarded headers 建立正確的絕對網址
+  const headerList = headers()
+  const rawForwardedHost = headerList.get('x-forwarded-host')
+  const forwardedHost = rawForwardedHost
+    ? rawForwardedHost.split(',')[0].trim()
+    : null
+  const hostHeader = headerList.get('host')
+  const host = forwardedHost || hostHeader
+
+  const rawForwardedProto = headerList.get('x-forwarded-proto')
+  const forwardedProto = rawForwardedProto
+    ? rawForwardedProto.split(',')[0].trim()
+    : null
+  const defaultProto =
+    host && (host.includes('localhost') || host.startsWith('127.'))
+      ? 'http'
+      : 'https'
+  const proto = forwardedProto || defaultProto
+
+  const baseUrl = host ? `${proto}://${host}` : new URL(req.url).origin
+  const redirectUrl = new URL('/checkout/pay', baseUrl)
+
+  return NextResponse.redirect(redirectUrl, 303)
 }
