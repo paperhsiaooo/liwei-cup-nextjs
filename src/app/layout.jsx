@@ -41,8 +41,9 @@ const antonio = Antonio({
   weight: ['400', '700'],
 })
 
-function RootLayout({ children }) {
-  const nonce = headers().get('x-nonce') || undefined
+async function RootLayout({ children }) {
+  const headersList = await headers()
+  const nonce = headersList.get('x-nonce') || undefined
   return (
     <html lang="zh-TW">
       <body
