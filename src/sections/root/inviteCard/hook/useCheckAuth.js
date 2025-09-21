@@ -1,3 +1,4 @@
+import posthog from 'posthog-js'
 import { useCallback, useEffect } from 'react'
 
 import { ERROR_CODE } from '@/apis/constants/api-code'
@@ -27,11 +28,33 @@ function useCheckAuth() {
 
         const res = await mutateAsync(payload)
 
+        const inviteCode = jwtPayload.sub
+        if (inviteCode) {
+          posthog.identify(inviteCode, {
+            invite_code: inviteCode,
+            role: res.data.role,
+            name: res.data.name,
+            nick_name: res.data.nick_name,
+            team: res.data.team || '',
+            is_participating: res.data.is_participating,
+            is_checked_in: res.data.is_checked_in,
+          })
+
+          posthog.register({
+            invite_code: inviteCode,
+            role: res.data.role,
+            team: res.data.team || '',
+          })
+
+          posthog.reloadFeatureFlags()
+        }
+
         if (res.data.role === ROLE.OTHER) {
           setCurrentStep(STEP.PLAYER_INFO)
         }
       } catch (error) {
         if (error.data.retStatus.code === ERROR_CODE[112008].code) {
+          posthog.reset()
           sessionStorage.removeItem(STORAGE_KEY)
         }
       }

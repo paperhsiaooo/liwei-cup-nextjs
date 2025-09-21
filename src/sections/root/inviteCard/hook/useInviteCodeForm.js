@@ -39,6 +39,26 @@ function useInviteCodeForm() {
 
         const res = await mutateAsync(payload)
 
+        if (res.data.token) {
+          posthog.identify(data.inviteCode, {
+            invite_code: data.inviteCode,
+            role: res.data.role,
+            name: res.data.name,
+            nick_name: res.data.nick_name,
+            team: res.data.team || '',
+            is_participating: res.data.is_participating,
+            is_checked_in: res.data.is_checked_in,
+          })
+
+          posthog.register({
+            invite_code: data.inviteCode,
+            role: res.data.role,
+            team: res.data.team || '',
+          })
+
+          posthog.reloadFeatureFlags()
+        }
+
         if (res.data.role === ROLE.OTHER) {
           setCurrentStep(STEP.PLAYER_INFO)
         }
