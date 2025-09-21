@@ -1,56 +1,92 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import Product from '@/sections/products/components/product'
+import http from '@/utils/axios'
 
 function ProductsPage() {
   const router = useRouter()
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const fetchProduct = useCallback(async () => {
-    try {
-      const res = await fetch('/api/checkout/intent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId: '測試商品一',
-          quantity: 1,
-          email: 'test@test.com',
-        }),
-        credentials: 'same-origin',
-      })
-
-      if (res.redirected) {
-        router.push(res.url)
-        return
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const res = await http.get('/product/list')
+        const payload = res?.data
+        const list = Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload?.list)
+            ? payload.list
+            : Array.isArray(payload)
+              ? payload
+              : []
+        if (mounted) setProducts(list)
+      } catch (err) {
+        if (mounted) setError(err?.message || '發生錯誤')
+      } finally {
+        if (mounted) setLoading(false)
       }
-
-      if (!res.ok) {
-        const maybeJson = await res.json().catch(() => null)
-        throw new Error(maybeJson?.error || 'Request failed')
-      }
-    } catch (error) {
-      console.error('>>> [handleProductBuyClick] error: ', error)
+    })()
+    return () => {
+      mounted = false
     }
-  }, [router])
+  }, [])
 
-  const handleProductBuyClick = () => {
-    fetchProduct()
+  const handleProductBuyClick = useCallback(
+    async product => {
+      try {
+        const res = await fetch('/api/checkout/intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: product.productId,
+            quantity: 1,
+            email: 'test@test.com',
+          }),
+          credentials: 'same-origin',
+        })
+
+        if (res.redirected) {
+          router.push(res.url)
+          return
+        }
+
+        if (!res.ok) {
+          const maybeJson = await res.json().catch(() => null)
+          throw new Error(maybeJson?.error || 'Request failed')
+        }
+      } catch (error) {
+        console.error('>>> [handleProductBuyClick] error: ', error)
+      }
+    },
+    [router],
+  )
+
+  if (loading) {
+    return <div className="p-10">載入中...</div>
+  }
+
+  if (error) {
+    return <div className="p-10 text-red-500">{error}</div>
   }
 
   return (
     <div className="flex flex-wrap gap-4 p-10">
-      <Product.Container className="w-[300px]">
-        <Product.Content
-          name="力維盃限量排球衣"
-          description="「不僅要參加，更要留下」，是參賽者的承諾，更是所有參賽者的共同心聲。用一場比賽，把青春刻進記憶深處。這不只是排球賽，更是一場關於熱血、友情與信念的旅程。每一次奔跑與吶喊，都將成為日後回望時，最難忘的光影殘影。"
-          image="https://picsum.photos/200/300"
-          onBuyClick={handleProductBuyClick}
-        />
-      </Product.Container>
+      {products.map(p => (
+        <Product.Container key={p.productId} className="w-[300px]">
+          <Product.Content
+            name={p.name}
+            description={p.description}
+            image={'https://picsum.photos/200/300'}
+            onBuyClick={() => handleProductBuyClick(p)}
+          />
+        </Product.Container>
+      ))}
     </div>
   )
 }
