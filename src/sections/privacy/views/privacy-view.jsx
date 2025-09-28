@@ -103,14 +103,10 @@ function PrivacyView() {
             客服信箱：
             <a
               className="text-blue-600 underline font-noto-sans-tc"
-              href="mailto:support@liweicup.tw"
+              href="mailto:support@liwei-cup.com"
             >
-              support@liweicup.tw
+              support@liwei-cup.com
             </a>
-            <br />
-            聯絡電話：02-0000-0000（週一至週五 10:00–18:00）
-            <br />
-            通訊地址：請以訂單或官網公告為準
           </p>
         </div>
       </BgLayout>
