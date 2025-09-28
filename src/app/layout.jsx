@@ -22,6 +22,8 @@ import PostHogProvider from '@/provider/post-hog-provider'
 const notoSansJP = Noto_Sans_JP({
   subsets: ['latin'],
   weight: ['400', '700', '900'],
+  display: 'swap',
+  variable: '--font-noto-sans-jp',
 })
 
 const notoSansTC = Noto_Sans_TC({
@@ -29,16 +31,21 @@ const notoSansTC = Noto_Sans_TC({
   weight: ['400', '700', '900'],
   display: 'swap',
   preload: true,
+  variable: '--font-noto-sans-tc',
 })
 
 const anton = Anton({
   subsets: ['latin'],
   weight: ['400'],
+  display: 'swap',
+  variable: '--font-anton',
 })
 
 const antonio = Antonio({
   subsets: ['latin'],
   weight: ['400', '700'],
+  display: 'swap',
+  variable: '--font-antonio',
 })
 
 async function RootLayout({ children }) {
@@ -47,7 +54,7 @@ async function RootLayout({ children }) {
   return (
     <html lang="zh-TW">
       <body
-        className={`${notoSansJP.className} ${notoSansTC.className} ${anton.className} ${antonio.className}`}
+        className={`${notoSansTC.className} ${notoSansJP.className} ${anton.className} ${antonio.className}`}
       >
         <AppProvider>
           <PostHogProvider>
