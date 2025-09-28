@@ -4,9 +4,7 @@ function PrivacyView() {
   return (
     <section id="privacy">
       <BgLayout>
-        <h1 className="mb-8 text-3xl font-bold sm:text-4xl">
-          力維盃 隱私權政策
-        </h1>
+        <h1 className="mb-8 text-3xl font-bold sm:text-4xl">隱私權政策</h1>
         <p className="mb-6 text-sm text-gray-800">最後更新日期：2025-09-29</p>
 
         <div className="space-y-6 leading-relaxed text-gray-800">
