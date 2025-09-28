@@ -244,3 +244,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .wrapper {
+    @apply px-4 sm:px-0 mx-auto max-w-sm sm:max-w-xl xl:max-w-5xl 2xl:max-w-7xl;
+  }
+}

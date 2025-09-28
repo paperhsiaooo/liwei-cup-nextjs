@@ -1,6 +1,7 @@
 import './index.css'
 
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { headers } from 'next/headers'
 
 import GlobalComponents from '@/components/global-components'
 import { AppProvider } from '@/provider'
@@ -21,6 +22,8 @@ import PostHogProvider from '@/provider/post-hog-provider'
 const notoSansJP = Noto_Sans_JP({
   subsets: ['latin'],
   weight: ['400', '700', '900'],
+  display: 'swap',
+  variable: '--font-noto-sans-jp',
 })
 
 const notoSansTC = Noto_Sans_TC({
@@ -28,23 +31,30 @@ const notoSansTC = Noto_Sans_TC({
   weight: ['400', '700', '900'],
   display: 'swap',
   preload: true,
+  variable: '--font-noto-sans-tc',
 })
 
 const anton = Anton({
   subsets: ['latin'],
   weight: ['400'],
+  display: 'swap',
+  variable: '--font-anton',
 })
 
 const antonio = Antonio({
   subsets: ['latin'],
   weight: ['400', '700'],
+  display: 'swap',
+  variable: '--font-antonio',
 })
 
-function RootLayout({ children }) {
+async function RootLayout({ children }) {
+  const headersList = await headers()
+  const nonce = headersList.get('x-nonce') || undefined
   return (
     <html lang="zh-TW">
       <body
-        className={`${notoSansJP.className} ${notoSansTC.className} ${anton.className} ${antonio.className}`}
+        className={`${notoSansTC.className} ${notoSansJP.className} ${anton.className} ${antonio.className}`}
       >
         <AppProvider>
           <PostHogProvider>
@@ -53,7 +63,7 @@ function RootLayout({ children }) {
         </AppProvider>
         {process.env.NODE_ENV === 'production' &&
         process.env.NEXT_PUBLIC_GA_ID ? (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} nonce={nonce} />
         ) : null}
       </body>
     </html>
