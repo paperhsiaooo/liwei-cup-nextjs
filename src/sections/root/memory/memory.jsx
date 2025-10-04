@@ -112,33 +112,33 @@ function Memory({ className }) {
           />
         </div>
 
-        <div className="aspect-[275/138] w-[275px] absolute z-0 left-1.5 top-[750px]">
+        <div className="aspect-[2039/1023] w-[275px] absolute z-0 left-1.5 top-[750px]">
           <Image
             src="/images/picture/10.jpg"
             alt="main-bg"
             className="object-cover w-full"
-            width={275}
-            height={138}
+            width={2039}
+            height={1023}
           />
         </div>
 
-        <div className="aspect-[439/277] w-[218px] absolute z-10 left-[64px] top-[980px]">
+        <div className="aspect-[2192/1536] w-[218px] absolute z-10 left-[64px] top-[980px]">
           <Image
             src="/images/picture/11.jpg"
             alt="main-bg"
             className="object-cover w-full"
-            width={439}
-            height={277}
+            width={2192}
+            height={1536}
           />
         </div>
 
-        <div className="aspect-[89/115] w-[89px] absolute z-0 left-[264px] top-[1100px]">
+        <div className="aspect-[1431/1850] w-[89px] absolute z-0 left-[264px] top-[1100px]">
           <Image
             src="/images/picture/12.jpg"
             alt="main-bg"
             className="object-cover w-full"
-            width={89}
-            height={115}
+            width={1431}
+            height={1850}
           />
         </div>
 
@@ -147,8 +147,8 @@ function Memory({ className }) {
             src="/images/picture/13.jpg"
             alt="main-bg"
             className="object-cover w-full"
-            width={220}
-            height={220}
+            width={864}
+            height={864}
           />
         </div>
       </div>
