@@ -21,12 +21,12 @@ function QaItem({ question, answer, defaultOpen = false }) {
       {/* Question 部分 - 可點擊 */}
       <button
         onClick={toggleOpen}
-        className="w-full px-4 py-3 cursor-pointer text-left bg-gray-100 hover:bg-gray-200 transition-colors duration-200 flex justify-between items-center group"
+        className="w-full px-4 py-3 1440:py-5 1440:px-4 cursor-pointer text-left bg-gray-100 hover:bg-gray-200 transition-colors duration-200 flex justify-between items-center group"
         aria-expanded={isOpen}
         aria-controls={answerId}
         id={questionId}
       >
-        <span className="font-bold text-base text-blue-primary pr-4 flex-1">
+        <span className="font-bold text-base text-blue-primary pr-4 flex-1 1440:text-[22px] 1440:leading-none">
           {question}
         </span>
         <svg
@@ -59,7 +59,7 @@ function QaItem({ question, answer, defaultOpen = false }) {
         aria-labelledby={questionId}
       >
         <div
-          className="px-4 py-4 bg-white text-blue-primary text-sm leading-relaxed"
+          className="px-4 py-4 bg-white text-blue-primary text-sm leading-relaxed 1440:text-lg"
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(answer) }}
         />
       </div>
