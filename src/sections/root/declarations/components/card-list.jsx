@@ -115,7 +115,7 @@ function CardList({ battleDeclarations = [], declarationsOptions = [] }) {
       })}
 
       {battleDeclarations?.length > 0 && (
-        <div className="absolute bottom-0 z-0 w-full bg-green-primary h-24" />
+        <div className="absolute -bottom-4 z-0 w-full bg-green-primary h-24" />
       )}
     </div>
   )

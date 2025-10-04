@@ -35,7 +35,7 @@ function QaContainer() {
   ]
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 1440:space-y-4">
       {qaList.map((qa, index) => (
         <QaItem
           key={index}

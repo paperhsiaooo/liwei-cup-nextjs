@@ -7,12 +7,12 @@ import CardContainer from './components/card-container'
 function Declaration() {
   return (
     <section className="root">
-      <div className="flex flex-col gap-y-7 pt-6">
-        <div className="w-full max-w-[320px] mx-auto">
-          <h3 className="text-blue-primary text-4xl font-black font-noto-sans-tc text-center">
+      <div className="pt-4 1440:pt-16">
+        <div className="w-full max-w-[320px] mx-auto mb-6 1440:max-w-[1440px] 1440:mb-16">
+          <h3 className="text-blue-primary text-4xl font-black font-noto-sans-tc text-center 1440:text-[111px]">
             只接發球
           </h3>
-          <div className="relative w-full aspect-[2421/1537] my-6">
+          <div className="relative w-full aspect-[2421/1537] my-6 1440:my-16">
             <Image
               src={'/images/picture/01.jpg'}
               alt="declaration"
@@ -20,12 +20,14 @@ function Declaration() {
               height={1537}
             />
           </div>
-          <h3 className="text-blue-primary text-4xl font-black font-noto-sans-tc text-center">
+          <h3 className="text-blue-primary text-4xl font-black font-noto-sans-tc text-center 1440:text-[111px]">
             不接命運
           </h3>
         </div>
 
-        <CountDownTimer type="secondary" />
+        <div className="mb-6 1440:mb-16">
+          <CountDownTimer type="secondary" />
+        </div>
 
         <Suspense fallback={<div>Loading...</div>}>
           <CardContainer />
