@@ -1,94 +1,23 @@
-'use client'
+import ProductsClient from './products-client'
 
-import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
-
-import Product from '@/sections/products/components/product'
-import http from '@/utils/axios'
+export const metadata = {
+  title: '商品兌換',
+  description:
+    '2025 力維盃錦標賽商品兌換專區，使用活動點數兌換精美排球周邊商品與紀念品。',
+  keywords: ['力維盃商品', '排球周邊', '商品兌換', '力維盃紀念品', '排球商品'],
+  openGraph: {
+    title: '商品兌換 | 2025 力維盃錦標賽',
+    description:
+      '2025 力維盃錦標賽商品兌換專區，使用活動點數兌換精美排球周邊商品與紀念品。',
+    url: 'https://liwei-cup.com/products',
+  },
+  alternates: {
+    canonical: 'https://liwei-cup.com/products',
+  },
+}
 
 function ProductsPage() {
-  const router = useRouter()
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    let mounted = true
-    ;(async () => {
-      try {
-        const res = await http.get('/product/list')
-        const payload = res?.data
-        const list = Array.isArray(payload?.data)
-          ? payload.data
-          : Array.isArray(payload?.list)
-            ? payload.list
-            : Array.isArray(payload)
-              ? payload
-              : []
-        if (mounted) setProducts(list)
-      } catch (err) {
-        if (mounted) setError(err?.message || '發生錯誤')
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    })()
-    return () => {
-      mounted = false
-    }
-  }, [])
-
-  const handleProductBuyClick = useCallback(
-    async product => {
-      try {
-        const res = await fetch('/api/checkout/intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productId: product.productId,
-            quantity: 1,
-            email: 'test@test.com',
-          }),
-          credentials: 'same-origin',
-        })
-
-        if (res.redirected) {
-          router.push(res.url)
-          return
-        }
-
-        if (!res.ok) {
-          const maybeJson = await res.json().catch(() => null)
-          throw new Error(maybeJson?.error || 'Request failed')
-        }
-      } catch (error) {
-        console.error('>>> [handleProductBuyClick] error: ', error)
-      }
-    },
-    [router],
-  )
-
-  if (loading) {
-    return <div className="p-10">載入中...</div>
-  }
-
-  if (error) {
-    return <div className="p-10 text-red-500">{error}</div>
-  }
-
-  return (
-    <div className="flex flex-wrap gap-4 p-10">
-      {products.map(p => (
-        <Product.Container key={p.productId} className="w-[300px]">
-          <Product.Content
-            name={p.name}
-            description={p.description}
-            image={'https://picsum.photos/200/300'}
-            onBuyClick={() => handleProductBuyClick(p)}
-          />
-        </Product.Container>
-      ))}
-    </div>
-  )
+  return <ProductsClient />
 }
 
 export default ProductsPage

@@ -5,6 +5,16 @@ import ClientOnlyView from '@/components/common/client-only/client-only-view'
 import ConfettiRunner from '@/components/confetti-runner'
 import { Button } from '@/components/ui/button'
 
+export const metadata = {
+  title: '兌換成功',
+  description:
+    '恭喜您成功兌換 2025 力維盃錦標賽商品！訂單處理中，我們將盡快為您出貨。',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
+
 function InfoRow({ label, value }) {
   return (
     <div className="grid grid-cols-[96px_1fr] gap-2 text-sm leading-6">
