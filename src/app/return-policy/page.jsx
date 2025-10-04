@@ -5,4 +5,3 @@ function ReturnPolicyPage() {
 }
 
 export default ReturnPolicyPage
-
