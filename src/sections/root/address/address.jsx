@@ -7,30 +7,30 @@ function Address() {
   return (
     <section className="root bg-orange-primary">
       <div className="relative pt-[500px] pb-5 max-w-[375px] mx-auto">
-        <div className="absolute top-[120px] left-7 w-[157px] aspect-[314/206]">
+        <div className="absolute top-[120px] left-7 w-[157px] aspect-[1464/961]">
           <Image
             src="/images/picture/05.jpg"
             alt="picture-05"
-            width={314}
-            height={206}
+            width={1464}
+            height={961}
           />
         </div>
 
-        <div className="absolute z-10 top-[150px] right-7 w-[145px] aspect-[290/346]">
+        <div className="absolute z-10 top-[150px] right-7 w-[145px] aspect-[1469/1753]">
           <Image
             src="/images/picture/04.jpg"
             alt="picture-04"
-            width={290}
-            height={346}
+            width={1469}
+            height={1753}
           />
         </div>
 
-        <div className="absolute top-[266px] left-7 w-[277px] aspect-[554/284]">
+        <div className="absolute top-[266px] left-7 w-[277px] aspect-[2730/1400]">
           <Image
             src="/images/picture/03.jpg"
             alt="picture-04"
-            width={554}
-            height={284}
+            width={2730}
+            height={1400}
           />
         </div>
 
