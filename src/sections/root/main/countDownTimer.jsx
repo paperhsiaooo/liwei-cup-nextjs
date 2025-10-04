@@ -11,11 +11,11 @@ function CountDownTimer({ type = 'primary' | 'secondary' }) {
 
   return (
     <div className="relative z-10">
-      <p className="text-center font-anton font-normal text-4xl text-white flex justify-center items-end flex-row gap-x-3">
+      <p className="text-center font-anton font-normal text-4xl text-white flex justify-center items-end flex-row gap-x-3 1440:gap-x-10">
         <span
           suppressHydrationWarning={true}
           className={twMerge(
-            'text-[30px]',
+            'text-[30px] 1440:text-[100px] leading-none',
             type === 'primary' && 'text-white',
             type === 'secondary' && 'text-blue-primary',
           )}
@@ -24,7 +24,7 @@ function CountDownTimer({ type = 'primary' | 'secondary' }) {
         </span>
         <span
           className={twMerge(
-            'text-[14px]',
+            'text-[14px] 1440:text-[45px]',
             type === 'primary' && 'text-white',
             type === 'secondary' && 'text-green-primary',
           )}
@@ -34,7 +34,7 @@ function CountDownTimer({ type = 'primary' | 'secondary' }) {
         <span
           suppressHydrationWarning={true}
           className={twMerge(
-            'text-[30px]',
+            'text-[30px] 1440:text-[100px] leading-none',
             type === 'primary' && 'text-white',
             type === 'secondary' && 'text-blue-primary',
           )}
@@ -43,7 +43,7 @@ function CountDownTimer({ type = 'primary' | 'secondary' }) {
         </span>
         <span
           className={twMerge(
-            'text-[14px]',
+            'text-[14px] 1440:text-[45px]',
             type === 'primary' && 'text-white',
             type === 'secondary' && 'text-green-primary',
           )}
@@ -53,7 +53,7 @@ function CountDownTimer({ type = 'primary' | 'secondary' }) {
         <span
           suppressHydrationWarning={true}
           className={twMerge(
-            'text-[30px]',
+            'text-[30px] 1440:text-[100px] leading-none',
             type === 'primary' && 'text-white',
             type === 'secondary' && 'text-blue-primary',
           )}
@@ -62,7 +62,7 @@ function CountDownTimer({ type = 'primary' | 'secondary' }) {
         </span>
         <span
           className={twMerge(
-            'text-[14px]',
+            'text-[14px] 1440:text-[45px]',
             type === 'primary' && 'text-white',
             type === 'secondary' && 'text-green-primary',
           )}
@@ -72,7 +72,7 @@ function CountDownTimer({ type = 'primary' | 'secondary' }) {
         <span
           suppressHydrationWarning={true}
           className={twMerge(
-            'text-[30px]',
+            'text-[30px] 1440:text-[100px] leading-none',
             type === 'primary' && 'text-white',
             type === 'secondary' && 'text-blue-primary',
           )}
@@ -81,7 +81,7 @@ function CountDownTimer({ type = 'primary' | 'secondary' }) {
         </span>
         <span
           className={twMerge(
-            'text-[14px]',
+            'text-[14px] 1440:text-[45px]',
             type === 'primary' && 'text-white',
             type === 'secondary' && 'text-green-primary',
           )}

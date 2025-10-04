@@ -6,8 +6,8 @@ import { InfoDate, InfoDestination, InfoDistance, InfoDuration } from './'
 function Address() {
   return (
     <section className="root bg-orange-primary">
-      <div className="relative pt-[560px] max-w-[375px] mx-auto">
-        <div className="absolute top-[148px] left-7 w-[157px] aspect-[314/206]">
+      <div className="relative pt-[500px] pb-5 max-w-[375px] mx-auto">
+        <div className="absolute top-[120px] left-7 w-[157px] aspect-[314/206]">
           <Image
             src="/images/picture/05.jpg"
             alt="picture-05"
@@ -16,7 +16,7 @@ function Address() {
           />
         </div>
 
-        <div className="absolute z-10 top-44 right-7 w-[145px] aspect-[290/346]">
+        <div className="absolute z-10 top-[150px] right-7 w-[145px] aspect-[290/346]">
           <Image
             src="/images/picture/04.jpg"
             alt="picture-04"
@@ -25,7 +25,7 @@ function Address() {
           />
         </div>
 
-        <div className="absolute top-[300px] left-7 w-[277px] aspect-[554/284]">
+        <div className="absolute top-[266px] left-7 w-[277px] aspect-[554/284]">
           <Image
             src="/images/picture/03.jpg"
             alt="picture-04"
@@ -34,13 +34,11 @@ function Address() {
           />
         </div>
 
-        <div className="absolute top-[490px] left-12 w-[92px] aspect-[185/448]">
-          <Image
-            src="/images/particle-01.png"
-            alt="particle-01"
-            width={185}
-            height={448}
-          />
+        <div className="absolute top-[440px] left-[48px] z-10">
+          <p className="absolute left-[34px] top-[32px] w-4 h-4 bg-white" />
+          <p className="absolute z-20 left-0 top-[56px] w-[52px] h-[107px] bg-[linear-gradient(160deg,_#71F57C_0%,_rgba(113,245,124,0)_62%)]" />
+          <p className="absolute left-[38px] top-[106px] w-[28px] h-[28px] bg-[#70EEEA]" />
+          <p className="absolute left-[80px] top-0 w-[12px] h-[12px] bg-white" />
         </div>
 
         {/* 板橋 */}

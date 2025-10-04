@@ -17,10 +17,8 @@ export default function Root() {
         </ClientOnlyView>
       </div>
       <Main />
-      <div className="relative z-10">
-        <Slogan />
-      </div>
-      <Memory />
+      <Slogan className="relative z-20" />
+      <Memory className="relative z-10" />
       <Address />
       <Declaration />
       <InviteCard />
