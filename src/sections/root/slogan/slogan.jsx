@@ -22,12 +22,12 @@ function Slogan({ className }) {
           </p>
         </div>
 
-        <div className="absolute top-[140px] left-0 w-[90%] aspect-[714/408] 1440:w-[76%] 1440:left-auto 1440:right-0 1440:top-auto 1440:-bottom-[200px]">
+        <div className="absolute top-[140px] left-0 w-[90%] aspect-[1738/993] 1440:w-[76%] 1440:left-auto 1440:right-0 1440:top-auto 1440:-bottom-[200px]">
           <Image
             src="/images/picture/02.jpg"
             alt="slogan"
-            width={714}
-            height={408}
+            width={1738}
+            height={993}
             className="w-full"
           />
         </div>
