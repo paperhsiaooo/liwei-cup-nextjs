@@ -33,7 +33,7 @@ function Slogan({ className }) {
         </div>
 
         <div className="absolute top-80 -right-1 1440:right-[452px] 1440:top-auto 1440:-bottom-[230px]">
-          <p className="absolute -top-3 right-16 text-nowrap text-4xl text-white font-noto-sans-tc font-bold 1440:text-[111px] 1440:-top-9 1440:-right-[260px] 1440:font-extrabold">
+          <p className="absolute -top-3 right-16 text-nowrap text-4xl text-white font-noto-sans-tc font-bold 1440:text-[111px] 1440:-top-9 1440:-right-[320px] 1440:font-extrabold">
             你的名字
           </p>
           <div className="h-10 flex flex-row gap-x-1.5 1440:h-16">
