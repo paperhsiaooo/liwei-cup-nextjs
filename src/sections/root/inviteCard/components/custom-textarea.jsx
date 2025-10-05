@@ -1,8 +1,9 @@
 import { Controller, useFormContext } from 'react-hook-form'
 
 import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 
-function CustomTextarea({ disabled, name, placeholder }) {
+function CustomTextarea({ disabled, name, placeholder, className }) {
   const { control } = useFormContext()
 
   return (
@@ -12,7 +13,7 @@ function CustomTextarea({ disabled, name, placeholder }) {
       render={({ field }) => {
         return (
           <Textarea
-            className="text-sm font-anton h-40"
+            className={cn(className, 'text-sm font-anton h-40 1440:text-lg')}
             disabled={disabled}
             placeholder={placeholder}
             value={field.value}

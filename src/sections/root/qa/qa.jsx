@@ -12,7 +12,7 @@ function Qa() {
             <h1 className="font-anton font-normal leading-snug text-[84px] whitespace-nowrap 1440:leading-none">
               Q & A
             </h1>
-            <p className="text-base max-w-[260px] text-center mx-auto 1440:mx-0 1440:max-w-none 1440:text-left 1440:leading-tight 1440:pb-2 1440:ml-12">
+            <p className="text-base max-w-[260px] text-center mx-auto 1440:text-lg 1440:mx-0 1440:max-w-none 1440:text-left 1440:leading-tight 1440:pb-2 1440:ml-12">
               一起深度了解
               <br className="1440:hidden" />
               關於「リキイ 盃」的常見問題，
