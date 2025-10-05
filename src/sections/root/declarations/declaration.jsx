@@ -14,7 +14,7 @@ function Declaration() {
           </h3>
           <div className="relative w-full aspect-[2421/1537] my-6 1440:my-16">
             <Image
-              src={'/images/picture/01.jpg'}
+              src={'/images/picture/01.webp'}
               alt="declaration"
               width={2421}
               height={1537}
