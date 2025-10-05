@@ -27,13 +27,17 @@ function CustomSelect({ disabled, name, placeholder, options = [] }) {
               field.onChange(event)
             }}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full 1440:text-lg 1440:px-3 1440:py-5">
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {options.map(option => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="1440:text-lg"
+                  >
                     {option.label}
                   </SelectItem>
                 ))}

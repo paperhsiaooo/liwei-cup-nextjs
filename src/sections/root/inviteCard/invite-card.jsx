@@ -41,7 +41,7 @@ function InviteCard() {
 
   return (
     <section className="root bg-green-primary">
-      <div className="wrapper max-w-[350px] mx-auto">
+      <div className="wrapper max-w-[350px] mx-auto 1440:max-w-[934px]">
         {flagEnabled && (
           <>
             <div className="w-full max-w-[940px] mx-auto py-4">

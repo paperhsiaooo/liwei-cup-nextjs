@@ -26,29 +26,31 @@ function ProgressInviteForm() {
     <div className="flex flex-col gap-y-[110px] pt-6 pb-20">
       {!user.isLogin ? (
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col gap-y-4 max-w-[850px] mx-auto">
-            <h4 className="progress-title">邀請碼輸入</h4>
+          <div className="flex flex-col gap-y-4 max-w-[850px] mx-auto 1440:gap-y-6">
+            <h4 className="progress-title 1440:text-[34px]">邀請碼輸入</h4>
             <div className="">
               <RHFTextField
                 name="inviteCode"
                 type="text"
-                className="font-bold text-center text-blue-primary"
+                className="font-bold text-center bg-white/40 text-blue-primary min-h-[54px] py-12 px-4 1440:py-16"
               />
             </div>
             <button
               type="submit"
               className={twMerge('btn-primary', isPending && 'bg-gray-400')}
             >
-              <span className="text-white text-base">下一步</span>
+              <span className="text-white text-base 1440:text-[22px]">
+                下一步
+              </span>
             </button>
           </div>
         </FormProvider>
       ) : (
         <div className="flex flex-col items-center gap-y-6">
-          <h4 className="progress-title">加入 Line 群組</h4>
+          <h4 className="progress-title 1440:text-[34px]">加入 Line 群組</h4>
           <Link
             href="https://line.me/ti/g/tjntwUbYwt"
-            className="relative w-32 aspect-square"
+            className="relative w-32 aspect-square 1440:w-[160px]"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -64,7 +66,7 @@ function ProgressInviteForm() {
             className={twMerge('btn-primary', isPending && 'bg-gray-400')}
             onClick={handleOnLineNextBtnClick}
           >
-            <span className="text-white text-base leading-none">
+            <span className="text-white text-base leading-none 1440:text-[22px]">
               下一步 ｜ 填寫資料
             </span>
           </button>
