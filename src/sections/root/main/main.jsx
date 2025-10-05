@@ -7,7 +7,7 @@ function Main() {
     <section className="root overflow-hidden">
       <div className="aspect-[397/250] w-[200px] absolute z-0 left-1/2 -translate-x-1/2 1440:w-[700px]">
         <Image
-          src="/images/win-01.png"
+          src="/images/win-01.webp"
           alt="main-bg"
           className="object-cover w-full"
           width={397}
@@ -20,7 +20,7 @@ function Main() {
         <div className="absolute z-0 top-[320px] bg-[#FFCC05] w-full h-[500px] 1440:top-[394px]" />
         <div className="relative z-20 aspect-[924/1102] w-[320px] left-1/2 -translate-x-1/2 mb-4 1440:w-[400px]">
           <Image
-            src="/images/main-cover-02.png"
+            src="/images/main-cover-02.webp"
             alt="main-bg"
             className="object-cover"
             priority
