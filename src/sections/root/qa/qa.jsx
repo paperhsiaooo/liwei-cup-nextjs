@@ -22,9 +22,6 @@ function Qa() {
           </div>
           <QaContainer />
         </div>
-        <p className="text-base text-[#233145]/30 font-noto-sans-tc text-center">
-          #リキイ 盃 2025
-        </p>
       </div>
     </section>
   )
