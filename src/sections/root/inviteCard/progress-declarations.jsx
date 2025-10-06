@@ -43,8 +43,8 @@ function ProgressDeclarations() {
       methods={methods}
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="relative rounded-[8px] bg-white px-4 pb-5 pt-3 flex flex-col gap-y-3">
-        <div className="absolute top-5 left-5 w-[19px] aspect-square">
+      <div className="relative rounded-[8px] bg-white px-4 pb-5 pt-3 flex flex-col gap-y-3 1440:gap-y-4 1440:px-5 1440:pb-6 1440:pt-4">
+        <div className="absolute top-5 left-5 w-[19px] aspect-square 1440:top-6">
           <Image
             src="/images/random.png"
             alt="icon"
@@ -52,11 +52,12 @@ function ProgressDeclarations() {
             className="object-cover"
           />
         </div>
+
         <h3 className="text-[22px] leading-normal font-bold text-blue-primary text-center">
           我的參戰宣言
         </h3>
 
-        <div className="flex flex-col gap-y-3">
+        <div className="flex flex-col gap-y-3 1440:gap-y-4">
           <CustomSelect
             disabled={isLoading}
             name="declaration1"
@@ -76,10 +77,12 @@ function ProgressDeclarations() {
             options={options3}
           />
         </div>
+
         <CustomTextarea
           disabled={isLoading}
           name="messageToOrganizer"
           placeholder="預計要跟主辦方說的話"
+          className="1440:!text-lg 1440:px-3"
         />
       </div>
       <button type="submit" className={twMerge('btn-primary')}>

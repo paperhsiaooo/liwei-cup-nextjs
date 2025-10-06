@@ -11,7 +11,7 @@ export default function ProgressPoint({ active = false, text = '' }) {
       />
       <p
         className={twMerge(
-          'text-white text-sm font-bold',
+          'text-white text-sm font-bold 1440:text-lg',
           active && 'text-blue-primary',
         )}
       >

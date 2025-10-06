@@ -25,7 +25,7 @@ export default function RHFTextField({ name, type, className, ...other }) {
             }}
             {...other}
             className={twMerge(
-              'text-xl bg-white/40 rounded-[14px] min-h-[54px] py-12 px-4 outline-none',
+              'text-xl rounded-[14px] outline-none',
               className,
             )}
           />
