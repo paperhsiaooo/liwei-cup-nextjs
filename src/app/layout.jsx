@@ -84,7 +84,6 @@ export const metadata = {
 import { Anton, Antonio, Noto_Sans_JP, Noto_Sans_TC } from 'next/font/google'
 
 import PostHogProvider from '@/provider/post-hog-provider'
-import { Footer } from '@/sections/root/footer'
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ['latin'],
@@ -210,10 +209,7 @@ async function RootLayout({ children }) {
       >
         <AppProvider>
           <PostHogProvider>
-            <GlobalComponents>
-              {children}
-              <Footer />
-            </GlobalComponents>
+            <GlobalComponents>{children}</GlobalComponents>
           </PostHogProvider>
         </AppProvider>
         {process.env.NODE_ENV === 'production' &&
