@@ -8,8 +8,8 @@ import CardList from './card-list'
 
 const getUserBattleDeclarations = async () => {
   try {
-    const origin = process.env.BASE_URL || ''
-    const res = await fetch(`${origin}/api/list/getBattleDeclarationList`, {
+    const url = `${URL.BattleListCDN}${VERSION.MemberDeclarationsCDN}/website/declaration_data.json`
+    const res = await fetch(url, {
       next: {
         revalidate: 60 * 5,
         tags: [CACHE_KEY.BATTLE_DECLARATIONS],
@@ -21,7 +21,7 @@ const getUserBattleDeclarations = async () => {
     }
 
     const data = await res.json()
-    return data.data
+    return data
   } catch (error) {
     console.error('>>> [getBattleDeclarations] error: ', error)
     return []
@@ -31,7 +31,6 @@ const getUserBattleDeclarations = async () => {
 const getDeclarationsOptions = async () => {
   try {
     const url = `${URL.BattleListCDN}${VERSION.BattleListCDN}/DeclarationsList.json`
-
     const res = await fetch(url, {
       next: {
         revalidate: 60 * 60 * 24,
