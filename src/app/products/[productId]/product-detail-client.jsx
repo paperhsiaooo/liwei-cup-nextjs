@@ -13,6 +13,7 @@ const FALLBACK_IMAGE = 'https://picsum.photos/640/640'
 
 const uniqueList = list =>
   Array.from(
+    // eslint-disable-next-line no-undef
     new Set(
       (Array.isArray(list) ? list : [])
         .filter(Boolean)
@@ -135,12 +136,15 @@ function ProductDetailClient({ product }) {
 
     const productId = product?.productId || product?.id
     const primaryImage =
-      images.length > 0 ? images[0] : product?.heroImage || product?.image || FALLBACK_IMAGE
+      images.length > 0
+        ? images[0]
+        : product?.heroImage || product?.image || FALLBACK_IMAGE
 
     addItem({
       productId,
       name: product?.name || '商品',
-      price: typeof product?.price === 'number' ? product.price : product?.amount,
+      price:
+        typeof product?.price === 'number' ? product.price : product?.amount,
       image: primaryImage,
       color: selectedColor || '',
       size: selectedSize || '',

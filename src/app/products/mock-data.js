@@ -88,4 +88,4 @@ const getMockProduct = productId => {
 
 const getMockProductList = () => MOCK_PRODUCTS
 
-export { MOCK_PRODUCTS, getMockProduct, getMockProductList }
+export { getMockProduct, getMockProductList, MOCK_PRODUCTS }

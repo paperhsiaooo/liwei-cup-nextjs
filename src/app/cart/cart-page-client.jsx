@@ -78,9 +78,7 @@ function CartPageClient() {
 
             <div className="divide-y">
               {items.map(item => {
-                const rowSubtotal = formatCurrencyNT(
-                  item.price * item.quantity,
-                )
+                const rowSubtotal = formatCurrencyNT(item.price * item.quantity)
                 return (
                   <article
                     key={item.id}

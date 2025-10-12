@@ -6,6 +6,7 @@ import ProductDetailClient from './product-detail-client'
 
 const getProduct = cache(async productId => {
   // Mimic async latency so the component behaviour stays intact.
+  // eslint-disable-next-line no-undef
   await new Promise(resolve => setTimeout(resolve, 100))
 
   return getMockProduct(productId)
