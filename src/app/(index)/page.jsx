@@ -2,7 +2,6 @@ import ClientOnlyView from '@/components/common/client-only/client-only-view'
 import ConfettiView from '@/components/confetti-view'
 import { Address } from '@/sections/root/address'
 import { Declaration } from '@/sections/root/declarations'
-import { Footer } from '@/sections/root/footer'
 import { InviteCard } from '@/sections/root/inviteCard'
 import { Main } from '@/sections/root/main'
 import { Memory } from '@/sections/root/memory'
@@ -24,7 +23,6 @@ export default function Root() {
       <Declaration />
       <InviteCard />
       <Qa />
-      <Footer />
     </main>
   )
 }
