@@ -12,6 +12,7 @@ function Main() {
           className="object-cover w-full"
           width={397}
           height={250}
+          priority
         />
       </div>
       <div className="relative z-10 pt-[50px] pb-10">
