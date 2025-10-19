@@ -246,7 +246,7 @@ import { RHFShadcnSelect } from '@/components/common/hook-form/rhf-shadcn-select
 
 ## 📚 相關文檔
 
-- [UI Framework Policy](./UI_FRAMEWORK_POLICY.md)
+- [UI Framework Policy](../.cursor/rules/ui-framework-policy.mdc)
 - [shadcn/ui 官方文檔](https://ui.shadcn.com/)
 - [Checkout UI Redesign Report](./CHECKOUT_UI_REDESIGN_REPORT.md)
 

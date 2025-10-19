@@ -145,14 +145,16 @@ Query、Zustand 與 Tailwind CSS 4，支援前後端 API 串接與資料快取�
 - Tailwind CSS 4 採用 `@tailwindcss/postcss`；共用樣式集中於
   `src/app/index.css`，並定義 `root` / `wrapper` / `btn-primary` 等公用 class。
 - **UI Framework 政策**：僅允許使用 shadcn/ui，詳見
-  [UI Framework Policy](./docs/UI_FRAMEWORK_POLICY.md)。
+  [UI Framework Policy](./.cursor/rules/ui-framework-policy.mdc)。
 - **Material-UI 遷移計劃**：正在進行中，詳見
   [Migration from MUI](./docs/MIGRATION_FROM_MUI.md)。
 
 ## 文檔資源
 
 - **開發規範**
-  - [UI Framework Policy](./docs/UI_FRAMEWORK_POLICY.md) -
+  - [AI Development Workflow](./docs/AI_DEVELOPMENT_WORKFLOW.md) -
+    AI 協助開發工作流程指南（含 UI 驗證規範）
+  - [UI Framework Policy](./.cursor/rules/ui-framework-policy.mdc) -
     UI 組件庫使用政策（僅 shadcn/ui）
   - [Migration from MUI](./docs/MIGRATION_FROM_MUI.md) -
     Material-UI 遷移計劃與進度
