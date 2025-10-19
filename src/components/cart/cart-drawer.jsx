@@ -51,7 +51,7 @@ function CartDrawer() {
       <DrawerContent className="grid grid-rows-[auto,1fr,auto] p-0">
         <DrawerHeader className="flex flex-row items-center justify-between border-b px-6 py-4">
           <DrawerTitle className="text-xl font-anton text-blue-primary">
-            Shopping Cart
+            購物車
           </DrawerTitle>
           <DrawerClose asChild>
             <button
@@ -79,7 +79,7 @@ function CartDrawer() {
         <div className="overflow-y-auto px-6 py-4">
           {items.length === 0 ? (
             <p className="py-24 text-center text-sm text-muted-foreground">
-              Your Shopping Cart is empty.
+              您的購物車是空的
             </p>
           ) : (
             <div className="flex flex-col gap-5">
@@ -170,7 +170,7 @@ function CartDrawer() {
               className="h-12 w-full bg-green-primary text-blue-primary hover:bg-green-primary/90"
               onClick={handleCheckoutClick}
             >
-              Checkout
+              前往結帳
             </Button>
           </DrawerFooter>
         ) : null}
