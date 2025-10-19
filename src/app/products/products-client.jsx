@@ -1,42 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
+import { useProducts } from '@/apis/hook/use-products'
 import Loader from '@/components/common/loader'
-import Product from '@/sections/products/components/product'
-
-import { getMockProductList } from './mock-data'
+import { ProductsView } from '@/sections/products/views'
 
 function ProductsClient() {
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  // 使用 React Query hook 取得商品列表
+  const { data, isLoading, error } = useProducts()
 
-  useEffect(() => {
-    let mounted = true
-    setError('')
-    setLoading(true)
-
-    const timer = setTimeout(() => {
-      if (!mounted) return
-      try {
-        const list = getMockProductList()
-        setProducts(Array.isArray(list) ? list : [])
-      } catch (err) {
-        console.error('>>> [ProductsClient] load mock error: ', err)
-        setError('發生錯誤')
-      } finally {
-        setLoading(false)
-      }
-    }, 120)
-
-    return () => {
-      mounted = false
-      clearTimeout(timer)
-    }
-  }, [])
-
-  if (loading) {
+  // Loading 狀態
+  if (isLoading) {
     return (
       <div className="flex justify-center py-16">
         <Loader />
@@ -44,45 +17,23 @@ function ProductsClient() {
     )
   }
 
+  // 錯誤狀態
   if (error) {
-    return <div className="p-10 text-red-500">{error}</div>
+    const errorMessage =
+      error?.error?.message || error?.message || '發生錯誤，請稍後再試'
+
+    return (
+      <div className="p-10 text-center text-red-500">
+        <p className="text-lg font-bold">{errorMessage}</p>
+        <p className="text-sm mt-2">請稍後再試</p>
+      </div>
+    )
   }
 
-  return (
-    <section className="root">
-      <div className="wrapper py-8 1440:py-12">
-        <div className="flex flex-col items-center text-blue-primary mb-6 1440:mb-10">
-          <h1 className="font-anton font-normal leading-none text-[48px] 1440:text-[84px]">
-            PRODUCTS
-          </h1>
-          <p className="text-center text-base font-noto-sans-tc 1440:text-lg">
-            換取你的紀念時刻
-          </p>
-        </div>
+  // 取得商品資料
+  const products = data?.data?.products || []
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2">
-          {products.map(p => (
-            <Product.Container
-              key={p.productId}
-              href={p?.productId ? `/products/${p.productId}` : undefined}
-            >
-              <Product.Content
-                name={p.name}
-                description={p.description}
-                image={
-                  (Array.isArray(p?.images) && p.images.length > 0
-                    ? p.images[0]
-                    : p.heroImage || p.image) ?? 'https://picsum.photos/640/640'
-                }
-                price={p.price ?? undefined}
-                tag={p.tag ?? undefined}
-              />
-            </Product.Container>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
+  return <ProductsView initialProducts={products} />
 }
 
 export default ProductsClient

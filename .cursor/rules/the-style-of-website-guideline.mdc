@@ -626,6 +626,140 @@ test: 新增單元測試
 chore: 更新依賴套件
 ```
 
+### ⚠️ AI 協助開發時的強制檢查流程
+
+> **重要提醒**：這是 AI 協助開發時必須遵循的流程，不可跳過！
+
+當 AI 完成任何程式碼開發後，**必須**執行以下步驟才能提交給使用者：
+
+#### 🔍 步驟 1：執行 Linting 檢查
+
+```bash
+yarn lint
+```
+
+**目的**：
+
+- 檢查程式碼風格是否符合專案規範
+- 發現潛在的程式碼問題（unused variables, import errors 等）
+- 確保 import 順序正確（`simple-import-sort` 規則）
+
+**常見問題與解法**：
+
+1. **Import 順序錯誤**
+
+   ```bash
+   yarn lint --fix  # 自動修復 import 順序
+   ```
+
+2. **Unused variables**
+
+   - 移除未使用的變數
+   - 或使用 `// eslint-disable-next-line no-unused-vars` 註釋（需要充分理由）
+
+3. **測試文件的 Jest globals undefined**
+   - 確認 `.eslintrc.json` 的 `overrides` 配置正確
+   - 測試文件應該自動套用 Jest 環境設定
+
+#### 🏗️ 步驟 2：執行 Build 檢查
+
+```bash
+yarn build
+```
+
+**目的**：
+
+- 確保專案可以成功建置
+- Next.js build 會執行更嚴格的類型和語法檢查
+- 驗證所有 import 路徑正確
+- 檢查 Server/Client Component 使用是否正確
+
+**常見問題與解法**：
+
+1. **環境變數缺失 (`Promise is not defined`)**
+
+   - 檢查 `.eslintrc.json` 是否包含正確的 `env` 設定
+
+   ```json
+   {
+     "env": {
+       "browser": true,
+       "es2021": true,
+       "node": true
+     }
+   }
+   ```
+
+2. **模組解析失敗**
+
+   - 檢查 import 路徑是否正確
+   - 確認 `@/` alias 設定正確
+   - 驗證檔案確實存在於指定位置
+
+3. **Client Component 使用錯誤**
+   - 確保使用 React Hooks 的組件有 `'use client'` 宣告
+   - Server Component 不能使用 `useState`, `useEffect` 等 hooks
+
+#### ✅ 步驟 3：全部通過才能提交
+
+**成功標準**：
+
+- ✅ `yarn lint` 執行成功 (Exit code: 0)
+- ✅ `yarn build` 執行成功 (Exit code: 0)
+- ✅ 只有 warnings 可以接受（errors 必須修復）
+
+**失敗處理**：
+
+1. 詳細分析錯誤訊息
+2. 根據專案架構規範提出最佳解決方案
+3. 修復所有錯誤
+4. 重新執行步驟 1 和 2
+5. 確認全部通過後才提交程式碼
+
+#### 📋 檢查清單範本
+
+在每次開發完成後，確認以下項目：
+
+```markdown
+- [ ] 執行 `yarn lint` - 通過
+- [ ] 執行 `yarn lint --fix` - 自動修復可修復的問題
+- [ ] 執行 `yarn build` - 通過
+- [ ] 檢查並修復所有 Error（Warnings 可接受）
+- [ ] 驗證新增/修改的檔案符合專案架構
+- [ ] 確認 import 路徑使用 `@/` alias
+- [ ] 檢查是否有未使用的 import 或變數
+```
+
+#### 🚫 絕對不可以
+
+- ❌ 跳過 lint 或 build 檢查就提交程式碼
+- ❌ 使用 `// eslint-disable` 來隱藏應該修復的問題
+- ❌ 提交有 Error 的程式碼（Warnings 可以，但要有充分理由）
+- ❌ 假設「應該沒問題」而不實際執行檢查
+- ❌ 依賴 `read_lints` 工具而不執行完整的 `yarn lint` 和 `yarn build`
+
+#### 💡 最佳實踐
+
+1. **開發過程中隨時檢查**
+
+   - 完成一個小功能就執行一次 lint
+   - 不要等到全部開發完才檢查
+
+2. **使用 lint --fix 自動修復**
+
+   - 大部分格式問題可以自動修復
+   - 節省手動調整時間
+
+3. **理解錯誤訊息**
+
+   - 不要只是消除錯誤，要理解為什麼會有錯誤
+   - 學習如何預防類似問題
+
+4. **保持專案配置最新**
+   - `.eslintrc.json` 的環境和規則設定
+   - `jest.config.js` 的測試配置
+   - `next.config.mjs` 的 Next.js 配置
+
 ### 程式碼異動檢查流程
 
 #### 1. 開發階段

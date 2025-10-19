@@ -5,6 +5,12 @@ export const paths = {
 export const PATH = {
   root: '/',
 
+  // 商品相關
+  products: {
+    list: '/products',
+    detail: productId => `/products/${productId}`,
+  },
+
   // 認證相關
   auth: {
     login: '/auth/login',
@@ -15,5 +21,17 @@ export const PATH = {
   // 設定頁面
   settings: {
     profile: '/settings/profile',
+  },
+
+  // 購物流程
+  cart: '/cart',
+  checkout: {
+    root: '/checkout',
+    pay: '/checkout/pay',
+  },
+
+  // 完成頁面
+  shop: {
+    complete: '/shop/complete',
   },
 }

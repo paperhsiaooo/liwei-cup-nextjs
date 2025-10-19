@@ -1,5 +1,6 @@
 'use client'
 
+import { ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -17,7 +18,6 @@ import {
 } from '@/components/ui/drawer'
 import useCartStore from '@/store/cart-context'
 import { formatCurrencyNT } from '@/utils/currency'
-import { ShoppingCart } from 'lucide-react'
 
 function CartDrawer() {
   const router = useRouter()
