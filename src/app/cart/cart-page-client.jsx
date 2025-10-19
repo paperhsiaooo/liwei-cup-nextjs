@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useMemo } from 'react'
 
+import CheckoutProgress from '@/components/common/checkout-progress'
 import { Button } from '@/components/ui/button'
 import useCartStore from '@/store/cart-context'
 import { formatCurrencyNT } from '@/utils/currency'
@@ -45,6 +46,9 @@ function CartPageClient() {
   return (
     <section className="root">
       <div className="wrapper py-10 1440:py-14">
+        {/* 進度指示器 */}
+        <CheckoutProgress currentStep={1} />
+
         <div className="mb-8 space-y-3">
           <h1 className="font-anton text-4xl text-blue-primary">購物車</h1>
           <p className="font-noto-sans-tc text-muted-foreground">
