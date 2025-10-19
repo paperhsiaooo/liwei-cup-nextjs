@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { showSuccessToast } from '@/utils/toast'
 import { ImageSlider } from '@/components/ui/image-slider'
 import { cn } from '@/lib/utils'
 import useCartStore from '@/store/cart-context'
@@ -153,6 +154,11 @@ function ProductDetailClient({ product }) {
       size: selectedSize || '',
       quantity,
     })
+
+    showSuccessToast({
+      title: '加入成功',
+      description: '商品已加入購物車',
+    })
   }, [
     addItem,
     images,
@@ -189,6 +195,11 @@ function ProductDetailClient({ product }) {
       color: selectedColor || '',
       size: selectedSize || '',
       quantity,
+    })
+
+    showSuccessToast({
+      title: '加入成功',
+      description: '商品已加入購物車',
     })
 
     // 導向購物車頁面
