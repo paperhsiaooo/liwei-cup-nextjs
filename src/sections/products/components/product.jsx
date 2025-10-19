@@ -23,10 +23,12 @@ function Container({ children, className, href, onClick }) {
 }
 
 function Content({ name, description, image, tag, price }) {
-  const displayPrice =
-    typeof price !== 'undefined' && price !== null && price !== ''
-      ? formatCurrencyNT(price)
-      : ''
+  const shouldDisplayPrice =
+    typeof price === 'number'
+      ? price > 0
+      : price !== undefined && price !== null && price !== ''
+
+  const displayPrice = shouldDisplayPrice ? formatCurrencyNT(price) : ''
 
   return (
     <div className="relative">
