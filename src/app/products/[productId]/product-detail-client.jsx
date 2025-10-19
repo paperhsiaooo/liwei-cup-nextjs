@@ -9,6 +9,7 @@ import { ImageSlider } from '@/components/ui/image-slider'
 import { cn } from '@/lib/utils'
 import useCartStore from '@/store/cart-context'
 import { formatCurrencyNT } from '@/utils/currency'
+import { showSuccessToast } from '@/utils/toast'
 
 const FALLBACK_IMAGE = 'https://picsum.photos/640/640'
 
@@ -115,10 +116,8 @@ function ProductDetailClient({ product }) {
   const [selectedColor, setSelectedColor] = useState(colors[0] || '')
   const [selectedSize, setSelectedSize] = useState(sizes[0] || '')
   const [quantity, setQuantity] = useState(1)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isImageLoading, setIsImageLoading] = useState(true)
   const [showImageModal, setShowImageModal] = useState(false)
-  const [error, setError] = useState(null)
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0)
 
   const activeImage =
@@ -155,6 +154,11 @@ function ProductDetailClient({ product }) {
       size: selectedSize || '',
       quantity,
     })
+
+    showSuccessToast({
+      title: '加入成功',
+      description: '商品已加入購物車',
+    })
   }, [
     addItem,
     images,
@@ -170,42 +174,45 @@ function ProductDetailClient({ product }) {
     selectedSize,
   ])
 
-  const handleBuyNow = useCallback(async () => {
-    if (!product?.productId || isSubmitting) return
-
-    try {
-      setIsSubmitting(true)
-      setError(null)
-      const res = await fetch('/api/checkout/intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: product.productId,
-          quantity,
-          email: 'test@test.com',
-          color: selectedColor || undefined,
-          size: selectedSize || undefined,
-        }),
-        credentials: 'same-origin',
-      })
-
-      if (res.redirected) {
-        router.push(res.url)
-        return
-      }
-
-      if (!res.ok) {
-        const maybeJson = await res.json().catch(() => null)
-        throw new Error(maybeJson?.error || 'Request failed')
-      }
-    } catch (error) {
-      console.error('[product-detail] handleBuyNow error: ', error)
-      setError('購買過程中發生錯誤，請稍後再試')
-    } finally {
-      setIsSubmitting(false)
+  const handleBuyNow = useCallback(() => {
+    if (!product?.productId && !product?.id) {
+      return
     }
+
+    // 先加入購物車
+    const productId = product?.productId || product?.id
+    const primaryImage =
+      images.length > 0
+        ? images[0]
+        : product?.heroImage || product?.image || FALLBACK_IMAGE
+
+    addItem({
+      productId,
+      name: product?.name || '商品',
+      price:
+        typeof product?.price === 'number' ? product.price : product?.amount,
+      image: primaryImage,
+      color: selectedColor || '',
+      size: selectedSize || '',
+      quantity,
+    })
+
+    showSuccessToast({
+      title: '加入成功',
+      description: '商品已加入購物車',
+    })
+
+    // 導向購物車頁面
+    router.push('/cart')
   }, [
-    isSubmitting,
+    addItem,
+    images,
+    product?.amount,
+    product?.heroImage,
+    product?.id,
+    product?.image,
+    product?.name,
+    product?.price,
     product?.productId,
     quantity,
     router,
@@ -555,19 +562,6 @@ function ProductDetailClient({ product }) {
           </div>
         </section>
 
-        {error ? (
-          <div className="mt-2 rounded-lg bg-red-50 border border-red-200 p-3">
-            <p className="text-sm text-red-600">{error}</p>
-            <button
-              type="button"
-              onClick={() => setError(null)}
-              className="mt-2 text-xs text-red-500 hover:text-red-700 underline cursor-pointer"
-            >
-              關閉
-            </button>
-          </div>
-        ) : null}
-
         <div className="mt-2 flex flex-col gap-3 sm:flex-row">
           <Button
             variant="outline"
@@ -579,9 +573,8 @@ function ProductDetailClient({ product }) {
           <Button
             className="h-12 flex-1 bg-green-primary text-sm font-anton tracking-widest text-blue-primary hover:bg-green-primary/90 cursor-pointer"
             onClick={handleBuyNow}
-            disabled={isSubmitting}
           >
-            {isSubmitting ? '處理中…' : '立即購買'}
+            立即購買
           </Button>
         </div>
       </div>

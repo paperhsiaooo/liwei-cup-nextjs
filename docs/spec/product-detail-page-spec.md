@@ -549,6 +549,7 @@ src/
 
 - ✅ 購物車項目正確建立
 - ✅ Cart Store 正確更新
+- ✅ 顯示「加入成功」Toast（樣式依 `docs/spec/toast-style-spec.md`）
 - ✅ 購物車抽屜顯示新增項目
 - ✅ 相同規格商品數量累加
 
@@ -1329,6 +1330,7 @@ A: 手機版關閉按鈕放在上方避免被螢幕邊界遮住，桌面版放�
 **相關文檔**：
 
 - [商品列表頁面規格書](./products-page-spec.md)
+- [Toast Style 指南](../toast-style-spec.md)
 - [購物車頁面規格書](./cart-page-spec.md)（未來）
 - [結帳頁面規格書](./checkout-page-spec.md)（未來）
 
