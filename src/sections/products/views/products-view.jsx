@@ -5,13 +5,19 @@ import { useEffect, useState } from 'react'
 import { PATH } from '@/routers/path'
 import Product from '@/sections/products/components/product'
 
-function ProductsView({ initialProducts = [] }) {
-  const [products, setProducts] = useState(initialProducts)
+function ProductsView({ initialProducts }) {
+  const safeInitialProducts = Array.isArray(initialProducts)
+    ? initialProducts
+    : []
+
+  const [products, setProducts] = useState(safeInitialProducts)
 
   // 如果沒有初始資料，可以在這裡載入
   useEffect(() => {
-    if (initialProducts.length > 0) {
+    if (Array.isArray(initialProducts)) {
       setProducts(initialProducts)
+    } else {
+      setProducts([])
     }
   }, [initialProducts])
 

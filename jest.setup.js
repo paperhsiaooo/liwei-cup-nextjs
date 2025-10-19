@@ -4,17 +4,21 @@ import '@testing-library/jest-dom'
 // Mock Next.js Image component
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: props => {
+  default: ({ fill, ...rest }) => {
     // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
-    return <img {...props} />
+    return <img {...rest} />
   },
 }))
 
 // Mock Next.js Link component
 jest.mock('next/link', () => ({
   __esModule: true,
-  default: ({ children, href }) => {
-    return <a href={href}>{children}</a>
+  default: ({ children, href, ...rest }) => {
+    return (
+      <a href={href} {...rest}>
+        {children}
+      </a>
+    )
   },
 }))
 
