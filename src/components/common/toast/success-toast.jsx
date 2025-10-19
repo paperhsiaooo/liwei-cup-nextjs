@@ -1,8 +1,8 @@
 'use client'
 
-import { X, CheckCircle } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { CheckCircle, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 function SuccessToast({
   toastId,

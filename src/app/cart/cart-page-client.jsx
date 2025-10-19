@@ -16,11 +16,6 @@ function CartPageClient() {
   const decrementItem = useCartStore(state => state.decrementItem)
   const removeItem = useCartStore(state => state.removeItem)
 
-  const itemCount = useMemo(
-    () => items.reduce((total, item) => total + item.quantity, 0),
-    [items],
-  )
-
   const subtotal = useMemo(
     () => items.reduce((total, item) => total + item.price * item.quantity, 0),
     [items],

@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { showSuccessToast } from '@/utils/toast'
 import { ImageSlider } from '@/components/ui/image-slider'
 import { cn } from '@/lib/utils'
 import useCartStore from '@/store/cart-context'
 import { formatCurrencyNT } from '@/utils/currency'
+import { showSuccessToast } from '@/utils/toast'
 
 const FALLBACK_IMAGE = 'https://picsum.photos/640/640'
 
