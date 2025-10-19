@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/drawer'
 import useCartStore from '@/store/cart-context'
 import { formatCurrencyNT } from '@/utils/currency'
+import { ShoppingCart } from 'lucide-react'
 
 function CartDrawer() {
   const router = useRouter()
@@ -36,25 +37,10 @@ function CartDrawer() {
       <DrawerTrigger asChild>
         <button
           type="button"
-          className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-blue-primary bg-white text-blue-primary transition-colors hover:bg-blue-primary hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-primary 1440:h-11 1440:w-11"
+          className="relative grid h-10 w-10 place-items-center rounded-full border border-blue-primary bg-white text-blue-primary transition-colors hover:bg-blue-primary hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-primary 1440:h-11 1440:w-11"
           aria-label="開啟購物車"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="size-5"
-            aria-hidden
-          >
-            <circle cx="9" cy="20" r="1" />
-            <circle cx="17" cy="20" r="1" />
-            <path d="M5 4h2l2.68 9.39a1 1 0 0 0 .96.71h7.72a1 1 0 0 0 .96-.73L21 6H7" />
-          </svg>
+          <ShoppingCart className="size-5" aria-hidden />
           {itemCount > 0 ? (
             <span className="absolute -right-1 -top-1 inline-flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-orange-primary px-1 text-[10px] font-bold text-white">
               {itemCount}
