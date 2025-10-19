@@ -471,6 +471,94 @@ process.env.NEXT_PUBLIC_GA_ID
 // ✅ 使用 Radix UI 已包含無障礙支援
 ```
 
+### 測試驅動開發
+
+#### 1. 可測試的程式碼設計
+
+```jsx
+// ✅ 推薦：純函數，易於測試
+function calculateTotal(items) {
+  return items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+}
+
+// ✅ 推薦：分離業務邏輯和 UI 邏輯
+function useCartTotal(items) {
+  return useMemo(() => calculateTotal(items), [items])
+}
+
+// ❌ 避免：業務邏輯與 UI 緊耦合
+function CartComponent() {
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  return <div>Total: {total}</div>
+}
+```
+
+#### 2. 組件測試最佳實踐
+
+```jsx
+// ✅ 使用 data-testid 進行測試
+;<button data-testid="add-to-cart" onClick={handleAddToCart}>
+  加入購物車
+</button>
+
+// ✅ 提供可預測的 props 介面
+function ProductCard({
+  id,
+  name,
+  price,
+  onAddToCart,
+  testId = 'product-card',
+}) {
+  return (
+    <div data-testid={testId}>
+      <h3>{name}</h3>
+      <span>{price}</span>
+      <button onClick={() => onAddToCart(id)}>Add</button>
+    </div>
+  )
+}
+```
+
+#### 3. 測試檔案結構
+
+```
+src/
+├── components/
+│   └── product-card.jsx
+├── __tests__/
+│   └── product-card.test.jsx
+└── utils/
+    └── calculate-total.js
+    └── __tests__/
+        └── calculate-total.test.js
+```
+
+#### 4. 測試覆蓋率要求
+
+- **單元測試**：工具函數、自定義 hooks 需達到 80% 以上覆蓋率
+- **組件測試**：關鍵業務組件需有基本渲染和互動測試
+- **整合測試**：重要用戶流程（如購物車、表單提交）需有端到端測試
+
+#### 5. 測試執行流程
+
+```bash
+# 開發時執行測試
+npm run test
+
+# 提交前執行完整測試
+npm run test:ci
+
+# 監控測試覆蓋率
+npm run test:coverage
+```
+
+#### 6. 測試工具建議
+
+- **Jest** - 測試框架
+- **React Testing Library** - 組件測試
+- **Playwright** - 端到端測試
+- **MSW** - API 模擬
+
 ### 字體使用
 
 專案使用以下 Google Fonts：
@@ -538,6 +626,45 @@ test: 新增單元測試
 chore: 更新依賴套件
 ```
 
+### 程式碼異動檢查流程
+
+#### 1. 開發階段
+
+- [ ] 撰寫程式碼時考慮可測試性
+- [ ] 分離業務邏輯與 UI 邏輯
+- [ ] 使用純函數處理計算邏輯
+- [ ] 為關鍵功能添加 `data-testid` 屬性
+
+#### 2. 提交前檢查
+
+- [ ] 執行單元測試：`npm run test`
+- [ ] 執行組件測試：`npm run test:components`
+- [ ] 檢查測試覆蓋率：`npm run test:coverage`
+- [ ] 執行 linting：`npm run lint`
+- [ ] 執行類型檢查（如有 TypeScript）
+
+#### 3. 部署前檢查
+
+- [ ] 執行完整測試套件：`npm run test:ci`
+- [ ] 執行端到端測試：`npm run test:e2e`
+- [ ] 驗證關鍵用戶流程
+- [ ] 檢查效能回歸測試
+
+#### 4. 測試失敗處理
+
+```bash
+# 如果測試失敗，必須修復後才能提交
+npm run test -- --watch  # 監控模式修復測試
+npm run test:debug       # 除錯模式
+```
+
+#### 5. 測試驅動開發流程
+
+1. **Red** - 寫一個失敗的測試
+2. **Green** - 寫最少的程式碼讓測試通過
+3. **Refactor** - 重構程式碼，保持測試通過
+4. **Repeat** - 重複上述流程
+
 ## ⚠️ 注意事項
 
 ### 1. Feature Flags
@@ -574,16 +701,40 @@ const flagEnabled = useFeatureFlagEnabled('feature-name')
 
 ## 🚀 部署前檢查
 
+### 程式碼品質
+
+- [ ] 所有測試通過（單元測試、組件測試、整合測試）
+- [ ] 測試覆蓋率達到要求（工具函數 80% 以上）
+- [ ] 程式碼 linting 通過
+- [ ] 無 console.log 或 debug 程式碼遺留
+
+### 功能驗證
+
 - [ ] 所有環境變數已設置
+- [ ] 購物車流程測試
+- [ ] 表單驗證測試
+- [ ] 用戶註冊/登入流程測試
+- [ ] 商品兌換流程測試
+
+### SEO 與效能
+
 - [ ] Metadata 和 SEO 標籤正確
 - [ ] 圖片已優化（WebP、適當尺寸）
 - [ ] Lighthouse 測試通過（Performance, SEO, Accessibility）
-- [ ] 跨瀏覽器測試
+- [ ] 結構化資料驗證通過
+
+### 跨平台測試
+
+- [ ] 跨瀏覽器測試（Chrome, Firefox, Safari, Edge）
 - [ ] 響應式設計測試（手機、平板、桌面）
-- [ ] 購物車流程測試
-- [ ] 表單驗證測試
+- [ ] 行動裝置觸控操作測試
+
+### 第三方整合
+
 - [ ] Google Analytics 追蹤正常
 - [ ] PostHog 事件追蹤正常
+- [ ] 支付流程測試（如適用）
+- [ ] API 端點回應正常
 
 ## 📚 參考資源
 
