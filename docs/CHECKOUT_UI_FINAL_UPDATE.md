@@ -46,7 +46,7 @@ Framework 政策文檔。
 
 #### UI Framework Policy
 
-- ✅ 創建 `docs/UI_FRAMEWORK_POLICY.md`
+- ✅ 創建 `.cursor/rules/ui-framework-policy.mdc`
 - **核心政策**：僅允許使用 shadcn/ui
 - **禁止使用**：Material-UI、Ant Design、Chakra UI 等
 - **包含內容**：
@@ -85,7 +85,7 @@ Framework 政策文檔。
 
 1. `src/components/common/hook-form/rhf-shadcn-select.jsx` - shadcn/ui Select
    wrapper
-2. `docs/UI_FRAMEWORK_POLICY.md` - UI Framework 使用政策
+2. `.cursor/rules/ui-framework-policy.mdc` - UI Framework 使用政策
 3. `docs/MIGRATION_FROM_MUI.md` - MUI 遷移計劃
 4. `docs/CHECKOUT_UI_FINAL_UPDATE.md` - 本文檔
 
@@ -265,7 +265,7 @@ npx shadcn@latest add badge
 
 ## 📚 相關文檔
 
-1. [UI Framework Policy](./UI_FRAMEWORK_POLICY.md) - 完整的 UI
+1. [UI Framework Policy](../.cursor/rules/ui-framework-policy.mdc) - 完整的 UI
    Framework 使用政策
 2. [Migration from MUI](./MIGRATION_FROM_MUI.md) - MUI 遷移計劃與進度
 3. [Checkout Page Spec](./spec/checkout-page-spec.md) - Checkout 頁面功能規格

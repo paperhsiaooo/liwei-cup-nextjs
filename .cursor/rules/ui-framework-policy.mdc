@@ -199,7 +199,7 @@ function CustomButton({ className, children, ...props }) {
 為了與 React Hook Form 整合，需建立包裝組件：
 
 ```jsx
-// src/components/common/hook-form/rhf-shadcn-select.jsx
+// src/components/common/hook-form/rhf-select.jsx
 'use client'
 
 import { Controller, useFormContext } from 'react-hook-form'
@@ -211,7 +211,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-export function RHFShadcnSelect({ name, options, placeholder, ...props }) {
+export function RHFSelect({ name, options, placeholder, ...props }) {
   const { control } = useFormContext()
 
   return (
