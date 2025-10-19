@@ -29,6 +29,7 @@ export const PATH = {
     root: '/checkout',
     pay: '/checkout/pay',
   },
+  confirm: '/confirm',
 
   // 完成頁面
   shop: {
