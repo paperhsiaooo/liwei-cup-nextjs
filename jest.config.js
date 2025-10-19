@@ -19,7 +19,7 @@ const customJestConfig = {
     '!src/**/__tests__/**',
     '!src/**/*.stories.{js,jsx}',
   ],
-  coverageThresholds: {
+  coverageThreshold: {
     global: {
       branches: 70,
       functions: 70,

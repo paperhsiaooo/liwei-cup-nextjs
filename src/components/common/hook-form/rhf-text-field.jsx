@@ -13,6 +13,7 @@ export default function RHFTextField({ name, type, className, ...other }) {
       render={({ field, fieldState: { error } }) => (
         <div className="flex flex-col gap-1">
           <input
+            id={name}
             type={type}
             name={name}
             value={type === 'number' && field.value === 0 ? '' : field.value}
@@ -25,12 +26,17 @@ export default function RHFTextField({ name, type, className, ...other }) {
             }}
             {...other}
             className={twMerge(
-              'text-xl bg-white/40 rounded-[14px] min-h-[54px] py-2 px-4 outline-none',
+              'min-h-[48px] rounded-lg border-2 bg-white px-3 py-2 text-sm outline-none transition-colors border-slate-300 focus:border-blue-primary',
               className,
+              error && 'border-red-500 focus:border-red-500',
             )}
+            aria-invalid={!!error}
+            aria-describedby={error ? `${name}-error` : undefined}
           />
           {error && (
-            <label className="text-red-500 text-sm">{error?.message}</label>
+            <label id={`${name}-error`} className="text-sm text-red-500">
+              {error?.message}
+            </label>
           )}
         </div>
       )}
