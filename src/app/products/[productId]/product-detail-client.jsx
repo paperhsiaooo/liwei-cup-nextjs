@@ -2,9 +2,10 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { ImageSlider } from '@/components/ui/image-slider'
 import { cn } from '@/lib/utils'
 import useCartStore from '@/store/cart-context'
 import { formatCurrencyNT } from '@/utils/currency'
@@ -115,6 +116,10 @@ function ProductDetailClient({ product }) {
   const [selectedSize, setSelectedSize] = useState(sizes[0] || '')
   const [quantity, setQuantity] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isImageLoading, setIsImageLoading] = useState(true)
+  const [showImageModal, setShowImageModal] = useState(false)
+  const [error, setError] = useState(null)
+  const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0)
 
   const activeImage =
     images[Math.min(activeImageIndex, images.length - 1)] || FALLBACK_IMAGE
@@ -125,7 +130,7 @@ function ProductDetailClient({ product }) {
         return Math.max(1, prev - 1)
       }
 
-      return prev + 1
+      return Math.min(5, prev + 1) // 限制最多 5 個
     })
   }, [])
 
@@ -170,6 +175,7 @@ function ProductDetailClient({ product }) {
 
     try {
       setIsSubmitting(true)
+      setError(null)
       const res = await fetch('/api/checkout/intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -194,6 +200,7 @@ function ProductDetailClient({ product }) {
       }
     } catch (error) {
       console.error('[product-detail] handleBuyNow error: ', error)
+      setError('購買過程中發生錯誤，請稍後再試')
     } finally {
       setIsSubmitting(false)
     }
@@ -206,46 +213,232 @@ function ProductDetailClient({ product }) {
     selectedSize,
   ])
 
-  const thumbnailList = images.slice(0, 4)
+  const thumbnailList = images.slice(
+    thumbnailStartIndex,
+    thumbnailStartIndex + 4,
+  )
+  const showSlider = images.length > 4
+  const showMobileSlider = images.length > 3 // 手機版超過 3 張就使用 slider
+  const canGoLeft = thumbnailStartIndex > 0
+  const canGoRight = thumbnailStartIndex + 4 < images.length
+
+  const handleThumbnailNavigation = useCallback(
+    direction => {
+      if (direction === 'left' && canGoLeft) {
+        setThumbnailStartIndex(prev => Math.max(0, prev - 1))
+      } else if (direction === 'right' && canGoRight) {
+        setThumbnailStartIndex(prev => Math.min(images.length - 4, prev + 1))
+      }
+    },
+    [canGoLeft, canGoRight, images.length],
+  )
+
+  // ESC 鍵關閉 Modal
+  useEffect(() => {
+    const handleKeyDown = event => {
+      if (event.key === 'Escape' && showImageModal) {
+        setShowImageModal(false)
+      }
+    }
+
+    if (showImageModal) {
+      document.addEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = 'hidden'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = 'unset'
+    }
+  }, [showImageModal])
 
   return (
     <div className="grid gap-10 1440:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] 1440:gap-16">
       <div>
         <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-white shadow-md">
+          {isImageLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-primary border-t-transparent" />
+            </div>
+          )}
           <Image
             src={activeImage}
             alt={`${product?.name || 'Product'} 預覽圖`}
             fill
-            className="object-contain"
+            className="object-contain cursor-pointer transition-opacity"
+            style={{ opacity: isImageLoading ? 0 : 1 }}
             sizes="(min-width: 1440px) 640px, (min-width: 768px) 75vw, 100vw"
             priority
+            onLoad={() => setIsImageLoading(false)}
+            onError={() => setIsImageLoading(false)}
+            onClick={() => setShowImageModal(true)}
           />
         </div>
 
         {thumbnailList.length > 1 ? (
-          <div className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-4">
-            {thumbnailList.map((src, index) => (
-              <button
-                key={`${src}-${index}`}
-                type="button"
-                onClick={() => setActiveImageIndex(index)}
-                className={cn(
-                  'relative aspect-square overflow-hidden rounded-2xl border bg-white shadow-sm transition-all',
-                  activeImageIndex === index
-                    ? 'border-blue-primary ring-2 ring-blue-primary'
-                    : 'border-transparent hover:border-blue-primary/50',
-                )}
-                aria-label={`預覽圖 ${index + 1}`}
-              >
-                <Image
-                  src={src}
-                  alt={`${product?.name || 'Product'} 預覽圖 ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="(min-width: 1440px) 150px, (min-width: 768px) 25vw, 33vw"
+          <div className="mt-5">
+            {/* 手機版：超過 3 張圖片使用 ImageSlider，否則使用縮圖網格 */}
+            <div className="block sm:hidden">
+              {showMobileSlider ? (
+                <ImageSlider
+                  images={images}
+                  activeIndex={activeImageIndex}
+                  onImageChange={setActiveImageIndex}
                 />
-              </button>
-            ))}
+              ) : (
+                <div className="grid grid-cols-3 gap-3">
+                  {images.slice(0, 3).map((src, index) => (
+                    <button
+                      key={`${src}-${index}`}
+                      type="button"
+                      onClick={() => setActiveImageIndex(index)}
+                      className={cn(
+                        'relative aspect-square overflow-hidden rounded-2xl border bg-white shadow-sm transition-all cursor-pointer',
+                        activeImageIndex === index
+                          ? 'border-blue-primary ring-2 ring-blue-primary'
+                          : 'border-transparent hover:border-blue-primary/50',
+                      )}
+                      aria-label={`預覽圖 ${index + 1}`}
+                    >
+                      <Image
+                        src={src}
+                        alt={`${product?.name || 'Product'} 預覽圖 ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 33vw, 25vw"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 桌面版使用原有縮圖網格 */}
+            <div className="hidden sm:block">
+              {showSlider ? (
+                <div className="relative">
+                  {/* 左箭頭 */}
+                  {canGoLeft && (
+                    <button
+                      type="button"
+                      onClick={() => handleThumbnailNavigation('left')}
+                      className="absolute left-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 shadow-md transition-colors hover:bg-white cursor-pointer"
+                      aria-label="上一張圖片"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="15,18 9,12 15,6" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* 右箭頭 */}
+                  {canGoRight && (
+                    <button
+                      type="button"
+                      onClick={() => handleThumbnailNavigation('right')}
+                      className="absolute right-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 shadow-md transition-colors hover:bg-white cursor-pointer"
+                      aria-label="下一張圖片"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="9,18 15,12 9,6" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* 縮圖網格 */}
+                  <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                    {thumbnailList.map((src, index) => {
+                      const actualIndex = thumbnailStartIndex + index
+                      return (
+                        <button
+                          key={`${src}-${actualIndex}`}
+                          type="button"
+                          onClick={() => setActiveImageIndex(actualIndex)}
+                          className={cn(
+                            'relative aspect-square overflow-hidden rounded-2xl border bg-white shadow-sm transition-all cursor-pointer',
+                            activeImageIndex === actualIndex
+                              ? 'border-blue-primary ring-2 ring-blue-primary'
+                              : 'border-transparent hover:border-blue-primary/50',
+                          )}
+                          aria-label={`預覽圖 ${actualIndex + 1}`}
+                        >
+                          <Image
+                            src={src}
+                            alt={`${product?.name || 'Product'} 預覽圖 ${actualIndex + 1}`}
+                            fill
+                            className="object-cover"
+                            sizes="(min-width: 1440px) 150px, (min-width: 768px) 25vw, 33vw"
+                          />
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* 位置指示器 */}
+                  <div className="mt-2 flex justify-center gap-1">
+                    {Array.from({ length: Math.ceil(images.length / 4) }).map(
+                      (_, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => setThumbnailStartIndex(index * 4)}
+                          className={cn(
+                            'h-2 w-2 rounded-full transition-colors cursor-pointer',
+                            Math.floor(thumbnailStartIndex / 4) === index
+                              ? 'bg-blue-primary'
+                              : 'bg-slate-300',
+                          )}
+                          aria-label={`第 ${index + 1} 頁`}
+                        />
+                      ),
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                  {thumbnailList.map((src, index) => (
+                    <button
+                      key={`${src}-${index}`}
+                      type="button"
+                      onClick={() => setActiveImageIndex(index)}
+                      className={cn(
+                        'relative aspect-square overflow-hidden rounded-2xl border bg-white shadow-sm transition-all cursor-pointer',
+                        activeImageIndex === index
+                          ? 'border-blue-primary ring-2 ring-blue-primary'
+                          : 'border-transparent hover:border-blue-primary/50',
+                      )}
+                      aria-label={`預覽圖 ${index + 1}`}
+                    >
+                      <Image
+                        src={src}
+                        alt={`${product?.name || 'Product'} 預覽圖 ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        sizes="(min-width: 1440px) 150px, (min-width: 768px) 25vw, 33vw"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         ) : null}
       </div>
@@ -259,6 +452,13 @@ function ProductDetailClient({ product }) {
             <p className="mt-2 font-noto-sans-tc text-sm text-muted-foreground">
               {product.tagline}
             </p>
+          ) : null}
+          {product?.tag ? (
+            <div className="mt-2">
+              <span className="inline-flex items-center rounded-full bg-green-primary px-3 py-1 text-xs font-bold text-blue-primary">
+                {product.tag}
+              </span>
+            </div>
           ) : null}
         </div>
 
@@ -334,7 +534,7 @@ function ProductDetailClient({ product }) {
             <button
               type="button"
               onClick={() => handleQuantityChange('decrease')}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-lg font-anton text-blue-primary transition-colors hover:border-blue-primary/60 disabled:opacity-50"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-2xl font-anton text-blue-primary transition-colors hover:border-blue-primary/60 disabled:opacity-50 cursor-pointer leading-none"
               disabled={quantity <= 1}
               aria-label="減少購買數量"
             >
@@ -346,7 +546,8 @@ function ProductDetailClient({ product }) {
             <button
               type="button"
               onClick={() => handleQuantityChange('increase')}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-lg font-anton text-blue-primary transition-colors hover:border-blue-primary/60"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-2xl font-anton text-blue-primary transition-colors hover:border-blue-primary/60 disabled:opacity-50 cursor-pointer leading-none"
+              disabled={quantity >= 5}
               aria-label="增加購買數量"
             >
               +
@@ -354,23 +555,76 @@ function ProductDetailClient({ product }) {
           </div>
         </section>
 
+        {error ? (
+          <div className="mt-2 rounded-lg bg-red-50 border border-red-200 p-3">
+            <p className="text-sm text-red-600">{error}</p>
+            <button
+              type="button"
+              onClick={() => setError(null)}
+              className="mt-2 text-xs text-red-500 hover:text-red-700 underline cursor-pointer"
+            >
+              關閉
+            </button>
+          </div>
+        ) : null}
+
         <div className="mt-2 flex flex-col gap-3 sm:flex-row">
           <Button
             variant="outline"
-            className="h-12 flex-1 border-blue-primary text-sm font-anton tracking-widest text-blue-primary hover:bg-blue-primary hover:text-white"
+            className="h-12 flex-1 border-blue-primary text-sm font-anton tracking-widest text-blue-primary hover:bg-blue-primary hover:text-white cursor-pointer"
             onClick={handleAddToCart}
           >
-            ADD TO CART
+            加入購物車
           </Button>
           <Button
-            className="h-12 flex-1 bg-green-primary text-sm font-anton tracking-widest text-blue-primary hover:bg-green-primary/90"
+            className="h-12 flex-1 bg-green-primary text-sm font-anton tracking-widest text-blue-primary hover:bg-green-primary/90 cursor-pointer"
             onClick={handleBuyNow}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'PROCESSING…' : 'BUY NOW'}
+            {isSubmitting ? '處理中…' : '立即購買'}
           </Button>
         </div>
       </div>
+
+      {/* 圖片放大 Modal */}
+      {showImageModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <div className="relative max-h-[90vh] max-w-[90vw]">
+            {/* 手機版關閉按鈕在上方，桌面版在右側 */}
+            <button
+              type="button"
+              onClick={() => setShowImageModal(false)}
+              className="absolute -top-12 right-0 sm:-right-12 sm:top-0 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/30 cursor-pointer"
+              aria-label="關閉圖片"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <Image
+              src={activeImage}
+              alt={`${product?.name || 'Product'} 放大圖`}
+              width={800}
+              height={800}
+              className="max-h-[90vh] max-w-[90vw] object-contain"
+              onClick={e => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
