@@ -1,0 +1,600 @@
+---
+alwaysApply: true
+---
+
+# 2025 力維盃錦標賽網站開發規範
+
+> 本專案是一個基於 Next.js
+> 15 的排球賽事官網，包含商品兌換、賽事資訊和多步驟表單流程。
+
+## 🎯 專案概述
+
+- **專案名稱**：力維盃錦標賽官網
+- **目標**：提供賽事資訊、參賽報名、商品兌換等功能
+- **設計理念**：熱血、青春、運動風格，注重視覺衝擊力和使用者體驗
+
+## 🛠️ 技術棧
+
+### 核心框架
+
+- **Next.js 15.3.3** - App Router 架構，優先使用 Server Components
+- **React 19** - 使用最新的 React 特性
+- **Node.js** - 執行環境
+
+### UI 與樣式
+
+- **Tailwind CSS 4** - 使用 utility-first 方式撰寫樣式
+- **Radix UI** - 無障礙 UI primitives（Dialog, Select, Checkbox 等）
+- **Material-UI** - 部分複雜組件
+- **Framer Motion** - 動畫效果
+- **Lucide React** / **React Icons** - 圖標庫
+
+### 狀態管理
+
+- **Zustand** - 全局狀態管理（購物車、對話框、使用者等）
+- **TanStack Query (React Query)** - 伺服器狀態管理和資料緩存
+- **React Context** - 局部狀態共享
+
+### 表單處理
+
+- **React Hook Form** - 表單狀態管理
+- **Zod** - Schema 驗證
+- **@hookform/resolvers** - 整合 RHF 和 Zod
+
+### 工具庫
+
+- **Axios** - HTTP 請求
+- **date-fns** - 日期處理
+- **Ramda** - 函數式編程工具
+- **clsx** / **tailwind-merge** - 條件式類名合併
+- **Immer** - 不可變資料處理
+
+### 分析與監控
+
+- **PostHog** - 使用者分析和 Feature Flags
+- **Google Analytics** - 流量分析
+
+### 其他
+
+- **DOMPurify** - XSS 防護
+- **Swiper** - 輪播圖
+- **react-confetti** - 彩帶動畫效果
+- **react-timer-hook** - 倒數計時器
+
+## 📁 專案結構
+
+```
+src/
+├── app/                    # Next.js App Router 頁面
+│   ├── (index)/           # 首頁路由群組
+│   ├── (protect)/         # 受保護路由（需登入）
+│   ├── api/               # API Routes
+│   ├── layout.jsx         # Root Layout（包含 metadata、字體、結構化資料）
+│   └── */page.jsx         # 各頁面
+├── sections/              # 頁面特定區塊組件
+│   └── [section-name]/
+│       ├── views/         # 主視圖組件
+│       ├── components/    # 區塊專用組件
+│       └── index.js       # 導出
+├── components/            # 可重用通用組件
+│   ├── ui/                # 基礎 UI 組件（按鈕、輸入框等）
+│   ├── common/            # 共用組件
+│   └── cart/              # 購物車組件
+├── apis/                  # API 相關
+│   ├── hook/              # React Query hooks
+│   └── constants/         # API 常數
+├── store/                 # Zustand stores
+├── provider/              # Context Providers
+├── utils/                 # 工具函數
+├── lib/                   # 第三方庫配置
+├── routers/               # 路由常數
+├── constants/             # 全局常數
+├── config/                # 配置檔案
+└── layout/                # 版型組件
+```
+
+## 💻 編碼規範
+
+### 代碼風格（Prettier）
+
+```js
+{
+  semi: false,                    // 不使用分號
+  singleQuote: true,             // 使用單引號
+  tabWidth: 2,                   // 2 空格縮進
+  trailingComma: 'all',          // 尾逗號
+  arrowParens: 'avoid',          // 單參數箭頭函數不加括號
+  printWidth: 80,                // 每行最多 80 字元
+}
+```
+
+### 命名規範
+
+- **組件**：PascalCase（`ProductCard`）
+- **文件名**：
+  - 組件：kebab-case + `.jsx`（`product-card.jsx`）
+  - 工具/邏輯：kebab-case + `.js`（`use-cart.js`）
+- **變數/函數**：camelCase（`handleSubmit`）
+- **常數**：UPPER_SNAKE_CASE（`API_BASE_URL`）
+- **Context/Store**：描述性名稱（`useCartStore`, `UserContext`）
+
+### 組件開發
+
+#### 1. 優先使用函數組件
+
+```jsx
+// ✅ 推薦
+function ProductCard({ name, price }) {
+  return <div>...</div>
+}
+
+// ❌ 避免使用 class 組件
+```
+
+#### 2. Client 和 Server Components 分離
+
+```jsx
+// page.jsx (Server Component)
+import ProductsClient from './products-client'
+
+async function ProductsPage() {
+  const data = await fetchData()
+  return <ProductsClient initialData={data} />
+}
+
+// products-client.jsx
+;('use client')
+
+function ProductsClient({ initialData }) {
+  // 客戶端邏輯
+}
+```
+
+#### 3. 使用 Compound Component 模式
+
+```jsx
+// ✅ 推薦的組合式組件
+export const Product = {
+  Container: Container,
+  Content: Content,
+  Image: ProductImage,
+}
+
+// 使用
+<Product.Container>
+  <Product.Image src="..." />
+  <Product.Content title="..." />
+</Product.Container>
+```
+
+#### 4. Props 解構與預設值
+
+```jsx
+function Component({ name = '預設名稱', onClick, className, ...rest }) {
+  // ...
+}
+```
+
+### 樣式處理
+
+#### 1. Tailwind CSS Utilities
+
+```jsx
+// ✅ 使用 Tailwind utilities
+<div className="flex items-center gap-4 bg-blue-primary rounded-lg p-4">
+
+// ✅ 使用自定義顏色（已定義於 Tailwind config）
+// - blue-primary
+// - green-primary
+// - orange-primary
+```
+
+#### 2. 條件類名合併
+
+```jsx
+import { cn } from '@/lib/utils'
+
+function Button({ className, variant }) {
+  return (
+    <button
+      className={cn(
+        'px-4 py-2 rounded-lg',
+        variant === 'primary' && 'bg-blue-primary text-white',
+        className,
+      )}
+    />
+  )
+}
+```
+
+#### 3. 響應式設計
+
+```jsx
+// 使用 Tailwind 響應式前綴
+<div className="text-xl sm:text-base xl:text-3xl">// Mobile first 設計</div>
+```
+
+### 狀態管理
+
+#### 1. Zustand Store 模式
+
+```js
+// store/example-context.js
+import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+
+const useExampleStore = create(
+  persist(
+    (set, get) => ({
+      data: [],
+      addData: item =>
+        set(state => ({
+          data: [...state.data, item],
+        })),
+      getData: () => get().data,
+    }),
+    {
+      name: 'liwei-example',
+      storage: createJSONStorage(() =>
+        typeof window === 'undefined'
+          ? { getItem: () => null, setItem: () => {}, removeItem: () => {} }
+          : window.localStorage,
+      ),
+    },
+  ),
+)
+```
+
+#### 2. React Query Hooks
+
+```js
+// apis/hook/use-example.js
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { axs } from '@/utils/axios'
+
+async function fetchDataAPI(params) {
+  const data = await axs('/endpoint', params)
+  return data
+}
+
+function useFetchData(options) {
+  return useQuery({
+    queryKey: ['example', 'fetchData'],
+    queryFn: () => fetchDataAPI(options),
+  })
+}
+
+function useSubmitData(onSuccess) {
+  return useMutation({
+    mutationKey: ['example', 'submitData'],
+    mutationFn: payload => submitDataAPI(payload),
+    onSuccess: data => {
+      onSuccess(data)
+    },
+  })
+}
+```
+
+### 表單處理
+
+#### 1. React Hook Form + Zod
+
+```jsx
+// schema/example-schema.js
+import { z } from 'zod'
+
+export const exampleSchema = z.object({
+  name: z.string().min(1, '請輸入名稱'),
+  email: z.string().email('請輸入有效的電子郵件'),
+})
+
+// component
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import FormProvider from '@/components/common/hook-form/form-provider'
+import RHFTextField from '@/components/common/hook-form/rhf-text-field'
+
+function ExampleForm() {
+  const methods = useForm({
+    resolver: zodResolver(exampleSchema),
+    defaultValues: { name: '', email: '' },
+  })
+
+  const onSubmit = data => {
+    console.log(data)
+  }
+
+  return (
+    <FormProvider methods={methods} onSubmit={methods.handleSubmit(onSubmit)}>
+      <RHFTextField name="name" placeholder="姓名" />
+      <RHFTextField name="email" type="email" placeholder="電子郵件" />
+      <button type="submit">提交</button>
+    </FormProvider>
+  )
+}
+```
+
+### API 處理
+
+#### 1. Axios Instance
+
+```js
+// 使用自定義 axios instance (utils/axios.js)
+import { axs } from '@/utils/axios'
+
+// POST 請求
+const response = await axs('/api/endpoint', {
+  key: 'value',
+})
+```
+
+#### 2. 錯誤處理
+
+```js
+try {
+  const data = await axs('/api/endpoint', payload)
+  return data
+} catch (error) {
+  // 錯誤會被統一處理
+  throw error
+}
+```
+
+### 圖片優化
+
+```jsx
+import Image from 'next/image'
+
+// ✅ 使用 Next.js Image 組件
+;<Image
+  src="/images/example.webp"
+  alt="描述性文字"
+  fill
+  className="object-cover"
+  sizes="(max-width: 768px) 100vw, 50vw"
+/>
+
+// ✅ 圖片格式優先使用 WebP
+```
+
+### SEO 最佳實踐
+
+#### 1. 頁面 Metadata
+
+```jsx
+// app/example/page.jsx
+export const metadata = {
+  title: '頁面標題',
+  description: '頁面描述（150-160 字元）',
+  keywords: ['關鍵字1', '關鍵字2', '力維盃'],
+  openGraph: {
+    title: '社交媒體標題',
+    description: '社交媒體描述',
+    images: ['/images/og-image.jpg'],
+  },
+  alternates: {
+    canonical: 'https://liwei-cup.com/example',
+  },
+}
+```
+
+#### 2. 結構化資料
+
+- 在 root layout 中已包含 Organization、WebSite、SportsEvent schema
+- 新增頁面時考慮是否需要額外的結構化資料
+
+#### 3. 圖片 Alt 文字
+
+```jsx
+// ✅ 提供有意義的 alt 文字
+<Image src="..." alt="2025 力維盃排球錦標賽現場照片" />
+
+// ❌ 避免空白或無意義的 alt
+<Image src="..." alt="" />
+```
+
+### 效能優化
+
+#### 1. 動態導入
+
+```jsx
+import dynamic from 'next/dynamic'
+
+const HeavyComponent = dynamic(() => import('./heavy-component'), {
+  loading: () => <Loader />,
+  ssr: false, // 如果不需要 SSR
+})
+```
+
+#### 2. React Query 緩存策略
+
+```js
+useQuery({
+  queryKey: ['data'],
+  queryFn: fetchData,
+  staleTime: 5 * 60 * 1000, // 5 分鐘
+  cacheTime: 10 * 60 * 1000, // 10 分鐘
+})
+```
+
+#### 3. 避免不必要的重渲染
+
+```jsx
+import { memo, useCallback, useMemo } from 'react'
+
+// 使用 memo 包裝純組件
+const MemoizedComponent = memo(Component)
+
+// 使用 useCallback 緩存函數
+const handleClick = useCallback(() => {
+  // ...
+}, [dependency])
+
+// 使用 useMemo 緩存計算結果
+const expensiveValue = useMemo(() => {
+  return computeExpensiveValue(data)
+}, [data])
+```
+
+### 安全性
+
+#### 1. XSS 防護
+
+```jsx
+import DOMPurify from 'isomorphic-dompurify'
+
+// 清理用戶輸入的 HTML
+const cleanHTML = DOMPurify.sanitize(userInput)
+```
+
+#### 2. 環境變數
+
+```js
+// ✅ 使用環境變數存儲敏感資訊
+process.env.NEXT_PUBLIC_GA_ID
+
+// ⚠️ NEXT_PUBLIC_ 前綴的變數會暴露到客戶端
+// 敏感資料不要使用此前綴
+```
+
+### 無障礙性（Accessibility）
+
+```jsx
+// ✅ 使用語義化 HTML 標籤
+<button onClick={...}>點擊</button>
+
+// ✅ 提供 aria 標籤
+<button aria-label="關閉對話框" onClick={...}>
+  <CloseIcon />
+</button>
+
+// ✅ 使用 Radix UI 已包含無障礙支援
+```
+
+### 字體使用
+
+專案使用以下 Google Fonts：
+
+- **Noto Sans TC** - 繁體中文主要字體
+- **Noto Sans JP** - 日文字體
+- **Anton** - 英文標題字體
+- **Antonio** - 英文副標題字體
+
+使用方式：
+
+```jsx
+<p className="font-noto-sans-tc">中文內容</p>
+<p className="font-noto-sans-jp">日本語</p>
+<h1 className="font-anton">TITLE</h1>
+<h2 className="font-antonio">Subtitle</h2>
+```
+
+## 🎨 設計系統
+
+### 主色調
+
+- `blue-primary` - 主要藍色（CTA、重點元素）
+- `green-primary` - 輔助綠色（背景、標籤）
+- `orange-primary` - 強調色（價格、警示）
+
+### 設計風格
+
+- 使用粗邊框（border-8）營造運動風格
+- 使用陰影層次感（shadow-xs, shadow-md）
+- 文字使用粗體（font-bold, font-black）呈現力量感
+- 保持高對比度，提升可讀性
+
+## 🔧 開發流程
+
+### 新增功能頁面
+
+1. 在 `src/app/` 建立路由
+2. 在 `src/sections/` 建立對應的視圖組件
+3. 如需 API，在 `src/apis/hook/` 建立 custom hooks
+4. 更新 `src/routers/path.js` 路由常數
+5. 添加 metadata 進行 SEO 優化
+6. 更新 `sitemap.js`
+
+### 新增可重用組件
+
+1. 評估是否為通用組件（放 `components/`）或特定區塊（放 `sections/`）
+2. 考慮使用 Compound Component 模式
+3. 提供 TypeScript-friendly 的 props（使用 JSDoc 或遷移到 .tsx）
+4. 確保響應式設計
+5. 添加適當的 accessibility 屬性
+
+### Git Commit 規範
+
+建議使用 Conventional Commits：
+
+```
+feat: 新增商品篩選功能
+fix: 修正購物車數量計算錯誤
+docs: 更新 README
+style: 調整按鈕樣式
+refactor: 重構表單驗證邏輯
+perf: 優化圖片載入
+test: 新增單元測試
+chore: 更新依賴套件
+```
+
+## ⚠️ 注意事項
+
+### 1. Feature Flags
+
+專案使用 PostHog Feature Flags：
+
+```jsx
+import { useFeatureFlagEnabled } from 'posthog-js/react'
+
+const flagEnabled = useFeatureFlagEnabled('feature-name')
+```
+
+### 2. 環境變數檢查
+
+- 確保 `NEXT_PUBLIC_GA_ID` 在生產環境設置
+- PostHog 相關變數需正確配置
+
+### 3. SEO 維護
+
+- 定期檢查 Google Search Console
+- 更新 sitemap 包含新頁面
+- 驗證結構化資料正確性
+
+### 4. 購物車持久化
+
+- 使用 Zustand persist 儲存於 localStorage
+- 注意 SSR 與 client-side 的資料同步
+
+### 5. 圖片管理
+
+- 優先使用 WebP 格式
+- 圖片放置於 `public/images/`
+- 使用 Next.js Image 組件優化載入
+
+## 🚀 部署前檢查
+
+- [ ] 所有環境變數已設置
+- [ ] Metadata 和 SEO 標籤正確
+- [ ] 圖片已優化（WebP、適當尺寸）
+- [ ] Lighthouse 測試通過（Performance, SEO, Accessibility）
+- [ ] 跨瀏覽器測試
+- [ ] 響應式設計測試（手機、平板、桌面）
+- [ ] 購物車流程測試
+- [ ] 表單驗證測試
+- [ ] Google Analytics 追蹤正常
+- [ ] PostHog 事件追蹤正常
+
+## 📚 參考資源
+
+- [Next.js 15 文檔](https://nextjs.org/docs)
+- [Tailwind CSS 文檔](https://tailwindcss.com/docs)
+- [React Hook Form](https://react-hook-form.com/)
+- [TanStack Query](https://tanstack.com/query/latest)
+- [Zustand](https://zustand-demo.pmnd.rs/)
+- [Radix UI](https://www.radix-ui.com/)
+
+---
+
+**最後更新**：2025-10-19  
+**維護者**：Paper Hsiao (@paperhsiaooo)
