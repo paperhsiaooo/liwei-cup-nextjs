@@ -43,7 +43,7 @@ export default function PasswordInput({
       {label && (
         <label
           htmlFor={name}
-          className="mb-2 block text-sm font-bold text-gray-700"
+          className="mb-2 block text-base font-semibold text-slate-700"
         >
           {label}
         </label>
@@ -56,10 +56,10 @@ export default function PasswordInput({
           placeholder={placeholder}
           {...register(name)}
           {...other}
-          className={`w-full rounded-lg border-2 px-4 py-3 pr-12 transition-colors focus:outline-none ${
+          className={`w-full min-h-[48px] rounded-lg border-2 bg-white px-3 py-2 pr-12 text-sm outline-none transition-colors ${
             error
-              ? 'border-red-500 focus:border-red-600'
-              : 'border-gray-300 focus:border-blue-primary'
+              ? 'border-red-500 focus:border-red-500'
+              : 'border-slate-300 focus:border-blue-primary'
           }`}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? `${name}-error` : undefined}
@@ -76,13 +76,9 @@ export default function PasswordInput({
       </div>
 
       {error && (
-        <p
-          id={`${name}-error`}
-          className="mt-2 text-sm text-red-600"
-          role="alert"
-        >
+        <label id={`${name}-error`} className="mt-1 text-sm text-red-500">
           {error.message}
-        </p>
+        </label>
       )}
 
       {showStrength && password && password.length > 0 && (

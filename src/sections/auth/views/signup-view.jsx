@@ -23,7 +23,7 @@ export default function SignupView() {
             <div>
               <label
                 htmlFor="email"
-                className="mb-2 block text-sm font-bold text-gray-700"
+                className="mb-2 block text-base font-semibold text-slate-700"
               >
                 Email
               </label>
@@ -31,7 +31,6 @@ export default function SignupView() {
                 name="email"
                 placeholder="example@email.com"
                 type="email"
-                className="w-full rounded-lg border-2 border-gray-300 px-4 py-3 transition-colors focus:border-blue-primary focus:outline-none"
               />
             </div>
 
@@ -45,15 +44,11 @@ export default function SignupView() {
             <div>
               <label
                 htmlFor="invitationCode"
-                className="mb-2 block text-sm font-bold text-gray-700"
+                className="mb-2 block text-base font-semibold text-slate-700"
               >
                 邀請碼（選填）
               </label>
-              <RHFTextField
-                name="invitationCode"
-                placeholder="ABC123"
-                className="w-full rounded-lg border-2 border-gray-300 px-4 py-3 transition-colors focus:border-blue-primary focus:outline-none"
-              />
+              <RHFTextField name="invitationCode" placeholder="ABC123" />
               <p className="mt-1 text-sm text-blue-primary">
                 💡 有邀請碼可享特殊優惠！
               </p>
@@ -63,7 +58,7 @@ export default function SignupView() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full rounded-lg bg-blue-primary py-3 font-bold text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full cursor-pointer rounded-lg bg-blue-primary py-3 font-bold text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isPending ? <Loader /> : '註冊'}
             </button>

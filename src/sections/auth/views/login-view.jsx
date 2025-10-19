@@ -23,7 +23,7 @@ export default function LoginView() {
             <div>
               <label
                 htmlFor="email"
-                className="mb-2 block text-sm font-bold text-gray-700"
+                className="mb-2 block text-base font-semibold text-slate-700"
               >
                 Email
               </label>
@@ -31,7 +31,6 @@ export default function LoginView() {
                 name="email"
                 placeholder="example@email.com"
                 type="email"
-                className="w-full rounded-lg border-2 border-gray-300 px-4 py-3 transition-colors focus:border-blue-primary focus:outline-none"
               />
             </div>
 
@@ -42,7 +41,7 @@ export default function LoginView() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full rounded-lg bg-blue-primary py-3 font-bold text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full cursor-pointer rounded-lg bg-blue-primary py-3 font-bold text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isPending ? <Loader /> : '登入'}
             </button>
