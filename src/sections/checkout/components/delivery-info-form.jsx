@@ -1,5 +1,6 @@
 'use client'
 
+import { useCallback } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { RHFCheckbox } from '@/components/common/hook-form/rhf-checkbox'
@@ -10,7 +11,38 @@ export default function DeliveryInfoForm() {
   const { watch, setValue } = useFormContext()
   const sameAsCustomer = watch('sameAsCustomer')
 
-  // 監聽 sameAsCustomer 變化
+  const handle711ButtonClick = useCallback(() => {
+    // 必須用真實 form POST 到 ECPay，不能 fetch；此法避免 nested form
+    const form = document.createElement('form')
+    form.method = 'POST'
+    form.action = `${process.env.NEXT_PUBLIC_ECPAY_LOGISTICS_URL}`
+    form.target = '_blank' // 開新分頁，避免離開結帳頁
+
+    const append = (name, value) => {
+      const input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = name
+      input.value = value
+      form.appendChild(input)
+    }
+
+    // 依照你的需求填入固定或動態值（可改為從 react-hook-form 取值）
+    append('MerchantID', process.env.NEXT_PUBLIC_ECPAY_MERCHANT_ID)
+    append('LogisticsType', 'CVS')
+    append('LogisticsSubType', 'UNIMARTC2C')
+    append('IsCollection', 'N')
+    append(
+      'ServerReplyURL',
+      `${process.env.NEXT_PUBLIC_ECPAY_SERVER_REPLY_URL}`,
+    )
+    append('MerchantTradeNo', 'TEST20251024A') // 可改為實際 cartId 或 orderDraftId
+
+    document.body.appendChild(form)
+    form.submit()
+    document.body.removeChild(form)
+  }, [])
+
+  // 監聽 sameAsCustomer 變化（若勾選，將訂購人資料同步到收件人）
   const handleSameAsCustomerChange = checked => {
     if (checked) {
       const fullName = watch('fullName')
@@ -73,6 +105,15 @@ export default function DeliveryInfoForm() {
             className="w-full min-h-[48px] rounded-lg border-2 border-slate-300 px-3 py-2 text-sm transition-colors focus:border-blue-primary focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
           />
         </div>
+
+        <button
+          type="button"
+          onClick={handle711ButtonClick}
+          className="inline-flex items-center justify-center rounded-lg border-2 border-blue-primary px-4 py-2 text-sm font-semibold text-blue-primary transition hover:bg-blue-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-primary/50"
+          aria-label="選擇 7-11 門市（開啟電子地圖）"
+        >
+          選擇 7-11 門市
+        </button>
 
         {/* 配送地址 */}
         <div>
