@@ -79,14 +79,14 @@ function InfoIcon({ className }) {
   )
 }
 
-function resolveStatus(statusCode) {
+export function resolveStatus(statusCode) {
   if (statusCode === 200) return 'success'
   if (statusCode === 400 || statusCode === 422) return 'invalid'
   if (statusCode === 410) return 'expired'
   return 'error'
 }
 
-const STATUS_CONTENT = {
+export const STATUS_CONTENT = {
   success: {
     status: 'success',
     accent: 'from-green-primary via-green-primary/80 to-blue-primary/70',
@@ -253,12 +253,12 @@ export default async function VerifyPage({ searchParams }) {
   return <VerifyResult status={status} />
 }
 
-function VerifyResult({ status }) {
+export function VerifyResult({ status }) {
   const content = STATUS_CONTENT[status] ?? STATUS_CONTENT.error
   return <StatusCard {...content} />
 }
 
-function StatusCard({
+export function StatusCard({
   accent,
   iconRing,
   iconGradient,
