@@ -1,9 +1,18 @@
 import { useMutation } from '@tanstack/react-query'
+import { z } from 'zod'
 
 import { axs } from '@/utils/axios'
-import { setSession } from '@/utils/utils'
 
-const prefix = '/auth'
+const AUTH_PUBLIC_PREFIX = '/public/v1/auth'
+
+const authLoginResponseSchema = z.null()
+
+const authRegisterResponseSchema = z.object({
+  email: z.string().email(),
+  invitation_code: z.string().nullable().optional(),
+  status: z.string(),
+  is_resend: z.boolean(),
+})
 
 // ------------------------------------------------------------
 // Login API
@@ -11,7 +20,13 @@ const prefix = '/auth'
 
 async function loginAPI(payload) {
   try {
-    const data = await axs(`${prefix}/login`, payload)
+    const data = await axs(`${AUTH_PUBLIC_PREFIX}/login`, payload)
+    if (data?.data !== undefined) {
+      const parsed = authLoginResponseSchema.safeParse(data.data)
+      if (!parsed.success) {
+        throw parsed.error
+      }
+    }
     return data
   } catch (error) {
     throw error
@@ -23,16 +38,12 @@ export function useLogin(onSuccess) {
     mutationKey: ['auth/login'],
     mutationFn: payload => loginAPI(payload),
     onSuccess: data => {
-      if (data) {
-        if (data.data.token) {
-          setSession(data.data.token)
-        }
-
-        onSuccess(data.data)
-      } else {
-        setSession(null)
+      if (!data) {
+        return data
       }
 
+      const payload = data.data === null ? {} : data.data
+      onSuccess?.(payload)
       return data
     },
   })
@@ -44,7 +55,13 @@ export function useLogin(onSuccess) {
 
 async function signupAPI(payload) {
   try {
-    const data = await axs(`${prefix}/signup`, payload)
+    const data = await axs(`${AUTH_PUBLIC_PREFIX}/register`, payload)
+    if (data?.data) {
+      const parsed = authRegisterResponseSchema.safeParse(data.data)
+      if (!parsed.success) {
+        throw parsed.error
+      }
+    }
     return data
   } catch (error) {
     throw error
@@ -53,19 +70,14 @@ async function signupAPI(payload) {
 
 export function useSignup(onSuccess) {
   return useMutation({
-    mutationKey: ['auth/signup'],
+    mutationKey: ['auth/register'],
     mutationFn: payload => signupAPI(payload),
     onSuccess: data => {
-      if (data) {
-        if (data.data.token) {
-          setSession(data.data.token)
-        }
-
-        onSuccess(data.data)
-      } else {
-        setSession(null)
+      if (!data) {
+        return data
       }
 
+      onSuccess?.(data.data)
       return data
     },
   })

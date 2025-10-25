@@ -31,6 +31,7 @@ const axiosInstance = _axios.create({
   baseURL: `${resolvedBase}/api`,
   timeout: 10_000,
   responseType: 'json',
+  withCredentials: true,
 })
 
 axiosInstance.interceptors.request.use(config => {
