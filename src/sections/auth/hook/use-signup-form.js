@@ -6,13 +6,12 @@ import { useForm as useReactHookForm } from 'react-hook-form'
 
 import { useSignup } from '@/apis/hook/use-auth'
 import { PATH } from '@/routers/path'
-import useUserContext from '@/store/user-context'
+import { showSuccessToast } from '@/utils/toast'
 
 import { defaultValues, signupSchema } from '../schema/signup-schema'
 
 export default function useSignupForm() {
   const router = useRouter()
-  const loginSuccess = useUserContext(state => state.loginSuccess)
 
   const methods = useReactHookForm({
     resolver: zodResolver(signupSchema),
@@ -20,33 +19,37 @@ export default function useSignupForm() {
   })
 
   const { mutateAsync, isPending } = useSignup(data => {
-    // 更新 user store
-    loginSuccess(data)
-
-    // PostHog 追蹤
-    if (data.email) {
-      posthog.identify(data.email, {
+    if (data?.email) {
+      posthog.capture('user_register_success', {
         email: data.email,
-        name: data.name,
-        role: data.role,
-        has_invitation_code: Boolean(data.has_invitation_code),
-      })
-
-      posthog.capture('user_signup', {
-        email: data.email,
-        has_invitation_code: Boolean(data.has_invitation_code),
+        has_invitation_code: Boolean(data.invitation_code),
         signup_method: 'email',
+        status: data.status,
+        is_resend: Boolean(data.is_resend),
       })
     }
 
-    // 導向個人資料頁面
-    router.push(PATH.settings.profile)
+    const description = data?.email
+      ? `我們已將驗證信寄送至 ${data.email}，請於有效期限內完成驗證。`
+      : '我們已寄出驗證信至您的信箱，請於有效期限內完成驗證。'
+
+    showSuccessToast({
+      title: data?.is_resend ? '已重新寄送驗證信' : '註冊成功',
+      description,
+      duration: 6000,
+    })
+
+    router.push(PATH.auth.login)
   })
 
   const { handleSubmit } = methods
 
   const onSubmit = useCallback(
     async data => {
+      const hasInvitationCode =
+        typeof data.invitationCode === 'string' &&
+        data.invitationCode.trim().length > 0
+
       try {
         const payload = {
           email: data.email,
@@ -54,9 +57,15 @@ export default function useSignupForm() {
         }
 
         // 如果有填寫邀請碼，加入 payload
-        if (data.invitationCode && data.invitationCode.trim()) {
+        if (hasInvitationCode) {
           payload.invitation_code = data.invitationCode.trim()
         }
+
+        posthog.capture('user_register_attempt', {
+          email: data.email,
+          has_invitation_code: hasInvitationCode,
+          signup_method: 'email',
+        })
 
         await mutateAsync(payload)
       } catch (error) {

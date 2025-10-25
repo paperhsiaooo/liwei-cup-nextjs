@@ -19,36 +19,37 @@ export default function useLoginForm() {
     defaultValues,
   })
 
-  const { mutateAsync, isPending } = useLogin(data => {
-    // 更新 user store
-    loginSuccess(data)
+  const { mutateAsync, isPending } = useLogin(async data => {
+    const payload = data ?? {}
 
-    // PostHog 追蹤
-    if (data.email) {
-      posthog.identify(data.email, {
-        email: data.email,
-        name: data.name,
-        role: data.role,
+    // 更新 user store（資料為空時仍會標記登入狀態）
+    await loginSuccess(payload)
+
+    const email = methods.getValues('email')
+
+    if (email) {
+      posthog.identify(email, {
+        email,
         login_method: 'email',
       })
 
       posthog.capture('user_login', {
         method: 'email',
+        email,
       })
     }
 
-    // 導向個人資料頁面
     router.push(PATH.settings.profile)
   })
 
   const { handleSubmit } = methods
 
   const onSubmit = useCallback(
-    async data => {
+    async formData => {
       try {
         await mutateAsync({
-          email: data.email,
-          password: data.password,
+          email: formData.email,
+          password: formData.password,
         })
       } catch (error) {
         // 錯誤已由 axios interceptor 處理
