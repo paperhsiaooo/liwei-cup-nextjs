@@ -18,7 +18,7 @@ export function calculatePasswordStrength(password) {
 
 export default function PasswordStrength({ password, className = '' }) {
   const strength = calculatePasswordStrength(password)
-  const { level, label, color, score } = strength
+  const { label, color, score } = strength
 
   const colors = {
     red: {

@@ -1,45 +1,102 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { SUCCESS_CODE } from '@/apis/constants/api-code'
 import { MOCK_PRODUCTS } from '@/app/products/mock-data'
 
-// ------------------------------------------------------------
-// Mock API Functions (模擬 RESTful API)
-// ------------------------------------------------------------
+const PRODUCT_LIST_PATH = '/api/public/v1/products'
+
+const resolveBaseUrl = () => {
+  if (typeof window === 'undefined') {
+    return process.env.BASE_URL ?? ''
+  }
+
+  return process.env.NEXT_PUBLIC_BASE_URL ?? ''
+}
+
+const buildEndpoint = () => {
+  const base = resolveBaseUrl().replace(/\/+$/, '')
+  return base ? `${base}${PRODUCT_LIST_PATH}` : PRODUCT_LIST_PATH
+}
+
+const normalizeProduct = rawProduct => {
+  if (!rawProduct || typeof rawProduct !== 'object') {
+    return {
+      productId: '',
+      name: '',
+      description: '',
+      price: null,
+      images: [],
+    }
+  }
+
+  const id = rawProduct.productId ?? rawProduct.id ?? ''
+  const normalizedId = typeof id === 'number' ? String(id) : id
+
+  const price = rawProduct.price ?? rawProduct.base_price ?? null
+
+  const images =
+    Array.isArray(rawProduct.images) && rawProduct.images.length > 0
+      ? rawProduct.images
+      : rawProduct.main_image
+        ? [rawProduct.main_image]
+        : []
+
+  return {
+    ...rawProduct,
+    productId: normalizedId,
+    price,
+    images,
+  }
+}
 
 /**
- * 模擬 GET /api/products - 取得商品列表
+ * 取得公開商品列表
  * @returns {Promise} 商品列表資料
  */
 async function fetchProductsAPI() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        // 模擬 RESTful API 回應格式
-        const response = {
-          success: true,
-          data: {
-            products: MOCK_PRODUCTS,
-            total: MOCK_PRODUCTS.length,
-            page: 1,
-            limit: 20,
-          },
-          retStatus: {
-            code: '0000',
-            message: 'Success',
-          },
-        }
-        resolve(response)
-      } catch (error) {
-        reject({
-          success: false,
-          error: {
-            code: 'FETCH_ERROR',
-            message: '取得商品列表失敗',
-          },
-        })
-      }
-    }, 500) // 模擬網路延遲 500ms
+  const response = await fetch(buildEndpoint(), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-store',
   })
+
+  if (!response.ok) {
+    throw new Error(`取得商品列表失敗 (${response.status})`)
+  }
+
+  const payload = await response.json()
+  const retStatus = payload?.retStatus ?? {}
+  const statusCode =
+    typeof retStatus.code === 'string'
+      ? Number(retStatus.code)
+      : (retStatus.code ?? NaN)
+
+  if (statusCode !== SUCCESS_CODE) {
+    const error = new Error(retStatus.message ?? '取得商品列表失敗')
+    error.code = retStatus.code
+    throw error
+  }
+
+  const rawProducts = Array.isArray(payload?.data?.products)
+    ? payload.data.products
+    : []
+  const products = rawProducts.map(normalizeProduct)
+
+  return {
+    success: true,
+    data: {
+      products,
+      total: payload?.data?.total ?? products.length,
+      page: payload?.data?.page ?? 1,
+      limit: payload?.data?.limit ?? products.length,
+    },
+    retStatus: {
+      code: statusCode,
+      message: retStatus.message ?? '',
+    },
+  }
 }
 
 /**

@@ -31,9 +31,53 @@ const createWrapper = () => {
 
 describe('use-products API Hook', () => {
   describe('fetchProductsAPI', () => {
+    const originalEnv = process.env
+    const mockSuccessPayload = {
+      retStatus: { code: 10_000, message: 'Success' },
+      data: {
+        products: [
+          {
+            id: 1001,
+            name: '2025 力維盃紀念襪',
+            description: '吸汗透氣，適合運動穿搭',
+            base_price: 350,
+            main_image: 'https://cdn.example.com/socks/front.jpg',
+          },
+          {
+            productId: 'training-tee-elite',
+            name: '訓練 T-Shirt',
+            description: '透氣快乾',
+            price: 520,
+            images: ['https://cdn.example.com/tee/front.jpg'],
+          },
+        ],
+        total: 2,
+        page: 1,
+        limit: 20,
+      },
+    }
+
+    beforeEach(() => {
+      process.env = { ...originalEnv, NEXT_PUBLIC_BASE_URL: '' }
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockSuccessPayload,
+      })
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
+      process.env = originalEnv
+      delete global.fetch
+    })
+
     test('應該成功取得商品列表', async () => {
       const result = await fetchProductsAPI()
 
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/public/v1/products',
+        expect.objectContaining({ method: 'GET' }),
+      )
       expect(result.success).toBe(true)
       expect(result.data.products).toBeDefined()
       expect(Array.isArray(result.data.products)).toBe(true)
@@ -58,7 +102,7 @@ describe('use-products API Hook', () => {
       // 檢查 retStatus 結構
       expect(result.retStatus).toHaveProperty('code')
       expect(result.retStatus).toHaveProperty('message')
-      expect(result.retStatus.code).toBe('0000')
+      expect(result.retStatus.code).toBe(10_000)
     })
 
     test('商品物件應該包含必要欄位', async () => {
@@ -71,6 +115,34 @@ describe('use-products API Hook', () => {
       expect(product).toHaveProperty('price')
       expect(product).toHaveProperty('images')
       expect(Array.isArray(product.images)).toBe(true)
+      expect(product.productId).toBe('1001')
+      expect(product.price).toBe(350)
+      expect(product.images[0]).toBe('https://cdn.example.com/socks/front.jpg')
+    })
+
+    test('非 2xx 回應應該丟出錯誤', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        json: async () => ({}),
+      })
+
+      await expect(fetchProductsAPI()).rejects.toThrow('取得商品列表失敗 (500)')
+    })
+
+    test('retStatus 不是成功碼時應該丟出錯誤', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          retStatus: { code: 115001, message: '參數錯誤' },
+          data: { products: [] },
+        }),
+      })
+
+      await expect(fetchProductsAPI()).rejects.toMatchObject({
+        message: '參數錯誤',
+        code: 115001,
+      })
     })
   })
 
@@ -117,6 +189,34 @@ describe('use-products API Hook', () => {
   })
 
   describe('useProducts', () => {
+    beforeEach(() => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          retStatus: { code: 10_000, message: 'Success' },
+          data: {
+            products: [
+              {
+                id: 1001,
+                name: '2025 力維盃紀念襪',
+                description: '吸汗透氣，適合運動穿搭',
+                base_price: 350,
+                main_image: 'https://cdn.example.com/socks/front.jpg',
+              },
+            ],
+            total: 1,
+            page: 1,
+            limit: 20,
+          },
+        }),
+      })
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
+      delete global.fetch
+    })
+
     test('應該成功載入商品列表', async () => {
       const { result } = renderHook(() => useProducts(), {
         wrapper: createWrapper(),
