@@ -173,12 +173,29 @@ function ProductDetailClient({ productId, initialData }) {
   const description = useMemo(() => resolveDescription(product), [product])
 
   const [activeImageIndex, setActiveImageIndex] = useState(0)
-  const [selectedColor, setSelectedColor] = useState('')
-  const [selectedSize, setSelectedSize] = useState('')
+  // 初始化時就設置第一個顏色，避免顯示錯誤的圖片
+  const [selectedColor, setSelectedColor] = useState(() => {
+    // 如果 initialData 存在，從中提取第一個顏色
+    if (initialData?.data?.product) {
+      const initialColors = resolveColors(initialData.data.product)
+      return initialColors.length > 0 ? initialColors[0] : ''
+    }
+    return ''
+  })
+  const [selectedSize, setSelectedSize] = useState(() => {
+    // 如果 initialData 存在，從中提取第一個尺寸
+    if (initialData?.data?.product) {
+      const initialSizes = resolveSizes(initialData.data.product)
+      return initialSizes.length > 0 ? initialSizes[0] : ''
+    }
+    return ''
+  })
   const [quantity, setQuantity] = useState(1)
   const [isImageLoading, setIsImageLoading] = useState(true)
   const [showImageModal, setShowImageModal] = useState(false)
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0)
+  // 追蹤已載入的圖片，用於平滑切換
+  const [loadedImages, setLoadedImages] = useState(new Set())
 
   // 根據選中的顏色動態取得對應的圖片
   const images = useMemo(
@@ -186,7 +203,7 @@ function ProductDetailClient({ productId, initialData }) {
     [product, selectedColor],
   )
 
-  // 當商品資料載入後，重置選中的顏色和尺寸
+  // 當商品資料載入後，只在沒有選中顏色時才設置第一個顏色（作為 fallback）
   useEffect(() => {
     if (colors.length > 0 && !selectedColor) {
       setSelectedColor(colors[0])
@@ -196,15 +213,69 @@ function ProductDetailClient({ productId, initialData }) {
     }
   }, [colors, sizes, selectedColor, selectedSize])
 
-  // 當顏色變更或圖片列表變更時，重置圖片索引
+  // 當顏色變更時，重置圖片索引
   useEffect(() => {
     setActiveImageIndex(0)
     setThumbnailStartIndex(0)
     setIsImageLoading(true)
-  }, [selectedColor, images.length])
+  }, [selectedColor])
+
+  // 預載入所有圖片，優化切換體驗
+  useEffect(() => {
+    const preloadImage = imageUrl => {
+      if (imageUrl && !loadedImages.has(imageUrl)) {
+        const img = new window.Image()
+        img.src = imageUrl
+        img.onload = () => {
+          setLoadedImages(prev => {
+            const newSet = new Set(prev)
+            newSet.add(imageUrl)
+            return newSet
+          })
+        }
+        img.onerror = () => {
+          setLoadedImages(prev => {
+            const newSet = new Set(prev)
+            newSet.add(imageUrl)
+            return newSet
+          })
+        }
+      }
+    }
+
+    images.forEach(preloadImage)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images])
 
   const activeImage =
     images[Math.min(activeImageIndex, images.length - 1)] || FALLBACK_IMAGE
+  const isCurrentImageLoaded =
+    loadedImages.has(activeImage) || activeImage === FALLBACK_IMAGE
+  const shouldShowLoading = isImageLoading && !isCurrentImageLoaded
+
+  // 統一處理圖片切換邏輯
+  const handleImageChange = useCallback(
+    (newIndex, imageUrl) => {
+      if (loadedImages.has(imageUrl) || imageUrl === FALLBACK_IMAGE) {
+        setActiveImageIndex(newIndex)
+        setIsImageLoading(false)
+      } else {
+        setIsImageLoading(true)
+        setActiveImageIndex(newIndex)
+      }
+    },
+    [loadedImages],
+  )
+
+  // 統一處理圖片載入完成
+  const handleImageLoad = useCallback(imageUrl => {
+    setIsImageLoading(false)
+    setLoadedImages(prev => {
+      const newSet = new Set(prev)
+      newSet.add(imageUrl)
+      return newSet
+    })
+  }, [])
 
   const handleQuantityChange = useCallback(direction => {
     setQuantity(prev => {
@@ -216,10 +287,9 @@ function ProductDetailClient({ productId, initialData }) {
     })
   }, [])
 
-  const handleAddToCart = useCallback(() => {
-    if (!product?.productId && !product?.id) {
-      return
-    }
+  // 統一處理加入購物車的邏輯
+  const addToCart = useCallback(() => {
+    if (!product?.productId && !product?.id) return
 
     const productId = product?.productId || product?.id
     const primaryImage =
@@ -256,52 +326,15 @@ function ProductDetailClient({ productId, initialData }) {
     selectedColor,
     selectedSize,
   ])
+
+  const handleAddToCart = useCallback(() => {
+    addToCart()
+  }, [addToCart])
 
   const handleBuyNow = useCallback(() => {
-    if (!product?.productId && !product?.id) {
-      return
-    }
-
-    // 先加入購物車
-    const productId = product?.productId || product?.id
-    const primaryImage =
-      images.length > 0
-        ? images[0]
-        : product?.heroImage || product?.image || FALLBACK_IMAGE
-
-    addItem({
-      productId,
-      name: product?.name || '商品',
-      price:
-        typeof product?.price === 'number' ? product.price : product?.amount,
-      image: primaryImage,
-      color: selectedColor || '',
-      size: selectedSize || '',
-      quantity,
-    })
-
-    showSuccessToast({
-      title: '加入成功',
-      description: '商品已加入購物車',
-    })
-
-    // 導向購物車頁面
+    addToCart()
     router.push('/cart')
-  }, [
-    addItem,
-    images,
-    product?.amount,
-    product?.heroImage,
-    product?.id,
-    product?.image,
-    product?.name,
-    product?.price,
-    product?.productId,
-    quantity,
-    router,
-    selectedColor,
-    selectedSize,
-  ])
+  }, [addToCart, router])
 
   const thumbnailList = images.slice(
     thumbnailStartIndex,
@@ -375,8 +408,8 @@ function ProductDetailClient({ productId, initialData }) {
     <div className="grid gap-10 1440:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] 1440:gap-16">
       <div>
         <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-white shadow-md">
-          {isImageLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
+          {shouldShowLoading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-100">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-primary border-t-transparent" />
             </div>
           )}
@@ -384,12 +417,12 @@ function ProductDetailClient({ productId, initialData }) {
             src={activeImage}
             alt={`${product?.name || 'Product'} 預覽圖`}
             fill
-            className="object-cover cursor-pointer transition-opacity"
-            style={{ opacity: isImageLoading ? 0 : 1 }}
+            className="object-cover cursor-pointer transition-opacity duration-300"
+            style={{ opacity: shouldShowLoading ? 0 : 1 }}
             sizes="(min-width: 1440px) 640px, (min-width: 768px) 75vw, 100vw"
-            priority
-            onLoad={() => setIsImageLoading(false)}
-            onError={() => setIsImageLoading(false)}
+            priority={activeImageIndex === 0}
+            onLoad={() => handleImageLoad(activeImage)}
+            onError={() => handleImageLoad(activeImage)}
             onClick={() => setShowImageModal(true)}
           />
         </div>
@@ -402,7 +435,9 @@ function ProductDetailClient({ productId, initialData }) {
                 <ImageSlider
                   images={images}
                   activeIndex={activeImageIndex}
-                  onImageChange={setActiveImageIndex}
+                  onImageChange={newIndex => {
+                    handleImageChange(newIndex, images[newIndex])
+                  }}
                 />
               ) : (
                 <div className="grid grid-cols-3 gap-3">
@@ -410,7 +445,7 @@ function ProductDetailClient({ productId, initialData }) {
                     <button
                       key={`${src}-${index}`}
                       type="button"
-                      onClick={() => setActiveImageIndex(index)}
+                      onClick={() => handleImageChange(index, src)}
                       className={cn(
                         'relative aspect-square overflow-hidden rounded-2xl border bg-white shadow-sm transition-all cursor-pointer',
                         activeImageIndex === index
@@ -425,6 +460,7 @@ function ProductDetailClient({ productId, initialData }) {
                         fill
                         className="object-cover"
                         sizes="(max-width: 640px) 33vw, 25vw"
+                        loading="lazy"
                       />
                     </button>
                   ))}
@@ -490,7 +526,7 @@ function ProductDetailClient({ productId, initialData }) {
                         <button
                           key={`${src}-${actualIndex}`}
                           type="button"
-                          onClick={() => setActiveImageIndex(actualIndex)}
+                          onClick={() => handleImageChange(actualIndex, src)}
                           className={cn(
                             'relative aspect-square overflow-hidden rounded-2xl border bg-white shadow-sm transition-all cursor-pointer',
                             activeImageIndex === actualIndex
@@ -505,6 +541,7 @@ function ProductDetailClient({ productId, initialData }) {
                             fill
                             className="object-cover"
                             sizes="(min-width: 1440px) 150px, (min-width: 768px) 25vw, 33vw"
+                            loading="lazy"
                           />
                         </button>
                       )
@@ -537,7 +574,7 @@ function ProductDetailClient({ productId, initialData }) {
                     <button
                       key={`${src}-${index}`}
                       type="button"
-                      onClick={() => setActiveImageIndex(index)}
+                      onClick={() => handleImageChange(index, src)}
                       className={cn(
                         'relative aspect-square overflow-hidden rounded-2xl border bg-white shadow-sm transition-all cursor-pointer',
                         activeImageIndex === index
@@ -552,6 +589,7 @@ function ProductDetailClient({ productId, initialData }) {
                         fill
                         className="object-cover"
                         sizes="(min-width: 1440px) 150px, (min-width: 768px) 25vw, 33vw"
+                        loading="lazy"
                       />
                     </button>
                   ))}
@@ -724,8 +762,9 @@ function ProductDetailClient({ productId, initialData }) {
               alt={`${product?.name || 'Product'} 放大圖`}
               width={800}
               height={800}
-              className="max-h-[90vh] max-w-[90vw] object-contain"
+              className="max-h-[90vh] max-w-[90vw] object-contain transition-opacity duration-300"
               onClick={e => e.stopPropagation()}
+              priority
             />
           </div>
         </div>
