@@ -29,6 +29,58 @@ const createWrapper = () => {
   )
 }
 
+const createMockProductDetailPayload = () => ({
+  retStatus: { code: 10_000, message: 'Success' },
+  data: {
+    product: {
+      id: 1001,
+      name: '2025 力維盃紀念襪',
+      description: '吸汗透氣，適合運動穿搭',
+      base_price: 350,
+      main_image: 'https://cdn.example.com/socks/front.jpg',
+      tags: [{ name: '熱門', slug: 'hot' }],
+      gallery: [
+        { url: 'https://cdn.example.com/socks/front.jpg', is_primary: true },
+        {
+          url: 'https://cdn.example.com/socks/detail.jpg',
+          option_value_id: 3001,
+        },
+      ],
+      skus: [
+        {
+          id: 4001,
+          sku_code: 'LW2025-SOCKS-BW-M',
+          price: 350,
+          inventory: 25,
+          color: {
+            option_id: 2001,
+            option_value_id: 3001,
+            option_name: 'color',
+            option_display_name: '顏色',
+            value: 'bright-white',
+            display_value: '亮潔白',
+          },
+          size: {
+            option_id: 2002,
+            option_value_id: 3002,
+            option_name: 'size',
+            option_display_name: '尺寸',
+            value: 'm',
+            display_value: 'M',
+          },
+          images: [
+            { url: 'https://cdn.example.com/socks/white/front.jpg' },
+            'https://cdn.example.com/socks/white/detail.jpg',
+          ],
+        },
+      ],
+      snapshot: { snapshot_id: 7001, version: 1, trigger_event: 'publish' },
+      created_at: '2024-11-01T00:00:00Z',
+      updated_at: '2024-11-10T00:00:00Z',
+    },
+  },
+})
+
 describe('use-products API Hook', () => {
   describe('fetchProductsAPI', () => {
     const originalEnv = process.env
@@ -147,44 +199,68 @@ describe('use-products API Hook', () => {
   })
 
   describe('fetchProductAPI', () => {
-    test('應該成功取得指定商品', async () => {
-      const productId = 'volleyball-socks-classic-se'
-      const result = await fetchProductAPI(productId)
+    const originalEnv = process.env
 
-      expect(result.success).toBe(true)
-      expect(result.data.product).toBeDefined()
-      expect(result.data.product.productId).toBe(productId)
-    })
-
-    test('找不到商品時應該回傳錯誤', async () => {
-      const invalidId = 'non-existent-product'
-
-      await expect(fetchProductAPI(invalidId)).rejects.toEqual({
-        success: false,
-        error: {
-          code: 'NOT_FOUND',
-          message: '找不到此商品',
-        },
+    beforeEach(() => {
+      process.env = { ...originalEnv, NEXT_PUBLIC_BASE_URL: '' }
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => createMockProductDetailPayload(),
       })
     })
 
-    test('回應格式應該符合 RESTful API 規範', async () => {
-      const productId = 'volleyball-socks-classic-se'
+    afterEach(() => {
+      jest.resetAllMocks()
+      process.env = originalEnv
+      delete global.fetch
+    })
+
+    test('應該成功取得指定商品', async () => {
+      const productId = '1001'
       const result = await fetchProductAPI(productId)
 
-      // 檢查回應結構
-      expect(result).toHaveProperty('success')
-      expect(result).toHaveProperty('data')
-      expect(result).toHaveProperty('retStatus')
-
-      // 檢查 data 結構
-      expect(result.data).toHaveProperty('product')
-
-      // 檢查商品物件
+      expect(global.fetch).toHaveBeenCalledWith(
+        `/api/public/v1/products/${productId}`,
+        expect.objectContaining({ method: 'GET' }),
+      )
+      expect(result.success).toBe(true)
       const product = result.data.product
+      expect(product).toBeDefined()
       expect(product.productId).toBe(productId)
-      expect(product).toHaveProperty('name')
-      expect(product).toHaveProperty('description')
+      expect(product.images).toEqual([
+        'https://cdn.example.com/socks/front.jpg',
+        'https://cdn.example.com/socks/detail.jpg',
+      ])
+      expect(product.variants).toHaveLength(1)
+      expect(product.variants[0].color).toBe('亮潔白')
+    })
+
+    test('非 2xx 回應應該丟出錯誤', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        json: async () => ({}),
+      })
+
+      await expect(fetchProductAPI('1001')).rejects.toMatchObject({
+        message: '取得商品詳情失敗 (404)',
+        code: 404,
+      })
+    })
+
+    test('retStatus 不是成功碼時應該丟出錯誤', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          retStatus: { code: 115003, message: '查無商品' },
+          data: {},
+        }),
+      })
+
+      await expect(fetchProductAPI('1001')).rejects.toMatchObject({
+        message: '查無商品',
+        code: 115003,
+      })
     })
   })
 
@@ -254,24 +330,43 @@ describe('use-products API Hook', () => {
   })
 
   describe('useProduct', () => {
+    const originalEnv = process.env
+
+    beforeEach(() => {
+      process.env = { ...originalEnv, NEXT_PUBLIC_BASE_URL: '' }
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
+      process.env = originalEnv
+      delete global.fetch
+    })
+
     test('應該成功載入指定商品', async () => {
-      const productId = 'volleyball-socks-classic-se'
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => createMockProductDetailPayload(),
+      })
+
+      const productId = '1001'
       const { result } = renderHook(() => useProduct(productId), {
         wrapper: createWrapper(),
       })
 
-      // 初始狀態應該是 loading
       expect(result.current.isLoading).toBe(true)
 
-      // 等待資料載入完成
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true)
       })
 
-      // 檢查資料
+      expect(global.fetch).toHaveBeenCalledWith(
+        `/api/public/v1/products/${productId}`,
+        expect.objectContaining({ method: 'GET' }),
+      )
       expect(result.current.data.success).toBe(true)
       expect(result.current.data.data.product).toBeDefined()
       expect(result.current.data.data.product.productId).toBe(productId)
+      expect(result.current.data.data.product.variants[0].color).toBe('亮潔白')
       expect(result.current.isLoading).toBe(false)
       expect(result.current.error).toBeNull()
     })
@@ -281,25 +376,30 @@ describe('use-products API Hook', () => {
         wrapper: createWrapper(),
       })
 
-      // 應該不會進入 loading 狀態
       expect(result.current.isLoading).toBe(false)
       expect(result.current.data).toBeUndefined()
     })
 
     test('無效的 productId 應該回傳錯誤', async () => {
-      const invalidId = 'non-existent-product'
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          retStatus: { code: 115003, message: '查無商品' },
+          data: {},
+        }),
+      })
+
+      const invalidId = '999999'
       const { result } = renderHook(() => useProduct(invalidId), {
         wrapper: createWrapper(),
       })
 
-      // 等待錯誤發生
       await waitFor(() => {
         expect(result.current.isError).toBe(true)
       })
 
-      // 檢查錯誤
       expect(result.current.error).toBeDefined()
-      expect(result.current.error.error.code).toBe('NOT_FOUND')
+      expect(result.current.error.code).toBe(115003)
     })
   })
 })

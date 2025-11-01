@@ -4,11 +4,14 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { useProduct } from '@/apis/hook/use-products'
+import Loader from '@/components/common/loader'
 import { Button } from '@/components/ui/button'
 import { ImageSlider } from '@/components/ui/image-slider'
 import { cn } from '@/lib/utils'
 import useCartStore from '@/store/cart-context'
 import { formatCurrencyNT } from '@/utils/currency'
+import { extractImageUrl } from '@/utils/image'
 import { showSuccessToast } from '@/utils/toast'
 
 const FALLBACK_IMAGE = 'https://picsum.photos/640/640'
@@ -23,9 +26,47 @@ const uniqueList = list =>
     ),
   ).filter(Boolean)
 
-const resolveImages = product => {
+const resolveVariants = product =>
+  Array.isArray(product?.variants) ? product.variants : []
+
+const resolveImages = (product, selectedColor = null) => {
   if (!product) return [FALLBACK_IMAGE]
 
+  // 如果有選中顏色，嘗試找到對應 variant 的圖片
+  if (selectedColor) {
+    const variants = resolveVariants(product)
+    const matchingVariant = variants.find(variant => {
+      const variantColor =
+        variant?.color ||
+        variant?.colorName ||
+        variant?.optionColor ||
+        variant?.label
+      return variantColor === selectedColor
+    })
+
+    if (matchingVariant && Array.isArray(matchingVariant.images)) {
+      // 處理 variant images（可能是字串或對象）
+      const variantImages = matchingVariant.images
+        .map(img => {
+          // 如果是字串，直接使用
+          if (typeof img === 'string') {
+            return img.startsWith('//') ? `https:${img}` : img
+          }
+          // 如果是對象，提取 URL
+          if (typeof img === 'object' && img !== null) {
+            return extractImageUrl(img)
+          }
+          return null
+        })
+        .filter(Boolean)
+
+      if (variantImages.length > 0) {
+        return variantImages
+      }
+    }
+  }
+
+  // Fallback: 使用商品的主要圖片
   const sources = [
     product?.heroImage,
     product?.image,
@@ -37,9 +78,17 @@ const resolveImages = product => {
     ...(Array.isArray(product?.thumbnails) ? product.thumbnails : []),
   ]
 
-  const result = uniqueList(sources).map(src =>
-    typeof src === 'string' && src.startsWith('//') ? `https:${src}` : src,
-  )
+  const result = uniqueList(sources)
+    .map(src => {
+      if (typeof src === 'string') {
+        return src.startsWith('//') ? `https:${src}` : src
+      }
+      if (typeof src === 'object' && src !== null) {
+        return extractImageUrl(src)
+      }
+      return null
+    })
+    .filter(Boolean)
 
   if (result.length === 0) {
     return [FALLBACK_IMAGE]
@@ -47,9 +96,6 @@ const resolveImages = product => {
 
   return result
 }
-
-const resolveVariants = product =>
-  Array.isArray(product?.variants) ? product.variants : []
 
 const resolveColors = product => {
   const colorsFromList = uniqueList(product?.colors || product?.colorOptions)
@@ -102,23 +148,60 @@ const resolveDescription = product =>
   product?.content?.trim() ||
   ''
 
-function ProductDetailClient({ product }) {
+function ProductDetailClient({ productId, initialData }) {
   const router = useRouter()
   const addItem = useCartStore(state => state.addItem)
 
-  const images = useMemo(() => resolveImages(product), [product])
+  // 使用 useProduct hook 獲取商品資料
+  const {
+    data: productResponse,
+    isLoading,
+    isError,
+    error,
+  } = useProduct(productId, {
+    initialData, // 使用 SSR 傳入的初始資料，避免重複請求
+    retry: 1, // 失敗時重試 1 次
+  })
+
+  // 從 API 回應中提取商品資料
+  const product = productResponse?.data?.product || null
+
+  // 所有 hooks 必須在條件返回之前調用
   const colors = useMemo(() => resolveColors(product), [product])
   const sizes = useMemo(() => resolveSizes(product), [product])
   const priceLabel = useMemo(() => resolvePrice(product), [product])
   const description = useMemo(() => resolveDescription(product), [product])
 
   const [activeImageIndex, setActiveImageIndex] = useState(0)
-  const [selectedColor, setSelectedColor] = useState(colors[0] || '')
-  const [selectedSize, setSelectedSize] = useState(sizes[0] || '')
+  const [selectedColor, setSelectedColor] = useState('')
+  const [selectedSize, setSelectedSize] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [isImageLoading, setIsImageLoading] = useState(true)
   const [showImageModal, setShowImageModal] = useState(false)
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0)
+
+  // 根據選中的顏色動態取得對應的圖片
+  const images = useMemo(
+    () => resolveImages(product, selectedColor),
+    [product, selectedColor],
+  )
+
+  // 當商品資料載入後，重置選中的顏色和尺寸
+  useEffect(() => {
+    if (colors.length > 0 && !selectedColor) {
+      setSelectedColor(colors[0])
+    }
+    if (sizes.length > 0 && !selectedSize) {
+      setSelectedSize(sizes[0])
+    }
+  }, [colors, sizes, selectedColor, selectedSize])
+
+  // 當顏色變更或圖片列表變更時，重置圖片索引
+  useEffect(() => {
+    setActiveImageIndex(0)
+    setThumbnailStartIndex(0)
+    setIsImageLoading(true)
+  }, [selectedColor, images.length])
 
   const activeImage =
     images[Math.min(activeImageIndex, images.length - 1)] || FALLBACK_IMAGE
@@ -259,6 +342,35 @@ function ProductDetailClient({ product }) {
     }
   }, [showImageModal])
 
+  // 處理 loading 狀態
+  if (isLoading && !product) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Loader />
+      </div>
+    )
+  }
+
+  // 處理錯誤狀態
+  if (isError || !product) {
+    const errorMessage = error?.message || '商品資訊載入失敗，請稍後再試。'
+
+    return (
+      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
+        <p className="font-noto-sans-tc text-lg text-slate-600">
+          {errorMessage}
+        </p>
+        <Button
+          variant="outline"
+          onClick={() => window.location.reload()}
+          className="cursor-pointer"
+        >
+          重新載入
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="grid gap-10 1440:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] 1440:gap-16">
       <div>
@@ -272,7 +384,7 @@ function ProductDetailClient({ product }) {
             src={activeImage}
             alt={`${product?.name || 'Product'} 預覽圖`}
             fill
-            className="object-contain cursor-pointer transition-opacity"
+            className="object-cover cursor-pointer transition-opacity"
             style={{ opacity: isImageLoading ? 0 : 1 }}
             sizes="(min-width: 1440px) 640px, (min-width: 768px) 75vw, 100vw"
             priority
@@ -519,7 +631,7 @@ function ProductDetailClient({ product }) {
                   type="button"
                   onClick={() => setSelectedSize(size)}
                   className={cn(
-                    'rounded-md border px-4 py-2 text-sm font-noto-sans-tc transition-colors',
+                    'flex h-10 w-10 items-center justify-center rounded-md border text-xs font-noto-sans-tc transition-colors',
                     selectedSize === size
                       ? 'border-blue-primary bg-blue-primary text-white'
                       : 'border-slate-300 bg-white text-blue-primary hover:border-blue-primary/60',
