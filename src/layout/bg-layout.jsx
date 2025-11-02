@@ -1,6 +1,6 @@
 function BgLayout({ children }) {
   return (
-    <div className="flex flex-col h-svh">
+    <div className="flex flex-col">
       <div className="pb-1 border-[#FFCC08] border-b-4 mb-1 shrink-0">
         <div className="w-full h-8 [background-image:url('/images/deco-01.png')] bg-repeat bg-size-[auto_32px]" />
       </div>
