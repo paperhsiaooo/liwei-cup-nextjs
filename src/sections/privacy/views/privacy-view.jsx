@@ -9,7 +9,8 @@ function PrivacyView() {
 
         <div className="space-y-6 leading-relaxed text-gray-800">
           <p>
-            力維盃（以下稱「本網站」或「本活動」）重視您的隱私，依據《個人資料保護法》與相關法令，說明我們如何蒐集、處理與利用您的個人資料，並說明您可行使之權利。
+            リキイ
+            盃（以下稱「本網站」或「本活動」）重視您的隱私，依據《個人資料保護法》與相關法令，說明我們如何蒐集、處理與利用您的個人資料，並說明您可行使之權利。
           </p>
 
           <h2 className="mt-8 text-2xl font-semibold">一、蒐集目的與法源</h2>
@@ -98,7 +99,7 @@ function PrivacyView() {
 
           <h2 className="mt-8 text-2xl font-semibold">十、聯絡方式</h2>
           <p className="not-italic text-gray-700">
-            主辦單位：力維盃活動籌備團隊
+            主辦單位：リキイ 盃活動籌備團隊
             <br />
             客服信箱：
             <a
