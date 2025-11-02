@@ -5,7 +5,7 @@ import { InfoDate, InfoDestination, InfoDistance, InfoDuration } from './'
 
 function Address() {
   return (
-    <section id="address" className="root bg-orange-primary">
+    <section className="root bg-orange-primary">
       <div className="relative pt-[500px] pb-5 max-w-[375px] mx-auto 1440:max-w-[1440px] 1440:pt-[630px] 1440:pb-[300px]">
         <div className="absolute top-[120px] left-7 w-[157px] aspect-[1464/961] 1440:hidden">
           <Image
