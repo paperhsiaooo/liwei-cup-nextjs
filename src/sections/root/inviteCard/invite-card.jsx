@@ -40,7 +40,7 @@ function InviteCard() {
   }
 
   return (
-    <section id="invite" className="root bg-green-primary">
+    <section className="root bg-green-primary">
       <div className="wrapper max-w-[350px] mx-auto 1440:max-w-[934px]">
         {flagEnabled && (
           <>

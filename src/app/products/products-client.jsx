@@ -1,39 +1,94 @@
 'use client'
 
-import { useProducts } from '@/apis/hook/use-products'
-import Loader from '@/components/common/loader'
-import { ProductsView } from '@/sections/products/views'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
+
+import Product from '@/sections/products/components/product'
+import http from '@/utils/axios'
 
 function ProductsClient() {
-  // 使用 React Query hook 取得商品列表
-  const { data, isLoading, error } = useProducts()
+  const router = useRouter()
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  // Loading 狀態
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Loader />
-      </div>
-    )
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const res = await http.get('/product/list')
+        const payload = res?.data
+        const list = Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload?.list)
+            ? payload.list
+            : Array.isArray(payload)
+              ? payload
+              : []
+        if (mounted) setProducts(list)
+      } catch (err) {
+        if (mounted) setError(err?.message || '發生錯誤')
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    })()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const handleProductBuyClick = useCallback(
+    async product => {
+      try {
+        const res = await fetch('/api/checkout/intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: product.productId,
+            quantity: 1,
+            email: 'test@test.com',
+          }),
+          credentials: 'same-origin',
+        })
+
+        if (res.redirected) {
+          router.push(res.url)
+          return
+        }
+
+        if (!res.ok) {
+          const maybeJson = await res.json().catch(() => null)
+          throw new Error(maybeJson?.error || 'Request failed')
+        }
+      } catch (error) {
+        console.error('>>> [handleProductBuyClick] error: ', error)
+      }
+    },
+    [router],
+  )
+
+  if (loading) {
+    return <div className="p-10">載入中...</div>
   }
 
-  // 錯誤狀態
   if (error) {
-    const errorMessage =
-      error?.error?.message || error?.message || '發生錯誤，請稍後再試'
-
-    return (
-      <div className="p-10 text-center text-red-500">
-        <p className="text-lg font-bold">{errorMessage}</p>
-        <p className="text-sm mt-2">請稍後再試</p>
-      </div>
-    )
+    return <div className="p-10 text-red-500">{error}</div>
   }
 
-  // 取得商品資料
-  const products = data?.data?.products || []
-
-  return <ProductsView initialProducts={products} />
+  return (
+    <div className="flex flex-wrap gap-4 p-10">
+      {products.map(p => (
+        <Product.Container key={p.productId} className="w-[300px]">
+          <Product.Content
+            name={p.name}
+            description={p.description}
+            image={'https://picsum.photos/200/300'}
+            onBuyClick={() => handleProductBuyClick(p)}
+          />
+        </Product.Container>
+      ))}
+    </div>
+  )
 }
 
 export default ProductsClient

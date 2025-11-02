@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 function Slogan({ className }) {
   return (
-    <div id="slogan" className={cn('bg-white', className)}>
+    <div className={cn('bg-white', className)}>
       <div className="relative max-w-[375px] mx-auto 1440:max-w-[1440px]">
         {/* Word - 不僅要參加，更要留下 */}
         <div className="absolute top-6 left-9 1440:top-12 1440:left-28">

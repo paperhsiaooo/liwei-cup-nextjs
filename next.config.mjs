@@ -18,9 +18,9 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['react-icons'],
   },
-  // compiler: {
-  //   removeConsole: process.env.NODE_ENV === 'production',
-  // },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   async headers() {
     return [
       {

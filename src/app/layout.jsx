@@ -122,7 +122,7 @@ async function RootLayout({ children }) {
     '@type': 'Organization',
     name: 'リキイ 盃籌備團隊',
     url: 'https://liwei-cup.com',
-    logo: 'https://liwei-cup.com/social-media/logo_main.png',
+    logo: 'https://liwei-cup.com/icon.png',
     contactPoint: {
       '@type': 'ContactPoint',
       email: 'support@liwei-cup.com',
