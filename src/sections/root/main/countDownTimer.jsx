@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 
 function CountDownTimer({ type = 'primary' | 'secondary' }) {
   const { days, hours, minutes, seconds, isRunning } = useTimer({
-    expiryTimestamp: new Date(2025, 8, 15, 12, 20, 0),
+    expiryTimestamp: new Date(2025, 10, 15, 12, 0, 0),
   })
 
   const isExpired =
