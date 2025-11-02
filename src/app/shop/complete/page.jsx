@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 export const metadata = {
   title: '兌換成功',
   description:
-    '恭喜您成功兌換 2025 力維盃錦標賽商品！訂單處理中，我們將盡快為您出貨。',
+    '恭喜您成功兌換 リキイ 盃錦標賽商品！訂單處理中，我們將盡快為您出貨。',
   robots: {
     index: false,
     follow: false,

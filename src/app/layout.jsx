@@ -9,27 +9,25 @@ import { AppProvider } from '@/provider'
 export const metadata = {
   metadataBase: new URL('https://liwei-cup.com'),
   title: {
-    default: '2025 力維盃錦標賽',
-    template: '%s | 2025 力維盃錦標賽',
+    default: 'リキイ 盃錦標賽',
+    template: '%s | リキイ 盃錦標賽',
   },
   description:
-    '聲音與氣味會淡去，唯有拚搏的樣子留存在最後。力維盃，用一場比賽，把青春刻進記憶深處。這不只是排球賽，更是一場關於熱血、友情與信念的旅程。每一次奔跑與吶喊，都將成為日後回望時，最難忘的光影殘影。',
+    '聲音與氣味會淡去，唯有拚搏的樣子留存在最後。リキイ 盃，用一場比賽，把青春刻進記憶深處。這不只是排球賽，更是一場關於熱血、友情與信念的旅程。每一次奔跑與吶喊，都將成為日後回望時，最難忘的光影殘影。',
   keywords: [
-    'li wei',
-    'li-wei',
-    'paper',
-    'paperhsiaooo',
     '排球',
     '錦標賽',
     '力維盃',
+    'リキイ',
+    'リキイ 盃',
     '排球賽',
     '排球比賽',
     '台中排球',
     '排球活動',
   ],
-  authors: [{ name: '力維盃籌備團隊' }],
-  creator: '力維盃籌備團隊',
-  publisher: '力維盃籌備團隊',
+  authors: [{ name: 'リキイ 盃籌備團隊' }],
+  creator: 'リキイ 盃籌備團隊',
+  publisher: 'リキイ 盃籌備團隊',
   formatDetection: {
     email: false,
     address: false,
@@ -39,24 +37,24 @@ export const metadata = {
     type: 'website',
     locale: 'zh_TW',
     url: 'https://liwei-cup.com',
-    siteName: '2025 力維盃錦標賽',
-    title: '2025 力維盃錦標賽',
+    siteName: 'リキイ 盃錦標賽',
+    title: 'リキイ 盃錦標賽',
     description:
-      '聲音與氣味會淡去，唯有拚搏的樣子留存在最後。力維盃，用一場比賽，把青春刻進記憶深處。這不只是排球賽，更是一場關於熱血、友情與信念的旅程。',
+      '聲音與氣味會淡去，唯有拚搏的樣子留存在最後。リキイ 盃，用一場比賽，把青春刻進記憶深處。這不只是排球賽，更是一場關於熱血、友情與信念的旅程。',
     images: [
       {
         url: '/opengraph-image.jpg',
         width: 1200,
         height: 630,
-        alt: '2025 力維盃錦標賽',
+        alt: 'リキイ 盃錦標賽',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: '2025 力維盃錦標賽',
+    title: 'リキイ 盃錦標賽',
     description:
-      '聲音與氣味會淡去，唯有拚搏的樣子留存在最後。力維盃，用一場比賽，把青春刻進記憶深處。',
+      '聲音與氣味會淡去，唯有拚搏的樣子留存在最後。リキイ 盃，用一場比賽，把青春刻進記憶深處。',
     images: ['/opengraph-image.jpg'],
     creator: '@paperhsiaooo',
   },
@@ -122,7 +120,7 @@ async function RootLayout({ children }) {
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: '力維盃籌備團隊',
+    name: 'リキイ 盃籌備團隊',
     url: 'https://liwei-cup.com',
     logo: 'https://liwei-cup.com/icon.png',
     contactPoint: {
@@ -137,23 +135,23 @@ async function RootLayout({ children }) {
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: '2025 力維盃錦標賽',
+    name: 'リキイ 盃錦標賽',
     url: 'https://liwei-cup.com',
     description:
-      '聲音與氣味會淡去，唯有拚搏的樣子留存在最後。力維盃，用一場比賽，把青春刻進記憶深處。',
+      '聲音與氣味會淡去，唯有拚搏的樣子留存在最後。リキイ 盃，用一場比賽，把青春刻進記憶深處。',
     inLanguage: 'zh-TW',
     publisher: {
       '@type': 'Organization',
-      name: '力維盃籌備團隊',
+      name: 'リキイ 盃籌備團隊',
     },
   }
 
   const eventSchema = {
     '@context': 'https://schema.org',
     '@type': 'SportsEvent',
-    name: '2025 力維盃錦標賽',
+    name: 'リキイ 盃錦標賽',
     description:
-      '力維盃排球錦標賽，一場關於熱血、友情與信念的排球賽事。每一次奔跑與吶喊，都將成為最難忘的回憶。',
+      'リキイ 盃排球錦標賽，一場關於熱血、友情與信念的排球賽事。每一次奔跑與吶喊，都將成為最難忘的回憶。',
     url: 'https://liwei-cup.com',
     image: 'https://liwei-cup.com/opengraph-image.jpg',
     startDate: '2025-11-15',
@@ -173,7 +171,7 @@ async function RootLayout({ children }) {
     },
     organizer: {
       '@type': 'Organization',
-      name: '力維盃籌備團隊',
+      name: 'リキイ 盃籌備團隊',
       url: 'https://liwei-cup.com',
     },
     sport: '排球',
