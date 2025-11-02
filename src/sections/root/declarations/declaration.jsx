@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { Suspense } from 'react'
 
 import { CountDownTimer } from '../main'
+import { Music } from '../music'
 import CardContainer from './components/card-container'
 
 function Declaration() {
@@ -28,6 +29,8 @@ function Declaration() {
         <div className="mb-6 1440:mb-16">
           <CountDownTimer type="secondary" />
         </div>
+
+        <Music />
 
         <Suspense fallback={<div>Loading...</div>}>
           <CardContainer />
