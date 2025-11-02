@@ -29,7 +29,7 @@ function Main() {
             height={1102}
           />
         </div>
-        <CountDownTimer />
+        <CountDownTimer type="primary" />
       </div>
     </section>
   )
