@@ -7,7 +7,8 @@ import { cn } from '@/lib/utils'
 
 function CountDownTimer({ type = 'primary' | 'secondary' }) {
   const { days, hours, minutes, seconds, isRunning } = useTimer({
-    expiryTimestamp: new Date(2025, 10, 15, 12, 0, 0),
+    // Ensure SSR and CSR count down to the same UTC+8 instant
+    expiryTimestamp: new Date('2025-11-15T12:00:00+08:00'),
   })
 
   const isExpired =
