@@ -27,6 +27,7 @@ export default function DeliveryInfoForm() {
 
     // 依照你的需求填入固定或動態值（可改為從 react-hook-form 取值）
     append('MerchantID', process.env.NEXT_PUBLIC_ECPAY_MERCHANT_ID)
+    append('MerchantTradeNo', 'TEST20251024A') // 可改為實際 cartId 或 orderDraftId
     append('LogisticsType', 'CVS')
     append('LogisticsSubType', 'UNIMARTC2C')
     append('IsCollection', 'N')
@@ -34,7 +35,6 @@ export default function DeliveryInfoForm() {
       'ServerReplyURL',
       `${process.env.NEXT_PUBLIC_ECPAY_SERVER_REPLY_URL}`,
     )
-    append('MerchantTradeNo', 'TEST20251024A') // 可改為實際 cartId 或 orderDraftId
 
     document.body.appendChild(form)
     form.submit()
