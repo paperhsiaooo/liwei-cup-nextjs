@@ -1,6 +1,47 @@
 import { toArray, uniqueList } from '@/utils/array'
 import { extractImageUrl } from '@/utils/image'
 
+const toDisplayString = value => {
+  if (!value) return null
+  if (typeof value === 'string') return value
+  if (typeof value === 'object') {
+    return (
+      value.display_value ??
+      value.displayValue ??
+      value.label ??
+      value.name ??
+      value.value ??
+      null
+    )
+  }
+  return null
+}
+
+const toValueString = value => {
+  if (!value) return null
+  if (typeof value === 'string') return value
+  if (typeof value === 'object') {
+    return value.value ?? value.code ?? value.id ?? null
+  }
+  return null
+}
+
+const toNumeric = value => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+  if (typeof value === 'string') {
+    const parsed = Number(value.trim())
+    if (Number.isFinite(parsed)) {
+      return parsed
+    }
+  }
+  return null
+}
+
+const resolveImageList = source =>
+  toArray(source).map(extractImageUrl).filter(Boolean)
+
 /**
  * 正規化商品列表項目
  * @param {object} rawProduct - 原始商品資料
@@ -48,33 +89,59 @@ export const normalizeProductVariant = (sku, fallbackImages) => {
     return null
   }
 
-  const colorAttr = sku.color ?? null
-  const sizeAttr = sku.size ?? null
+  let colorDisplay = null
+  if (typeof sku.color === 'string') {
+    colorDisplay = sku.color
+  } else {
+    colorDisplay = toDisplayString(sku.color) ?? toDisplayString(sku.colorName)
+  }
 
-  const colorDisplay =
-    colorAttr?.display_value ??
-    colorAttr?.displayValue ??
-    colorAttr?.label ??
-    colorAttr?.value ??
-    null
-  const sizeDisplay =
-    sizeAttr?.display_value ??
-    sizeAttr?.displayValue ??
-    sizeAttr?.label ??
-    sizeAttr?.value ??
-    null
+  let sizeDisplay = null
+  if (typeof sku.size === 'string') {
+    sizeDisplay = sku.size
+  } else {
+    sizeDisplay = toDisplayString(sku.size) ?? toDisplayString(sku.sizeName)
+  }
 
-  const variantImages = toArray(sku.images).map(extractImageUrl).filter(Boolean)
+  let colorValue = null
+  if (typeof sku.colorValue === 'string') {
+    colorValue = sku.colorValue
+  } else {
+    colorValue = toValueString(sku.color) ?? toValueString(sku.colorCode)
+  }
+
+  let sizeValue = null
+  if (typeof sku.sizeValue === 'string') {
+    sizeValue = sku.sizeValue
+  } else {
+    sizeValue = toValueString(sku.size) ?? toValueString(sku.sizeCode)
+  }
+
+  const variantImages = resolveImageList(sku.images)
 
   const parsedInventory =
     typeof sku.inventory === 'number'
       ? sku.inventory
       : typeof sku.inventory === 'string'
         ? Number.parseInt(sku.inventory, 10) || null
-        : null
+        : typeof sku.variantInventory === 'number'
+          ? sku.variantInventory
+          : null
+
+  const resolvedVariantId =
+    toNumeric(sku.variantId) ??
+    toNumeric(sku.variant_id) ??
+    toNumeric(sku.id) ??
+    toNumeric(sku.skuId) ??
+    toNumeric(sku.sku_id)
 
   const skuPrimary =
-    sku?.sku_code ?? sku?.skuCode ?? sku?.id ?? sku?.skuId ?? null
+    resolvedVariantId ??
+    sku?.sku_code ??
+    sku?.skuCode ??
+    sku?.skuId ??
+    sku?.sku_id ??
+    null
   const normalizedSkuId =
     typeof skuPrimary === 'number'
       ? String(skuPrimary)
@@ -82,20 +149,27 @@ export const normalizeProductVariant = (sku, fallbackImages) => {
         ? `${skuPrimary}`
         : null
 
+  const resolvedPrice =
+    typeof sku?.price === 'number'
+      ? sku.price
+      : typeof sku?.price === 'string'
+        ? Number.parseFloat(sku.price)
+        : typeof sku?.amount === 'number'
+          ? sku.amount
+          : null
+
   return {
     skuId: normalizedSkuId ?? undefined,
+    variantId: resolvedVariantId ?? null,
+    productId:
+      toNumeric(sku.productId) ?? toNumeric(sku.product_id) ?? undefined,
     skuCode: sku?.sku_code ?? sku?.skuCode ?? null,
-    price:
-      typeof sku?.price === 'number'
-        ? sku.price
-        : typeof sku?.price === 'string'
-          ? Number.parseFloat(sku.price)
-          : null,
+    price: resolvedPrice,
     inventory: parsedInventory,
     color: colorDisplay ?? null,
-    colorValue: colorAttr?.value ?? colorAttr?.code ?? null,
+    colorValue: colorValue ?? null,
     size: sizeDisplay ?? null,
-    sizeValue: sizeAttr?.value ?? null,
+    sizeValue: sizeValue ?? null,
     images: variantImages.length > 0 ? variantImages : fallbackImages,
     snapshot: sku?.snapshot ?? null,
     raw: sku,
@@ -116,34 +190,86 @@ export const normalizeProductDetail = rawDetail => {
   const productId =
     typeof rawId === 'number' ? String(rawId) : rawId ? `${rawId}` : ''
 
-  const galleryItems = toArray(rawDetail.gallery)
-  const galleryImages = galleryItems.map(extractImageUrl).filter(Boolean)
+  const imageSources =
+    rawDetail.images &&
+    Array.isArray(rawDetail.images) &&
+    rawDetail.images.length
+      ? rawDetail.images
+      : rawDetail.gallery
+  const imageList = resolveImageList(imageSources)
   const mainImage =
-    rawDetail.main_image ?? rawDetail.mainImage ?? galleryImages[0] ?? null
+    rawDetail.mainImage ?? rawDetail.main_image ?? imageList[0] ?? null
   const fallbackImages =
-    galleryImages.length > 0 ? galleryImages : mainImage ? [mainImage] : []
+    imageList.length > 0 ? imageList : mainImage ? [mainImage] : []
 
-  const rawSkus = toArray(rawDetail.skus)
-  const variants = rawSkus
+  const rawVariantsSource =
+    rawDetail.variants && Array.isArray(rawDetail.variants)
+      ? rawDetail.variants
+      : rawDetail.skus
+  const rawVariants = toArray(rawVariantsSource)
+  const variants = rawVariants
     .map(sku => normalizeProductVariant(sku, fallbackImages))
     .filter(Boolean)
 
-  const colors = uniqueList(variants.map(variant => variant.color))
-  const sizes = uniqueList(variants.map(variant => variant.size))
+  const payloadColors = uniqueList(
+    toArray(rawDetail.colors).map(color => {
+      if (typeof color === 'string') {
+        return color
+      }
+      if (typeof color === 'object') {
+        return color.name ?? color.label ?? color.displayValue ?? null
+      }
+      return null
+    }),
+  )
+  const colors =
+    payloadColors.length > 0
+      ? payloadColors
+      : uniqueList(variants.map(variant => variant.color))
+
+  const payloadSizes = uniqueList(
+    toArray(rawDetail.sizes).map(size => {
+      if (typeof size === 'string') {
+        return size
+      }
+      if (typeof size === 'object') {
+        return size.name ?? size.label ?? size.displayValue ?? null
+      }
+      return null
+    }),
+  )
+  const sizes =
+    payloadSizes.length > 0
+      ? payloadSizes
+      : uniqueList(variants.map(variant => variant.size))
+
   const tags = uniqueList(
     toArray(rawDetail.tags).map(tag => tag?.name ?? tag?.label ?? null),
   )
+
+  const resolvedPrice =
+    typeof rawDetail.price === 'number'
+      ? rawDetail.price
+      : typeof rawDetail.price === 'string'
+        ? Number.parseFloat(rawDetail.price)
+        : undefined
 
   const basePrice =
     typeof rawDetail.base_price === 'number'
       ? rawDetail.base_price
       : typeof rawDetail.basePrice === 'number'
         ? rawDetail.basePrice
-        : null
-  const resolvedPrice =
-    basePrice ??
-    variants.find(variant => typeof variant.price === 'number')?.price ??
-    null
+        : typeof resolvedPrice === 'number'
+          ? resolvedPrice
+          : null
+
+  const fallbackVariantPrice =
+    variants.find(variant => typeof variant.price === 'number')?.price ?? null
+
+  const price =
+    typeof resolvedPrice === 'number'
+      ? resolvedPrice
+      : (basePrice ?? fallbackVariantPrice)
 
   const totalInventory = variants.reduce((total, variant) => {
     if (
@@ -160,8 +286,8 @@ export const normalizeProductDetail = rawDetail => {
     id: productId,
     name: rawDetail.name ?? '',
     description: rawDetail.description ?? '',
-    price: resolvedPrice,
-    basePrice: basePrice ?? resolvedPrice,
+    price,
+    basePrice,
     tag: tags[0],
     tags,
     colors,
@@ -171,7 +297,8 @@ export const normalizeProductDetail = rawDetail => {
     heroImage: mainImage,
     mainImage,
     variants,
-    rawSkus,
+    rawVariants,
+    rawSkus: rawVariants,
     inventoryTotal: totalInventory,
     snapshot: rawDetail.snapshot ?? null,
     createdAt: rawDetail.created_at ?? rawDetail.createdAt ?? null,

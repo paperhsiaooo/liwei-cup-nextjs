@@ -1,14 +1,32 @@
 'use client'
 
+import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
+import toast from 'react-hot-toast'
 
+import { useCreateOrder } from '@/apis/hook/use-order'
 import CheckoutProgress from '@/components/common/checkout-progress'
 import { Button } from '@/components/ui/button'
 import useCartStore from '@/store/cart-context'
 import { formatCurrencyNT } from '@/utils/currency'
+
+const toPositiveNumber = value => {
+  if (value === undefined || value === null) {
+    return null
+  }
+
+  const parsed =
+    typeof value === 'string' ? Number(value.trim()) : Number(value)
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return null
+  }
+
+  return parsed
+}
 
 function CartPageClient() {
   const router = useRouter()
@@ -17,10 +35,68 @@ function CartPageClient() {
   const decrementItem = useCartStore(state => state.decrementItem)
   const removeItem = useCartStore(state => state.removeItem)
 
+  const handleCreateOrderSuccess = useCallback(
+    data => {
+      const orderNumber = data?.orderNumber
+      if (orderNumber) {
+        router.push(`/checkout?orderNumber=${encodeURIComponent(orderNumber)}`)
+        return
+      }
+
+      router.push('/checkout')
+    },
+    [router],
+  )
+
+  const { mutateAsync: createOrder, isPending } = useCreateOrder(
+    handleCreateOrderSuccess,
+  )
+
   const subtotal = useMemo(
     () => items.reduce((total, item) => total + item.price * item.quantity, 0),
     [items],
   )
+
+  const handleCheckout = useCallback(async () => {
+    if (items.length === 0) {
+      toast.error('購物車內沒有商品')
+      return
+    }
+
+    const payloadItems = items
+      .map(item => {
+        const productId = toPositiveNumber(item.productId)
+        const variantId = toPositiveNumber(
+          item.variantId ?? item.productId ?? item.id,
+        )
+        const quantity = toPositiveNumber(item.quantity)
+
+        if (!productId || !variantId || !quantity) {
+          return null
+        }
+
+        return {
+          productId,
+          variantId,
+          quantity,
+        }
+      })
+      .filter(Boolean)
+
+    if (payloadItems.length !== items.length) {
+      toast.error('部分商品資訊缺失，請重新選擇商品')
+      return
+    }
+
+    try {
+      await createOrder({ items: payloadItems })
+    } catch (error) {
+      if (error?.data?.retStatus?.code) {
+        return
+      }
+      toast.error('建立訂單失敗，請稍後再試')
+    }
+  }, [createOrder, items])
 
   if (items.length === 0) {
     return (
@@ -289,9 +365,18 @@ function CartPageClient() {
 
             <Button
               className="w-full bg-green-primary text-blue-primary hover:bg-green-primary/90"
-              onClick={() => router.push('/checkout')}
+              disabled={isPending}
+              onClick={handleCheckout}
+              type="button"
             >
-              前往結帳
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  建立訂單中...
+                </>
+              ) : (
+                '前往結帳'
+              )}
             </Button>
           </aside>
         </div>

@@ -29,6 +29,57 @@ const uniqueList = list =>
 const resolveVariants = product =>
   Array.isArray(product?.variants) ? product.variants : []
 
+const extractVariantId = variant => {
+  if (!variant || typeof variant !== 'object') {
+    return null
+  }
+
+  const toNumericId = value => {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value
+    }
+
+    if (typeof value === 'string') {
+      const parsed = Number(value.trim())
+      if (Number.isFinite(parsed)) {
+        return parsed
+      }
+    }
+
+    return null
+  }
+
+  const directCandidates = [variant?.variantId, variant?.variant_id]
+  for (const candidate of directCandidates) {
+    const numericId = toNumericId(candidate)
+    if (numericId !== null) {
+      return numericId
+    }
+  }
+
+  const rawCandidates = [
+    variant?.raw?.id,
+    variant?.raw?.sku_id,
+    variant?.raw?.skuId,
+  ]
+  for (const candidate of rawCandidates) {
+    const numericId = toNumericId(candidate)
+    if (numericId !== null) {
+      return numericId
+    }
+  }
+
+  const fallbackCandidates = [variant?.skuId, variant?.skuCode]
+  for (const candidate of fallbackCandidates) {
+    const numericId = toNumericId(candidate)
+    if (numericId !== null) {
+      return numericId
+    }
+  }
+
+  return null
+}
+
 const resolveImages = (product, selectedColor = null) => {
   if (!product) return [FALLBACK_IMAGE]
 
@@ -166,11 +217,14 @@ function ProductDetailClient({ productId, initialData }) {
   // 從 API 回應中提取商品資料
   const product = productResponse?.data?.product || null
 
+  console.log('product: ', product)
+
   // 所有 hooks 必須在條件返回之前調用
   const colors = useMemo(() => resolveColors(product), [product])
   const sizes = useMemo(() => resolveSizes(product), [product])
   const priceLabel = useMemo(() => resolvePrice(product), [product])
   const description = useMemo(() => resolveDescription(product), [product])
+  const variants = useMemo(() => resolveVariants(product), [product])
 
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   // 初始化時就設置第一個顏色，避免顯示錯誤的圖片
@@ -196,6 +250,22 @@ function ProductDetailClient({ productId, initialData }) {
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0)
   // 追蹤已載入的圖片，用於平滑切換
   const [loadedImages, setLoadedImages] = useState(new Set())
+
+  const activeVariant = useMemo(() => {
+    if (!variants || variants.length === 0) {
+      return null
+    }
+
+    return (
+      variants.find(variant => {
+        const colorMatched = selectedColor
+          ? variant?.color === selectedColor
+          : true
+        const sizeMatched = selectedSize ? variant?.size === selectedSize : true
+        return colorMatched && sizeMatched
+      }) ?? null
+    )
+  }, [selectedColor, selectedSize, variants])
 
   // 根據選中的顏色動態取得對應的圖片
   const images = useMemo(
@@ -305,6 +375,7 @@ function ProductDetailClient({ productId, initialData }) {
       image: primaryImage,
       color: selectedColor || '',
       size: selectedSize || '',
+      variantId: extractVariantId(activeVariant),
       quantity,
     })
 
@@ -323,6 +394,7 @@ function ProductDetailClient({ productId, initialData }) {
     product?.price,
     product?.productId,
     quantity,
+    activeVariant,
     selectedColor,
     selectedSize,
   ])

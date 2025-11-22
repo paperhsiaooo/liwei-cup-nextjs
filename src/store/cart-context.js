@@ -32,6 +32,12 @@ const useCartStore = create(
                 {
                   id: key,
                   productId: item.productId,
+                  variantId:
+                    item.variantId ??
+                    item.skuId ??
+                    item.variant ??
+                    item.sku ??
+                    '',
                   name: item.name || '未命名商品',
                   price,
                   image: item.image || '',
