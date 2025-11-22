@@ -19,6 +19,10 @@
 }
 
 @layer base {
+  body {
+    @apply font-noto-sans-tc leading-[1.4];
+  }
+
   .root {
     @apply relative w-full bg-[#F9F9F9];
   }

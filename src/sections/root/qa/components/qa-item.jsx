@@ -1,12 +1,19 @@
 'use client'
 
-import DOMPurify from 'isomorphic-dompurify'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 
 function QaItem({ question, answer, defaultOpen = false }) {
   const [isOpen, setIsOpen] = useState(defaultOpen)
+  const [sanitizedAnswer, setSanitizedAnswer] = useState('')
+
+  // 動態載入 DOMPurify，只在客戶端執行
+  useEffect(() => {
+    import('isomorphic-dompurify').then(({ default: DOMPurify }) => {
+      setSanitizedAnswer(DOMPurify.sanitize(answer))
+    })
+  }, [answer])
 
   const toggleOpen = () => {
     setIsOpen(!isOpen)
@@ -60,7 +67,7 @@ function QaItem({ question, answer, defaultOpen = false }) {
       >
         <div
           className="px-4 py-4 bg-white text-blue-primary text-sm leading-relaxed 1440:text-lg"
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(answer) }}
+          dangerouslySetInnerHTML={{ __html: sanitizedAnswer }}
         />
       </div>
     </div>

@@ -7,7 +7,7 @@ import CardContainer from './components/card-container'
 
 function Declaration() {
   return (
-    <section className="root">
+    <section id="declaration" className="root">
       <div className="pt-4 1440:pt-16">
         <div className="w-full max-w-[320px] mx-auto mb-6 1440:max-w-[1440px] 1440:mb-16">
           <h3 className="text-blue-primary text-4xl font-black font-noto-sans-tc text-center 1440:text-[111px]">

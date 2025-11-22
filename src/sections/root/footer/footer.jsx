@@ -9,9 +9,9 @@ const Footer = ({
 }) => {
   return (
     <section className="bg-[#F9F9F9]">
-      <div className="max-w-[350px] 1440:max-w-[1440px] mx-auto">
+      <div className="wrapper">
         <footer>
-          <div className="text-muted-foreground flex flex-col justify-between gap-8 border-t px-4 py-4 text-sm font-medium 1440:flex-row 1440:items-center 1440:py-8 1440:px-0">
+          <div className="text-muted-foreground flex flex-col justify-between gap-8 border-t py-4 text-sm font-medium 1440:flex-row 1440:items-center 1440:py-8">
             <p className="font-noto-sans-jp">{copyright}</p>
             <ul className="flex flex-col gap-4 1440:flex-row">
               {bottomLinks.map((link, linkIdx) => (
