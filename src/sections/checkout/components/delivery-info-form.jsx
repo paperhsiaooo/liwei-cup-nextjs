@@ -16,7 +16,6 @@ export default function DeliveryInfoForm() {
     const form = document.createElement('form')
     form.method = 'POST'
     form.action = `${process.env.NEXT_PUBLIC_ECPAY_LOGISTICS_URL}`
-    form.target = '_blank' // 開新分頁，避免離開結帳頁
 
     const append = (name, value) => {
       const input = document.createElement('input')
