@@ -359,9 +359,9 @@ function ProductDetailClient({ productId, initialData }) {
 
   // 統一處理加入購物車的邏輯
   const addToCart = useCallback(() => {
-    if (!product?.productId && !product?.id) return
+    if (!product?.id) return
 
-    const productId = product?.productId || product?.id
+    const productId = product?.id
     const primaryImage =
       images.length > 0
         ? images[0]
@@ -392,7 +392,6 @@ function ProductDetailClient({ productId, initialData }) {
     product?.image,
     product?.name,
     product?.price,
-    product?.productId,
     quantity,
     activeVariant,
     selectedColor,

@@ -50,7 +50,7 @@ const resolveImageList = source =>
 export const normalizeProduct = rawProduct => {
   if (!rawProduct || typeof rawProduct !== 'object') {
     return {
-      productId: '',
+      id: '',
       name: '',
       description: '',
       price: null,
@@ -58,8 +58,16 @@ export const normalizeProduct = rawProduct => {
     }
   }
 
-  const id = rawProduct.productId ?? rawProduct.id ?? ''
-  const normalizedId = typeof id === 'number' ? String(id) : id
+  const { productId: legacyProductId, ...rest } = rawProduct
+
+  const rawId =
+    rawProduct.id ?? legacyProductId ?? rawProduct.product_id ?? rawProduct.ID
+  let normalizedId = ''
+  if (typeof rawId === 'number') {
+    normalizedId = String(rawId)
+  } else if (rawId) {
+    normalizedId = `${rawId}`
+  }
 
   const price = rawProduct.price ?? rawProduct.base_price ?? null
 
@@ -71,8 +79,8 @@ export const normalizeProduct = rawProduct => {
         : []
 
   return {
-    ...rawProduct,
-    productId: normalizedId,
+    ...rest,
+    id: normalizedId,
     price,
     images,
   }
@@ -161,8 +169,6 @@ export const normalizeProductVariant = (sku, fallbackImages) => {
   return {
     skuId: normalizedSkuId ?? undefined,
     variantId: resolvedVariantId ?? null,
-    productId:
-      toNumeric(sku.productId) ?? toNumeric(sku.product_id) ?? undefined,
     skuCode: sku?.sku_code ?? sku?.skuCode ?? null,
     price: resolvedPrice,
     inventory: parsedInventory,
@@ -186,9 +192,20 @@ export const normalizeProductDetail = rawDetail => {
     return null
   }
 
-  const rawId = rawDetail.productId ?? rawDetail.id ?? ''
-  const productId =
-    typeof rawId === 'number' ? String(rawId) : rawId ? `${rawId}` : ''
+  const { productId: legacyProductId, ...restDetail } = rawDetail
+
+  const rawId =
+    rawDetail.id ??
+    legacyProductId ??
+    rawDetail.product_id ??
+    rawDetail.ID ??
+    ''
+  let normalizedId = ''
+  if (typeof rawId === 'number') {
+    normalizedId = String(rawId)
+  } else if (rawId) {
+    normalizedId = `${rawId}`
+  }
 
   const imageSources =
     rawDetail.images &&
@@ -203,16 +220,16 @@ export const normalizeProductDetail = rawDetail => {
     imageList.length > 0 ? imageList : mainImage ? [mainImage] : []
 
   const rawVariantsSource =
-    rawDetail.variants && Array.isArray(rawDetail.variants)
-      ? rawDetail.variants
-      : rawDetail.skus
+    restDetail.variants && Array.isArray(restDetail.variants)
+      ? restDetail.variants
+      : restDetail.skus
   const rawVariants = toArray(rawVariantsSource)
   const variants = rawVariants
     .map(sku => normalizeProductVariant(sku, fallbackImages))
     .filter(Boolean)
 
   const payloadColors = uniqueList(
-    toArray(rawDetail.colors).map(color => {
+    toArray(restDetail.colors).map(color => {
       if (typeof color === 'string') {
         return color
       }
@@ -228,7 +245,7 @@ export const normalizeProductDetail = rawDetail => {
       : uniqueList(variants.map(variant => variant.color))
 
   const payloadSizes = uniqueList(
-    toArray(rawDetail.sizes).map(size => {
+    toArray(restDetail.sizes).map(size => {
       if (typeof size === 'string') {
         return size
       }
@@ -244,21 +261,21 @@ export const normalizeProductDetail = rawDetail => {
       : uniqueList(variants.map(variant => variant.size))
 
   const tags = uniqueList(
-    toArray(rawDetail.tags).map(tag => tag?.name ?? tag?.label ?? null),
+    toArray(restDetail.tags).map(tag => tag?.name ?? tag?.label ?? null),
   )
 
   const resolvedPrice =
-    typeof rawDetail.price === 'number'
-      ? rawDetail.price
-      : typeof rawDetail.price === 'string'
-        ? Number.parseFloat(rawDetail.price)
+    typeof restDetail.price === 'number'
+      ? restDetail.price
+      : typeof restDetail.price === 'string'
+        ? Number.parseFloat(restDetail.price)
         : undefined
 
   const basePrice =
-    typeof rawDetail.base_price === 'number'
-      ? rawDetail.base_price
-      : typeof rawDetail.basePrice === 'number'
-        ? rawDetail.basePrice
+    typeof restDetail.base_price === 'number'
+      ? restDetail.base_price
+      : typeof restDetail.basePrice === 'number'
+        ? restDetail.basePrice
         : typeof resolvedPrice === 'number'
           ? resolvedPrice
           : null
@@ -282,10 +299,9 @@ export const normalizeProductDetail = rawDetail => {
   }, 0)
 
   return {
-    productId,
-    id: productId,
-    name: rawDetail.name ?? '',
-    description: rawDetail.description ?? '',
+    id: normalizedId,
+    name: restDetail.name ?? '',
+    description: restDetail.description ?? '',
     price,
     basePrice,
     tag: tags[0],
@@ -300,9 +316,9 @@ export const normalizeProductDetail = rawDetail => {
     rawVariants,
     rawSkus: rawVariants,
     inventoryTotal: totalInventory,
-    snapshot: rawDetail.snapshot ?? null,
-    createdAt: rawDetail.created_at ?? rawDetail.createdAt ?? null,
-    updatedAt: rawDetail.updated_at ?? rawDetail.updatedAt ?? null,
+    snapshot: restDetail.snapshot ?? null,
+    createdAt: restDetail.created_at ?? restDetail.createdAt ?? null,
+    updatedAt: restDetail.updated_at ?? restDetail.updatedAt ?? null,
     raw: rawDetail,
   }
 }

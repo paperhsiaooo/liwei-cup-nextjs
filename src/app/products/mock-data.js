@@ -1,6 +1,6 @@
 const MOCK_PRODUCTS = [
   {
-    productId: 'volleyball-socks-classic-se',
+    id: 'volleyball-socks-classic-se',
     name: 'Volleyball Socks Classic+ SE',
     tagline: '回到球場，揮灑汗水的最好夥伴',
     description:
@@ -18,7 +18,7 @@ const MOCK_PRODUCTS = [
     ],
   },
   {
-    productId: 'training-tee-elite',
+    id: 'training-tee-elite',
     name: 'Training Tee Elite',
     tagline: '輕量速乾，任你揮汗',
     description:
@@ -36,7 +36,7 @@ const MOCK_PRODUCTS = [
     ],
   },
   {
-    productId: 'power-grip-gloves',
+    id: 'power-grip-gloves',
     name: 'Power Grip Gloves',
     tagline: '穩定握力，全面掌控',
     description:
@@ -54,7 +54,7 @@ const MOCK_PRODUCTS = [
     ],
   },
   {
-    productId: 'stadium-duffel-pro',
+    id: 'stadium-duffel-pro',
     name: 'Stadium Duffel Pro',
     tagline: '裝載所有戰力的專業球袋',
     description:
@@ -75,12 +75,12 @@ const MOCK_PRODUCTS = [
 
 const getMockProduct = productId => {
   if (!productId) return MOCK_PRODUCTS[0] ?? null
-  const matched = MOCK_PRODUCTS.find(item => item.productId === productId)
+  const matched = MOCK_PRODUCTS.find(item => item.id === productId)
 
   if (matched) return matched
 
   if (MOCK_PRODUCTS.length > 0) {
-    return { ...MOCK_PRODUCTS[0], productId }
+    return { ...MOCK_PRODUCTS[0], id: productId }
   }
 
   return null

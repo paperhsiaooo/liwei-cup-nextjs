@@ -49,7 +49,7 @@ function ProductsView({ initialProducts }) {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2">
           {products.map(product => {
             const {
-              productId,
+              id,
               name,
               description,
               price,
@@ -67,8 +67,8 @@ function ProductsView({ initialProducts }) {
 
             return (
               <Product.Container
-                key={productId}
-                href={productId ? PATH.products.detail(productId) : undefined}
+                key={id}
+                href={id ? PATH.products.detail(id) : undefined}
               >
                 <Product.Content
                   name={name}

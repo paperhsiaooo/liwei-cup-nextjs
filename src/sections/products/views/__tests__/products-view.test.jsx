@@ -14,7 +14,7 @@ jest.mock('@/routers/path', () => ({
 describe('ProductsView', () => {
   const mockProducts = [
     {
-      productId: 'product-1',
+      id: 'product-1',
       name: 'Product 1',
       description: 'Description 1',
       price: 150,
@@ -22,7 +22,7 @@ describe('ProductsView', () => {
       images: ['https://example.com/1.jpg'],
     },
     {
-      productId: 'product-2',
+      id: 'product-2',
       name: 'Product 2',
       description: 'Description 2',
       price: 480,
@@ -109,7 +109,7 @@ describe('ProductsView', () => {
   test('應該正確處理沒有圖片的商品', () => {
     const productsWithoutImages = [
       {
-        productId: 'product-1',
+        id: 'product-1',
         name: 'Product Without Image',
         description: 'No image',
         price: 100,
@@ -128,7 +128,7 @@ describe('ProductsView', () => {
   test('應該正確處理沒有價格的商品', () => {
     const productsWithoutPrice = [
       {
-        productId: 'product-1',
+        id: 'product-1',
         name: 'Product Without Price',
         description: 'No price',
         images: ['https://example.com/1.jpg'],
@@ -144,7 +144,7 @@ describe('ProductsView', () => {
   test('應該正確處理沒有標籤的商品', () => {
     const productsWithoutTag = [
       {
-        productId: 'product-1',
+        id: 'product-1',
         name: 'Product Without Tag',
         description: 'No tag',
         price: 100,
@@ -162,7 +162,7 @@ describe('ProductsView', () => {
   test('應該優先使用 images 陣列的第一張圖片', () => {
     const productsWithMultipleImages = [
       {
-        productId: 'product-1',
+        id: 'product-1',
         name: 'Product With Multiple Images',
         description: 'Test',
         price: 100,
@@ -184,7 +184,7 @@ describe('ProductsView', () => {
   test('應該在沒有 images 時使用 heroImage', () => {
     const productsWithHeroImage = [
       {
-        productId: 'product-1',
+        id: 'product-1',
         name: 'Product With Hero Image',
         description: 'Test',
         price: 100,
@@ -200,7 +200,7 @@ describe('ProductsView', () => {
 
   test('應該正確渲染大量商品', () => {
     const manyProducts = Array.from({ length: 20 }, (_, i) => ({
-      productId: `product-${i}`,
+      id: `product-${i}`,
       name: `Product ${i}`,
       description: `Description ${i}`,
       price: 100 + i * 10,

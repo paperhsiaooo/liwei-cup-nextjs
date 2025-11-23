@@ -96,7 +96,7 @@ describe('use-products API Hook', () => {
             main_image: 'https://cdn.example.com/socks/front.jpg',
           },
           {
-            productId: 'training-tee-elite',
+            id: 'training-tee-elite',
             name: '訓練 T-Shirt',
             description: '透氣快乾',
             price: 520,
@@ -161,13 +161,13 @@ describe('use-products API Hook', () => {
       const result = await fetchProductsAPI()
       const product = result.data.products[0]
 
-      expect(product).toHaveProperty('productId')
+      expect(product).toHaveProperty('id')
       expect(product).toHaveProperty('name')
       expect(product).toHaveProperty('description')
       expect(product).toHaveProperty('price')
       expect(product).toHaveProperty('images')
       expect(Array.isArray(product.images)).toBe(true)
-      expect(product.productId).toBe('1001')
+      expect(product.id).toBe('1001')
       expect(product.price).toBe(350)
       expect(product.images[0]).toBe('https://cdn.example.com/socks/front.jpg')
     })
@@ -226,7 +226,7 @@ describe('use-products API Hook', () => {
       expect(result.success).toBe(true)
       const product = result.data.product
       expect(product).toBeDefined()
-      expect(product.productId).toBe(productId)
+      expect(product.id).toBe(productId)
       expect(product.images).toEqual([
         'https://cdn.example.com/socks/front.jpg',
         'https://cdn.example.com/socks/detail.jpg',
@@ -365,7 +365,7 @@ describe('use-products API Hook', () => {
       )
       expect(result.current.data.success).toBe(true)
       expect(result.current.data.data.product).toBeDefined()
-      expect(result.current.data.data.product.productId).toBe(productId)
+      expect(result.current.data.data.product.id).toBe(productId)
       expect(result.current.data.data.product.variants[0].color).toBe('亮潔白')
       expect(result.current.isLoading).toBe(false)
       expect(result.current.error).toBeNull()
