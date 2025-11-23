@@ -11,7 +11,6 @@ describe('checkoutSchema', () => {
     sameAsCustomer: false,
     deliveryName: '李小華',
     recipientPhone: '0987654321',
-    deliveryAddress: '台北市信義區信義路五段7號',
     deliveryNote: '請於下午配送',
     agreeToTerms: true,
   }
@@ -157,24 +156,6 @@ describe('checkoutSchema', () => {
       expect(result.success).toBe(false)
       expect(result.error.issues[0].message).toContain('手機號碼格式')
     })
-
-    test('應該拒絕未填寫配送地址', () => {
-      const result = checkoutSchema.safeParse({
-        ...validData,
-        deliveryAddress: '',
-      })
-      expect(result.success).toBe(false)
-      expect(result.error.issues[0].message).toContain('配送地址')
-    })
-
-    test('應該拒絕過短的配送地址', () => {
-      const result = checkoutSchema.safeParse({
-        ...validData,
-        deliveryAddress: '台北',
-      })
-      expect(result.success).toBe(false)
-      expect(result.error.issues[0].message).toContain('5 個字元')
-    })
   })
 
   describe('條款同意驗證', () => {
@@ -263,7 +244,6 @@ describe('checkoutSchema', () => {
         sameAsCustomer: false,
         deliveryName: '',
         recipientPhone: '456',
-        deliveryAddress: '',
         deliveryNote: '',
         agreeToTerms: false,
       })
@@ -281,7 +261,6 @@ describe('checkoutSchema', () => {
         sameAsCustomer: false,
         deliveryName: '李小華',
         recipientPhone: '0987654321',
-        deliveryAddress: '台北市信義區信義路五段7號',
         deliveryNote: '',
         agreeToTerms: true,
       })

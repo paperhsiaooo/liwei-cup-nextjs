@@ -143,96 +143,59 @@ src/
 ```javascript
 // src/store/checkout-context.js
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 
-const useCheckoutStore = create(
-  persist(
-    (set, get) => ({
-      // 訂購人資訊 (Custom Info)
-      customerInfo: {
-        fullName: '',
-        email: '',
-        phone: '',
-        gender: '', // 'male' | 'female' | 'prefer-not-to-say' | ''
-      },
+const createInitialCustomerInfo = () => ({
+  fullName: '',
+  email: '',
+  phone: '',
+  gender: '',
+})
 
-      // 收件人資訊 (Delivery Detail)
+const createInitialDeliveryInfo = () => ({
+  sameAsCustomer: false,
+  deliveryName: '',
+  recipientPhone: '',
+  deliveryNote: '',
+})
+
+const useCheckoutStore = create((set, get) => ({
+  customerInfo: createInitialCustomerInfo(),
+  deliveryInfo: createInitialDeliveryInfo(),
+  agreeToTerms: false,
+
+  setCustomerInfo: data =>
+    set(state => ({
+      customerInfo: { ...state.customerInfo, ...data },
+    })),
+
+  setDeliveryInfo: data =>
+    set(state => ({
+      deliveryInfo: { ...state.deliveryInfo, ...data },
+    })),
+
+  setAgreeToTerms: agreeToTerms =>
+    set(() => ({
+      agreeToTerms,
+    })),
+
+  copyCustomerToDelivery: () => {
+    const { customerInfo } = get()
+    set(state => ({
       deliveryInfo: {
-        deliveryName: '',
-        recipientPhone: '',
-        storeId: '',
-        storeName: '',
-        storeAddress: '',
-        storeTel: '',
-        deliveryNote: '',
+        ...state.deliveryInfo,
+        deliveryName: customerInfo.fullName,
+        recipientPhone: customerInfo.phone,
       },
+    }))
+  },
 
-      // 同意條款
+  clear: () =>
+    set(() => ({
+      customerInfo: createInitialCustomerInfo(),
+      deliveryInfo: createInitialDeliveryInfo(),
       agreeToTerms: false,
-
-      // Actions
-      setCustomerInfo: customerInfo =>
-        set(() => ({
-          customerInfo,
-        })),
-
-      setDeliveryInfo: deliveryInfo =>
-        set(() => ({
-          deliveryInfo,
-        })),
-
-      setAgreeToTerms: agreeToTerms =>
-        set(() => ({
-          agreeToTerms,
-        })),
-
-      // 複製訂購人資訊到收件人
-      copyCustomerToDelivery: () => {
-        const { customerInfo } = get()
-        set(state => ({
-          deliveryInfo: {
-            ...state.deliveryInfo,
-            deliveryName: customerInfo.fullName,
-            recipientPhone: customerInfo.phone,
-          },
-        }))
-      },
-
-      // 清除結帳資料（訂單完成後）
-      clear: () =>
-        set(() => ({
-          customerInfo: {
-            fullName: '',
-            email: '',
-            phone: '',
-            gender: '',
-          },
-          deliveryInfo: {
-            deliveryName: '',
-            recipientPhone: '',
-            storeId: '',
-            storeName: '',
-            storeAddress: '',
-            storeTel: '',
-            deliveryNote: '',
-          },
-          agreeToTerms: false,
-        })),
-    }),
-    {
-      name: 'liwei-checkout',
-      storage: createJSONStorage(() =>
-        typeof window === 'undefined'
-          ? {
-              getItem: () => null,
-              setItem: () => {},
-              removeItem: () => {},
-            }
-          : window.localStorage,
-      ),
-    },
-  ),
-)
+    })),
+}))
 
 export default useCheckoutStore
 ```
@@ -622,19 +585,16 @@ export const defaultValues = {
 **欄位**：
 
 1. **全名**（必填）
-
    - Input type: text
    - Placeholder: "請輸入全名"
    - 驗證：2-50 字元
 
 2. **信箱**（必填）
-
    - Input type: email
    - Placeholder: "example@email.com"
    - 驗證：Email 格式
 
 3. **聯絡電話**（必填）
-
    - Input type: tel
    - Placeholder: "0912-345-678"
    - 驗證：09 開頭，共 10 碼
@@ -663,24 +623,20 @@ export const defaultValues = {
 **欄位**：
 
 1. **同訂購人資訊**（Checkbox）
-
    - 勾選後自動複製訂購人的姓名和電話
    - 取消勾選後清空欄位
 
 2. **收件人姓名**（必填）
-
    - Input type: text
    - Placeholder: "請輸入收件人姓名"
    - 驗證：2-50 字元
 
 3. **收件人電話**（必填）
-
    - Input type: tel
    - Placeholder: "0912-345-678"
    - 驗證：09 開頭，共 10 碼
 
 4. **配送門市**（必填）
-
    - 7-11 店到店門市選擇
    - 詳見 3.3.3
 
@@ -1225,63 +1181,58 @@ router.push('/confirm')
 **操作流程**：
 
 1. 使用者點擊「返回購物車」按鈕
-2. 系統暫存當前表單資料（`useCheckoutStore`）
+2. 系統暫存當前表單資料於 `useCheckoutStore`（僅存在記憶體，重新整理即清除）
 3. 導向 `/cart`
-4. 如果使用者再次進入 `/checkout`，自動恢復表單資料
-
-**資料持久化**：
-
-- 使用 Zustand persist middleware
-- 儲存於 LocalStorage（key: `liwei-checkout`）
+4. 使用者再次進入 `/checkout?orderNumber=...` 時，呼叫 order detail
+   API 並以 response 自動回填欄位
 
 **成功條件**：
 
 - ✅ 成功導回購物車頁面
-- ✅ 表單資料正確保存
-- ✅ 再次進入時資料正確恢復
+- ✅ 再次進入時可透過 API 回填資料
 
 ---
 
-### FR-9: 資料持久化
+### FR-9: 資料回填（Order Detail API）
 
 **優先級**: 🟡 P1 (High)
 
 **功能說明**：
 
-- 使用者填寫的資料自動儲存於 LocalStorage
-- 即使重新整理頁面、關閉瀏覽器，資料仍保留
-- 訂單完成後清除資料
+- `/checkout` 若帶有 `orderNumber`，頁面應自動呼叫 order detail API
+- API response 需要包含
+  `customerInfo`（姓名、電話、Email、性別）以及已選物流資訊
+- 取得資料後，透過 `setValue` 與 `useCheckoutStore` 即時回填欄位
 
-**持久化策略**：
+**實作建議**：
 
 ```javascript
-// Zustand persist middleware
-persist(
-  (set, get) => ({
-    // ... state
-  }),
-  {
-    name: 'liwei-checkout',
-    storage: createJSONStorage(() =>
-      typeof window === 'undefined'
-        ? { getItem: () => null, setItem: () => {}, removeItem: () => {} }
-        : window.localStorage,
-    ),
-  },
-)
+const { data: orderDetail } = useOrderDetail(orderNumber, {
+  enabled: Boolean(orderNumber),
+})
+
+useEffect(() => {
+  if (!orderNumber || !orderDetail?.data?.customerInfo) return
+
+  const { name, email, phone, gender } = orderDetail.data.customerInfo
+  setCustomerInfo({
+    fullName: name || '',
+    email: email || '',
+    phone: phone || '',
+    gender: gender || '',
+  })
+  setValue('fullName', name || '')
+  setValue('email', email || '')
+  setValue('phone', phone || '')
+  setValue('gender', gender || '')
+}, [orderDetail, orderNumber])
 ```
-
-**清除時機**：
-
-- 訂單完成後（`/shop/complete`）
-- 手動呼叫 `clear()` 函數
 
 **成功條件**：
 
-- ✅ 資料正確儲存於 LocalStorage
-- ✅ 頁面重新載入後資料正確恢復
-- ✅ 訂單完成後資料正確清除
-- ✅ SSR 環境不報錯
+- ✅ 只要 API 有資料，欄位就能立即回填
+- ✅ 未帶 `orderNumber` 時不觸發 API 呼叫
+- ✅ 回填後仍可由使用者編輯，並同步更新 `useCheckoutStore`
 
 ---
 
@@ -1844,7 +1795,6 @@ export const metadata = {
 **P0 (Critical)**
 
 1. **7-11 店到店 API 串接流程**
-
    - 如何開啟門市選擇介面？
    - 回傳資料格式？
    - 錯誤處理機制？
@@ -1856,7 +1806,6 @@ export const metadata = {
 **P1 (High)**
 
 3. **免運費規則**
-
    - 目前固定 NT$ 60
    - 免運條件待後續補充
    - 計算邏輯待實作
@@ -1869,7 +1818,6 @@ export const metadata = {
 **P2 (Medium)**
 
 5. **PostHog 追蹤**
-
    - 需要追蹤哪些事件？
    - 事件命名規範？
 

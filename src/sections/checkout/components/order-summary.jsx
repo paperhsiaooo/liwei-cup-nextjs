@@ -1,22 +1,25 @@
 'use client'
 
 import Image from 'next/image'
-import { useMemo } from 'react'
 
-import useCartStore from '@/store/cart-context'
 import { formatCurrencyNT } from '@/utils/currency'
 
-export default function OrderSummary() {
-  const items = useCartStore(state => state.items)
+export default function OrderSummary({ order }) {
+  const items = Array.isArray(order?.items) ? order.items : []
 
-  // 計算價格
-  const subtotal = useMemo(
-    () => items.reduce((total, item) => total + item.price * item.quantity, 0),
-    [items],
-  )
+  const subtotal =
+    typeof order?.subtotal === 'number'
+      ? order.subtotal
+      : items.reduce((total, item) => total + (item?.totalPrice || 0), 0)
 
-  const shippingFee = 60 // 固定運費
-  const total = subtotal + shippingFee
+  const discount = typeof order?.discount === 'number' ? order.discount : 0
+  const shippingFee =
+    typeof order?.shippingFee === 'number' ? order.shippingFee : 0
+
+  const total =
+    typeof order?.total === 'number' && order.total > 0
+      ? order.total
+      : subtotal - discount + shippingFee
 
   return (
     <aside className="ml-auto w-full rounded-3xl border bg-white shadow-sm lg:w-[350px] lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)]">
@@ -28,15 +31,18 @@ export default function OrderSummary() {
         {/* 商品列表 */}
         <div className="space-y-3 border-b pb-4">
           {items.length === 0 ? (
-            <p className="text-sm text-slate-600">購物車是空的</p>
+            <p className="text-sm text-slate-600">目前沒有訂單商品</p>
           ) : (
             items.map(item => (
-              <div key={item.id} className="flex items-center gap-3">
+              <div
+                key={`${item.productId}-${item.variantId ?? 'default'}`}
+                className="flex items-center gap-3"
+              >
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                  {item.image ? (
+                  {item.imageUrl ? (
                     <Image
-                      src={item.image}
-                      alt={item.name}
+                      src={item.imageUrl}
+                      alt={item.productName}
                       fill
                       sizes="64px"
                       className="object-cover"
@@ -49,19 +55,17 @@ export default function OrderSummary() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-blue-primary truncate">
-                    {item.name}
+                  <h3 className="truncate text-sm font-semibold text-blue-primary">
+                    {item.productName}
                   </h3>
-                  {(item.color || item.size) && (
-                    <p className="text-xs text-slate-600">
-                      {[item.color, item.size].filter(Boolean).join(' / ')}
-                    </p>
+                  {item.description && (
+                    <p className="text-xs text-slate-600">{item.description}</p>
                   )}
                 </div>
 
                 <div className="text-right shrink-0">
                   <p className="text-sm font-semibold text-blue-primary">
-                    {formatCurrencyNT(item.price * item.quantity)}
+                    {formatCurrencyNT(item.totalPrice ?? 0)}
                   </p>
                   <p className="text-xs text-slate-600">x{item.quantity}</p>
                 </div>
@@ -78,6 +82,14 @@ export default function OrderSummary() {
               {formatCurrencyNT(subtotal)}
             </span>
           </div>
+          {discount > 0 && (
+            <div className="flex items-center justify-between">
+              <span>折扣</span>
+              <span className="font-semibold text-orange-primary">
+                -{formatCurrencyNT(discount)}
+              </span>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span>運費</span>
             <span className="font-semibold text-blue-primary">

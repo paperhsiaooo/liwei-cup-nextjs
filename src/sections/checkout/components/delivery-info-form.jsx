@@ -7,8 +7,19 @@ import { RHFCheckbox } from '@/components/common/hook-form/rhf-checkbox'
 import RHFTextField from '@/components/common/hook-form/rhf-text-field'
 import { RHFTextarea } from '@/components/common/hook-form/rhf-textarea'
 
-export default function DeliveryInfoForm() {
+export default function DeliveryInfoForm({
+  orderNumber = '',
+  merchantTradeNo = '',
+  selectedStore,
+}) {
   const { watch, setValue } = useFormContext()
+  const fullName = watch('fullName')
+  const phone = watch('phone')
+  const email = watch('email')
+  const gender = watch('gender')
+  const deliveryName = watch('deliveryName')
+  const recipientPhone = watch('recipientPhone')
+  const deliveryNote = watch('deliveryNote')
   const sameAsCustomer = watch('sameAsCustomer')
 
   const handle711ButtonClick = useCallback(() => {
@@ -25,9 +36,20 @@ export default function DeliveryInfoForm() {
       form.appendChild(input)
     }
 
+    const extraData = JSON.stringify({
+      orderNumber,
+      customName: fullName,
+      customPhone: phone,
+      customGender: gender,
+      customEmail: email,
+      recipientName: deliveryName,
+      recipientPhone: recipientPhone,
+      deliveryNote,
+    })
+
     // 依照你的需求填入固定或動態值（可改為從 react-hook-form 取值）
     append('MerchantID', process.env.NEXT_PUBLIC_ECPAY_MERCHANT_ID)
-    append('MerchantTradeNo', 'TEST20251024A') // 可改為實際 cartId 或 orderDraftId
+    append('MerchantTradeNo', merchantTradeNo || 'TEST20251024A')
     append('LogisticsType', 'CVS')
     append('LogisticsSubType', 'UNIMARTC2C')
     append('IsCollection', 'N')
@@ -35,11 +57,22 @@ export default function DeliveryInfoForm() {
       'ServerReplyURL',
       `${process.env.NEXT_PUBLIC_ECPAY_SERVER_REPLY_URL}`,
     )
+    append('ExtraData', extraData)
 
     document.body.appendChild(form)
     form.submit()
     document.body.removeChild(form)
-  }, [])
+  }, [
+    deliveryName,
+    deliveryNote,
+    email,
+    fullName,
+    gender,
+    merchantTradeNo,
+    orderNumber,
+    phone,
+    recipientPhone,
+  ])
 
   // 監聽 sameAsCustomer 變化（若勾選，將訂購人資料同步到收件人）
   const handleSameAsCustomerChange = checked => {
@@ -105,6 +138,23 @@ export default function DeliveryInfoForm() {
           />
         </div>
 
+        {selectedStore?.name && (
+          <div className="rounded-lg border-2 border-green-primary/40 bg-green-primary/10 p-4">
+            <p className="text-sm font-semibold text-blue-primary">
+              目前選擇的門市
+            </p>
+            <p className="mt-1 text-base font-bold text-slate-800">
+              {selectedStore.name}
+            </p>
+            <p className="text-sm text-slate-600">{selectedStore.address}</p>
+            {selectedStore.id && (
+              <p className="text-xs text-slate-500">
+                門市代碼：{selectedStore.id}
+              </p>
+            )}
+          </div>
+        )}
+
         <button
           type="button"
           onClick={handle711ButtonClick}
@@ -113,22 +163,6 @@ export default function DeliveryInfoForm() {
         >
           選擇 7-11 門市
         </button>
-
-        {/* 配送地址 */}
-        <div>
-          <label
-            htmlFor="deliveryAddress"
-            className="mb-2 block text-base font-semibold text-slate-700"
-          >
-            配送地址 <span className="text-red-500">*</span>
-          </label>
-          <RHFTextarea
-            name="deliveryAddress"
-            placeholder="請輸入完整配送地址"
-            rows={2}
-            className="w-full min-h-[110px] rounded-lg border-2 border-slate-300 px-3 py-2 text-sm transition-colors focus:border-blue-primary focus:outline-none"
-          />
-        </div>
 
         {/* 配送備註 */}
         <div>

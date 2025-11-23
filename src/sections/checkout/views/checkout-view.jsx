@@ -3,11 +3,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
+import { useOrderDetail } from '@/apis/hook/use-order'
 import CheckoutProgress from '@/components/common/checkout-progress'
 import FormProvider from '@/components/common/hook-form/form-provider'
+import UnauthorizedState from '@/components/common/unauthorized-state'
 import { Button } from '@/components/ui/button'
 import { PATH } from '@/routers/path'
 import useCartStore from '@/store/cart-context'
@@ -20,7 +22,7 @@ import OrderSummary from '../components/order-summary'
 import TermsCheckbox from '../components/terms-checkbox'
 import { checkoutSchema, defaultValues } from '../schema/checkout-schema'
 
-export default function CheckoutView() {
+export default function CheckoutView({ orderNumber = '' }) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
@@ -34,8 +36,26 @@ export default function CheckoutView() {
 
   // Checkout Store
   const { customerInfo, deliveryInfo, agreeToTerms } = useCheckoutStore()
-  const { setCustomerInfo, setDeliveryInfo, setAgreeToTerms } =
+  const { setCustomerInfo, setDeliveryInfo, setAgreeToTerms, clear } =
     useCheckoutStore()
+
+  const { data: orderDetailResponse, error: orderDetailError } = useOrderDetail(
+    orderNumber,
+    {
+      enabled: Boolean(orderNumber),
+      retry: false,
+    },
+  )
+  const orderCustomerInfo = orderDetailResponse?.data?.customerInfo
+  const orderRecipientInfo = orderDetailResponse?.data?.recipientInfo
+  const orderDeliveryNote = orderDetailResponse?.data?.deliveryNote
+
+  const ecpayMerchantTradeNo = useMemo(() => {
+    if (!orderDetailResponse?.data?.ecpayMerchantTradeNo) {
+      return ''
+    }
+    return orderDetailResponse.data.ecpayMerchantTradeNo
+  }, [orderDetailResponse])
 
   // React Hook Form
   const methods = useForm({
@@ -49,7 +69,24 @@ export default function CheckoutView() {
     },
   })
 
-  const { handleSubmit, setValue } = methods
+  const { handleSubmit, reset, setValue } = methods
+
+  const isOrderDetailUnauthorized =
+    Boolean(orderNumber) && orderDetailError?.response?.status === 401
+
+  const previousOrderNumberRef = useRef(null)
+
+  useEffect(() => {
+    if (previousOrderNumberRef.current === orderNumber) {
+      return
+    }
+
+    clear()
+    reset({
+      ...defaultValues,
+    })
+    previousOrderNumberRef.current = orderNumber
+  }, [clear, orderNumber, reset])
 
   // 標記初始加載完成
   useEffect(() => {
@@ -63,15 +100,57 @@ export default function CheckoutView() {
     }
   }, [items, router, isInitialLoad])
 
-  // 已登入使用者自動帶入資料
+  // 從訂單詳情帶入此前填寫的訂購人資訊
+  useEffect(() => {
+    if (!orderNumber || !orderCustomerInfo) {
+      return
+    }
+
+    const nextCustomerInfo = {
+      fullName: orderCustomerInfo.name || '',
+      email: orderCustomerInfo.email || '',
+      phone: orderCustomerInfo.phone || '',
+      gender: orderCustomerInfo.gender || '',
+    }
+
+    setCustomerInfo(nextCustomerInfo)
+    Object.entries(nextCustomerInfo).forEach(([field, value]) => {
+      setValue(field, value || '')
+    })
+  }, [orderCustomerInfo, orderNumber, setCustomerInfo, setValue])
+
+  useEffect(() => {
+    if (!orderNumber || (!orderRecipientInfo && !orderDeliveryNote)) {
+      return
+    }
+
+    const nextDeliveryInfo = {
+      deliveryName: orderRecipientInfo?.name || '',
+      recipientPhone: orderRecipientInfo?.phone || '',
+      deliveryNote: orderDeliveryNote || '',
+    }
+
+    setDeliveryInfo(nextDeliveryInfo)
+    Object.entries(nextDeliveryInfo).forEach(([field, value]) => {
+      if (value !== undefined && value !== null) {
+        setValue(field, value)
+      }
+    })
+  }, [
+    orderDeliveryNote,
+    orderNumber,
+    orderRecipientInfo,
+    setDeliveryInfo,
+    setValue,
+  ])
+
+  // 已登入使用者自動帶入資料（仍維持既有行為）
   useEffect(() => {
     if (isLogin && user.name && !customerInfo.fullName) {
-      // 只在第一次進入且沒有儲存的資料時自動帶入
       setValue('fullName', user.name || '')
       setValue('phone', user.phone || '')
-      // email 目前 user-context 沒有，待後續處理
     }
-  }, [isLogin, user, customerInfo, setValue])
+  }, [customerInfo.fullName, isLogin, setValue, user])
 
   // 處理表單驗證錯誤
   const onError = errors => {
@@ -114,7 +193,6 @@ export default function CheckoutView() {
         sameAsCustomer: data.sameAsCustomer,
         deliveryName: data.deliveryName,
         recipientPhone: data.recipientPhone,
-        deliveryAddress: data.deliveryAddress,
         deliveryNote: data.deliveryNote,
       })
 
@@ -127,6 +205,29 @@ export default function CheckoutView() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  if (isOrderDetailUnauthorized) {
+    return (
+      <UnauthorizedState
+        title="沒有權限"
+        description="您沒有權限檢視這筆訂單。請確認已登入正確帳號，或洽客服協助。"
+        actions={[
+          {
+            label: '前往登入',
+            variant: 'outline',
+            className:
+              'border-blue-primary text-blue-primary hover:bg-blue-primary hover:text-white',
+            onClick: () => router.push(PATH.auth.login),
+          },
+          {
+            label: '返回商品頁',
+            className: 'bg-blue-primary text-white hover:bg-blue-primary/90',
+            onClick: () => router.push(PATH.products.list),
+          },
+        ]}
+      />
+    )
   }
 
   // 如果購物車為空，不渲染表單
@@ -160,14 +261,18 @@ export default function CheckoutView() {
               <CustomerInfoForm />
 
               {/* 收件人資訊 */}
-              <DeliveryInfoForm />
+              <DeliveryInfoForm
+                orderNumber={orderNumber}
+                merchantTradeNo={ecpayMerchantTradeNo}
+                selectedStore={orderDetailResponse?.data?.selectedStore}
+              />
 
               {/* 條款同意 */}
               <TermsCheckbox />
             </div>
 
             {/* 右側：訂單摘要 */}
-            <OrderSummary />
+            <OrderSummary order={orderDetailResponse?.data} />
           </div>
 
           {/* 按鈕區 */}

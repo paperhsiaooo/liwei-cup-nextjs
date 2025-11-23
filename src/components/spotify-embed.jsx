@@ -1,4 +1,4 @@
-export default function SpotifyEmbed({ src = '' }) {
+export default function SpotifyEmbed() {
   return (
     <iframe
       data-testid="embed-iframe"

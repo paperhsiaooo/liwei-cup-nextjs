@@ -31,12 +31,6 @@ export const checkoutSchema = z.object({
     .min(1, '請輸入收件人電話')
     .regex(/^09\d{8}$/, '請輸入有效的手機號碼格式（09xxxxxxxx）'),
 
-  // 配送地址
-  deliveryAddress: z
-    .string()
-    .min(1, '請輸入配送地址')
-    .min(5, '地址至少需要 5 個字元'),
-
   // 配送備註
   deliveryNote: z
     .string()
@@ -58,7 +52,6 @@ export const defaultValues = {
   sameAsCustomer: false,
   deliveryName: '',
   recipientPhone: '',
-  deliveryAddress: '',
   deliveryNote: '',
   agreeToTerms: false,
 }

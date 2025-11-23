@@ -112,7 +112,6 @@
 
 **新增欄位**：
 ```javascript
-+ deliveryAddress: z
 +   .string()
 +   .min(1, '請輸入配送地址')
 +   .min(5, '地址至少需要 5 個字元')
@@ -142,7 +141,6 @@ deliveryInfo: {
   sameAsCustomer: false,
   deliveryName: '',
   recipientPhone: '',
-  deliveryAddress: '',  // 新增
   deliveryNote: '',
 }
 ```
@@ -234,7 +232,6 @@ Time:        0.631 s
 **檔案**：`src/sections/checkout/views/checkout-view.jsx`
 
 **主要變更**：
-- ✅ 更新 `setDeliveryInfo` 邏輯：移除門市欄位，添加 `sameAsCustomer` 和 `deliveryAddress`
 - ✅ 更新按鈕樣式：高度 `h-12`，自訂顏色和 hover 效果
 - ✅ 提交按鈕使用 `font-anton tracking-widest`
 
@@ -293,7 +290,6 @@ setDeliveryInfo({
   sameAsCustomer: false,     // ✅ 新增
   deliveryName: '...',
   recipientPhone: '...',
-  deliveryAddress: '...',    // ✅ 新增（取代門市）
   deliveryNote: '...',
 })
 ```
@@ -302,7 +298,6 @@ setDeliveryInfo({
 **注意事項**：
 - 後端需要更新接收的資料結構
 - 移除 `storeId`, `storeName`, `storeAddress`, `storeTel` 欄位
-- 新增 `deliveryAddress` 欄位
 - 新增 `sameAsCustomer` 欄位
 
 ---

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default */
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import posthog from 'posthog-js'

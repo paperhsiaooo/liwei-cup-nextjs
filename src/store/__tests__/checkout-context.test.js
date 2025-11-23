@@ -1,39 +1,23 @@
-import { afterEach, beforeEach, describe, expect, test } from '@jest/globals'
+import { beforeEach, describe, expect, test } from '@jest/globals'
 import { act, renderHook } from '@testing-library/react'
 
-import useCheckoutStore from '../checkout-context'
+import useCheckoutStore, {
+  createCheckoutInitialState,
+} from '../checkout-context'
 
 describe('useCheckoutStore', () => {
   beforeEach(() => {
-    // 清空 localStorage
-    localStorage.clear()
-    // 重置 store 到初始狀態
     const store = useCheckoutStore.getState()
     store.clear()
   })
 
-  afterEach(() => {
-    localStorage.clear()
-  })
-
   test('應該有正確的初始狀態', () => {
     const store = useCheckoutStore.getState()
+    const initialState = createCheckoutInitialState()
 
-    expect(store.customerInfo).toEqual({
-      fullName: '',
-      email: '',
-      phone: '',
-      gender: '',
-    })
-
-    expect(store.deliveryInfo).toMatchObject({
-      deliveryName: '',
-      recipientPhone: '',
-      deliveryAddress: '',
-      deliveryNote: '',
-    })
-
-    expect(store.agreeToTerms).toBe(false)
+    expect(store.customerInfo).toEqual(initialState.customerInfo)
+    expect(store.deliveryInfo).toEqual(initialState.deliveryInfo)
+    expect(store.agreeToTerms).toBe(initialState.agreeToTerms)
   })
 
   describe('setCustomerInfo', () => {
@@ -89,14 +73,12 @@ describe('useCheckoutStore', () => {
         result.current.setDeliveryInfo({
           deliveryName: '李小華',
           recipientPhone: '0987654321',
-          deliveryAddress: '台北市信義區信義路五段7號',
         })
       })
 
       expect(result.current.deliveryInfo).toMatchObject({
         deliveryName: '李小華',
         recipientPhone: '0987654321',
-        deliveryAddress: '台北市信義區信義路五段7號',
       })
     })
 
@@ -172,108 +154,10 @@ describe('useCheckoutStore', () => {
 
       // 驗證所有資料已清除
       const clearedStore = useCheckoutStore.getState()
-      expect(clearedStore.customerInfo).toEqual({
-        fullName: '',
-        email: '',
-        phone: '',
-        gender: '',
-      })
-
-      expect(clearedStore.deliveryInfo).toMatchObject({
-        deliveryName: '',
-        recipientPhone: '',
-        deliveryAddress: '',
-        deliveryNote: '',
-      })
-
-      expect(clearedStore.agreeToTerms).toBe(false)
-    })
-  })
-
-  describe('localStorage 持久化', () => {
-    test('應該持久化資料到 localStorage', () => {
-      const { result } = renderHook(() => useCheckoutStore())
-
-      act(() => {
-        result.current.setCustomerInfo({
-          fullName: '王小明',
-          email: 'test@example.com',
-        })
-      })
-
-      // 檢查 localStorage 是否有資料
-      const storedData = JSON.parse(
-        localStorage.getItem('liwei-checkout') || '{}',
-      )
-      expect(storedData.state.customerInfo.fullName).toBe('王小明')
-      expect(storedData.state.customerInfo.email).toBe('test@example.com')
-    })
-
-    test('應該從 localStorage 恢復資料', () => {
-      // 清空當前狀態
-      localStorage.clear()
-      useCheckoutStore.getState().clear()
-
-      // 先設定資料到 localStorage
-      const mockData = {
-        state: {
-          customerInfo: {
-            fullName: '王小明',
-            email: 'test@example.com',
-            phone: '0912345678',
-            gender: 'male',
-          },
-          deliveryInfo: {
-            sameAsCustomer: false,
-            deliveryName: '李小華',
-            recipientPhone: '0987654321',
-            deliveryAddress: '台北市信義區信義路五段7號',
-            deliveryNote: '',
-          },
-          agreeToTerms: true,
-        },
-        version: 0,
-      }
-      localStorage.setItem('liwei-checkout', JSON.stringify(mockData))
-
-      // 手動從 localStorage 恢復（模擬頁面重載）
-      const storedData = JSON.parse(
-        localStorage.getItem('liwei-checkout') || '{}',
-      )
-      if (storedData.state) {
-        useCheckoutStore.setState(storedData.state)
-      }
-
-      // 驗證資料已從 localStorage 恢復
-      const store = useCheckoutStore.getState()
-      expect(store.customerInfo.fullName).toBe('王小明')
-      expect(store.customerInfo.email).toBe('test@example.com')
-      expect(store.deliveryInfo.deliveryName).toBe('李小華')
-      expect(store.agreeToTerms).toBe(true)
-    })
-
-    test('清除後應該也清除 localStorage', () => {
-      const { result } = renderHook(() => useCheckoutStore())
-
-      // 先設定資料
-      act(() => {
-        result.current.setCustomerInfo({
-          fullName: '王小明',
-          email: 'test@example.com',
-        })
-      })
-
-      // 清除資料
-      act(() => {
-        result.current.clear()
-      })
-
-      // 檢查 localStorage 是否已清除
-      const storedData = JSON.parse(
-        localStorage.getItem('liwei-checkout') || '{}',
-      )
-      expect(storedData.state.customerInfo.fullName).toBe('')
-      expect(storedData.state.customerInfo.email).toBe('')
+      const initialState = createCheckoutInitialState()
+      expect(clearedStore.customerInfo).toEqual(initialState.customerInfo)
+      expect(clearedStore.deliveryInfo).toEqual(initialState.deliveryInfo)
+      expect(clearedStore.agreeToTerms).toBe(initialState.agreeToTerms)
     })
   })
 
@@ -309,18 +193,7 @@ describe('useCheckoutStore', () => {
       expect(result.current.deliveryInfo.deliveryName).toBe('李小華')
       expect(result.current.deliveryInfo.recipientPhone).toBe('0987654321')
 
-      // 步驟 3: 填寫配送地址
-      act(() => {
-        result.current.setDeliveryInfo({
-          deliveryAddress: '台北市信義區信義路五段7號',
-        })
-      })
-
-      expect(result.current.deliveryInfo.deliveryAddress).toBe(
-        '台北市信義區信義路五段7號',
-      )
-
-      // 步驟 4: 同意條款
+      // 步驟 3: 同意條款
       act(() => {
         result.current.setAgreeToTerms(true)
       })
@@ -330,9 +203,6 @@ describe('useCheckoutStore', () => {
       // 驗證所有資料都正確
       expect(result.current.customerInfo.fullName).toBe('王小明')
       expect(result.current.deliveryInfo.deliveryName).toBe('李小華')
-      expect(result.current.deliveryInfo.deliveryAddress).toBe(
-        '台北市信義區信義路五段7號',
-      )
       expect(result.current.agreeToTerms).toBe(true)
     })
 

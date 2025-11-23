@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { axs } from '@/utils/axios'
 
@@ -6,6 +6,19 @@ const prefix = '/private/v1/order'
 
 async function createOrderAPI(payload) {
   const data = await axs(`${prefix}`, payload)
+  return data
+}
+
+async function getOrderDetailAPI(orderNumber) {
+  if (!orderNumber) {
+    throw new Error('orderNumber is required')
+  }
+
+  const data = await axs(
+    `${prefix}/${encodeURIComponent(orderNumber)}`,
+    null,
+    'GET',
+  )
   return data
 }
 
@@ -23,4 +36,13 @@ function useCreateOrder(onSuccess) {
   })
 }
 
-export { createOrderAPI, useCreateOrder }
+function useOrderDetail(orderNumber, options = {}) {
+  return useQuery({
+    queryKey: ['order', 'detail', orderNumber],
+    queryFn: () => getOrderDetailAPI(orderNumber),
+    enabled: Boolean(orderNumber),
+    ...options,
+  })
+}
+
+export { createOrderAPI, getOrderDetailAPI, useCreateOrder, useOrderDetail }
