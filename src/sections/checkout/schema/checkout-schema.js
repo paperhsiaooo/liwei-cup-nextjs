@@ -31,6 +31,12 @@ export const checkoutSchema = z.object({
     .min(1, '請輸入收件人電話')
     .regex(/^09\d{8}$/, '請輸入有效的手機號碼格式（09xxxxxxxx）'),
 
+  // 門市資訊 (必須已選 7-11 門市)
+  storeId: z.string().min(1, '請選擇 7-11 門市'),
+  storeName: z.string().min(1, '請選擇 7-11 門市'),
+  storeAddress: z.string().min(1, '請選擇 7-11 門市'),
+  storeTel: z.string().optional().default(''),
+
   // 配送備註
   deliveryNote: z
     .string()
@@ -52,6 +58,10 @@ export const defaultValues = {
   sameAsCustomer: false,
   deliveryName: '',
   recipientPhone: '',
+  storeId: '',
+  storeName: '',
+  storeAddress: '',
+  storeTel: '',
   deliveryNote: '',
   agreeToTerms: false,
 }

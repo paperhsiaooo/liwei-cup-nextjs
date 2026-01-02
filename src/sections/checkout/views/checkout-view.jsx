@@ -3,10 +3,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useOrderDetail } from '@/apis/hook/use-order'
+import { useOrderDetail, useUpdateOrder } from '@/apis/hook/use-order'
 import CheckoutProgress from '@/components/common/checkout-progress'
 import FormProvider from '@/components/common/hook-form/form-provider'
 import UnauthorizedState from '@/components/common/unauthorized-state'
@@ -24,7 +24,7 @@ import { checkoutSchema, defaultValues } from '../schema/checkout-schema'
 
 export default function CheckoutView({ orderNumber = '' }) {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRouting, startRouting] = useTransition()
   const [isInitialLoad, setIsInitialLoad] = useState(true)
 
   // 購物車資料
@@ -49,6 +49,7 @@ export default function CheckoutView({ orderNumber = '' }) {
   const orderCustomerInfo = orderDetailResponse?.data?.customerInfo
   const orderRecipientInfo = orderDetailResponse?.data?.recipientInfo
   const orderDeliveryNote = orderDetailResponse?.data?.deliveryNote
+  const orderSelectedStore = orderDetailResponse?.data?.selectedStore
 
   const ecpayMerchantTradeNo = useMemo(() => {
     if (!orderDetailResponse?.data?.ecpayMerchantTradeNo) {
@@ -69,10 +70,17 @@ export default function CheckoutView({ orderNumber = '' }) {
     },
   })
 
-  const { handleSubmit, reset, setValue } = methods
+  const {
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { isSubmitting },
+  } = methods
 
   const isOrderDetailUnauthorized =
     Boolean(orderNumber) && orderDetailError?.response?.status === 401
+
+  const { mutateAsync: updateOrder } = useUpdateOrder(orderNumber)
 
   const previousOrderNumberRef = useRef(null)
 
@@ -120,7 +128,22 @@ export default function CheckoutView({ orderNumber = '' }) {
   }, [orderCustomerInfo, orderNumber, setCustomerInfo, setValue])
 
   useEffect(() => {
-    if (!orderNumber || (!orderRecipientInfo && !orderDeliveryNote)) {
+    if (!orderNumber) {
+      return
+    }
+
+    const hasRecipient = Boolean(
+      orderRecipientInfo?.name || orderRecipientInfo?.phone,
+    )
+    const hasNote = Boolean(orderDeliveryNote)
+    const hasStore = Boolean(
+      orderSelectedStore?.id ||
+        orderSelectedStore?.name ||
+        orderSelectedStore?.address ||
+        orderSelectedStore?.phone,
+    )
+
+    if (!hasRecipient && !hasNote && !hasStore) {
       return
     }
 
@@ -128,6 +151,10 @@ export default function CheckoutView({ orderNumber = '' }) {
       deliveryName: orderRecipientInfo?.name || '',
       recipientPhone: orderRecipientInfo?.phone || '',
       deliveryNote: orderDeliveryNote || '',
+      storeId: orderSelectedStore?.id || '',
+      storeName: orderSelectedStore?.name || '',
+      storeAddress: orderSelectedStore?.address || '',
+      storeTel: orderSelectedStore?.phone || '',
     }
 
     setDeliveryInfo(nextDeliveryInfo)
@@ -137,9 +164,14 @@ export default function CheckoutView({ orderNumber = '' }) {
       }
     })
   }, [
-    orderDeliveryNote,
     orderNumber,
-    orderRecipientInfo,
+    orderRecipientInfo?.name,
+    orderRecipientInfo?.phone,
+    orderDeliveryNote,
+    orderSelectedStore?.id,
+    orderSelectedStore?.name,
+    orderSelectedStore?.address,
+    orderSelectedStore?.phone,
     setDeliveryInfo,
     setValue,
   ])
@@ -179,7 +211,10 @@ export default function CheckoutView({ orderNumber = '' }) {
   // 提交表單
   const onSubmit = async data => {
     try {
-      setIsSubmitting(true)
+      if (!orderNumber) {
+        router.push(PATH.cart)
+        return
+      }
 
       // 儲存資料到 Checkout Store
       setCustomerInfo({
@@ -198,12 +233,25 @@ export default function CheckoutView({ orderNumber = '' }) {
 
       setAgreeToTerms(data.agreeToTerms)
 
-      // 導向訂單確認頁面
-      router.push(PATH.confirm)
+      await updateOrder({
+        customerName: data.fullName,
+        customerEmail: data.email,
+        customerPhone: data.phone,
+        customerGender: data.gender || undefined,
+        recipientName: data.deliveryName,
+        recipientPhone: data.recipientPhone,
+        deliveryNote: data.deliveryNote || undefined,
+      })
+
+      // 導向訂單確認頁面（攜帶 orderNumber）
+      startRouting(() => {
+        const confirmUrl = orderNumber
+          ? `${PATH.confirm}?orderNumber=${encodeURIComponent(orderNumber)}`
+          : PATH.confirm
+        router.push(confirmUrl)
+      })
     } catch (error) {
       console.error('提交失敗:', error)
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -289,10 +337,10 @@ export default function CheckoutView({ orderNumber = '' }) {
 
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isRouting}
               className="h-12 w-full bg-green-primary text-blue-primary hover:bg-green-primary/90 sm:w-auto font-anton tracking-widest"
             >
-              {isSubmitting ? (
+              {isSubmitting || isRouting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   處理中...

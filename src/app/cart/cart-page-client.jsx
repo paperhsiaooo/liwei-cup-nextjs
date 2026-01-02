@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useTransition } from 'react'
 import toast from 'react-hot-toast'
 
 import { useCreateOrder } from '@/apis/hook/use-order'
@@ -30,6 +30,7 @@ const toPositiveNumber = value => {
 
 function CartPageClient() {
   const router = useRouter()
+  const [isRouting, startRouting] = useTransition()
   const items = useCartStore(state => state.items)
   const incrementItem = useCartStore(state => state.incrementItem)
   const decrementItem = useCartStore(state => state.decrementItem)
@@ -89,14 +90,24 @@ function CartPageClient() {
     }
 
     try {
-      await createOrder({ items: payloadItems })
+      const result = await createOrder({ items: payloadItems })
+      // 建立成功後進入路由轉換，避免再次點擊
+      startRouting(() => {
+        if (result?.data?.orderNumber) {
+          router.push(
+            `/checkout?orderNumber=${encodeURIComponent(result.data.orderNumber)}`,
+          )
+        } else {
+          router.push('/checkout')
+        }
+      })
     } catch (error) {
       if (error?.data?.retStatus?.code) {
         return
       }
       toast.error('建立訂單失敗，請稍後再試')
     }
-  }, [createOrder, items])
+  }, [createOrder, items, router, startRouting])
 
   if (items.length === 0) {
     return (
@@ -353,10 +364,6 @@ function CartPageClient() {
                   {formatCurrencyNT(subtotal) || 'NT$ 0'}
                 </span>
               </div>
-              <div className="flex items-center justify-between">
-                <span>運費</span>
-                <span className="text-muted-foreground">NT$ 0</span>
-              </div>
               <div className="flex items-center justify-between pt-2 text-base font-semibold text-blue-primary">
                 <span>總計</span>
                 <span>{formatCurrencyNT(subtotal) || 'NT$ 0'}</span>
@@ -365,11 +372,11 @@ function CartPageClient() {
 
             <Button
               className="w-full bg-green-primary text-blue-primary hover:bg-green-primary/90"
-              disabled={isPending}
+              disabled={isPending || isRouting}
               onClick={handleCheckout}
               type="button"
             >
-              {isPending ? (
+              {isPending || isRouting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   建立訂單中...

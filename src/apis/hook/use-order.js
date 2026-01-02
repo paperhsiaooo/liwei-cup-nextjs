@@ -22,10 +22,37 @@ async function getOrderDetailAPI(orderNumber) {
   return data
 }
 
+async function updateOrderAPI(orderNumber, payload) {
+  if (!orderNumber) {
+    throw new Error('orderNumber is required')
+  }
+
+  const data = await axs(
+    `${prefix}/${encodeURIComponent(orderNumber)}`,
+    payload,
+    'PUT',
+  )
+  return data
+}
+
 function useCreateOrder(onSuccess) {
   return useMutation({
     mutationKey: ['order', 'create'],
     mutationFn: payload => createOrderAPI(payload),
+    onSuccess: data => {
+      if (typeof onSuccess === 'function' && data?.data) {
+        onSuccess(data.data)
+      }
+
+      return data
+    },
+  })
+}
+
+function useUpdateOrder(orderNumber, onSuccess) {
+  return useMutation({
+    mutationKey: ['order', 'update', orderNumber],
+    mutationFn: payload => updateOrderAPI(orderNumber, payload),
     onSuccess: data => {
       if (typeof onSuccess === 'function' && data?.data) {
         onSuccess(data.data)
@@ -45,4 +72,11 @@ function useOrderDetail(orderNumber, options = {}) {
   })
 }
 
-export { createOrderAPI, getOrderDetailAPI, useCreateOrder, useOrderDetail }
+export {
+  createOrderAPI,
+  getOrderDetailAPI,
+  updateOrderAPI,
+  useCreateOrder,
+  useOrderDetail,
+  useUpdateOrder,
+}
