@@ -8,9 +8,17 @@ import { URL } from '@/constants/url'
 
 const handleCatchError = error => {
   if (error.response) {
+    const status = error.response.status
+    if (status === 401 || status === 403) {
+      return error
+    }
     toast.error(error.response.statusText)
   } else {
-    toast.error(`${error.code} ${JSON.stringify(error)}`)
+    const fallback =
+      error?.message ||
+      error?.code ||
+      (typeof error === 'string' ? error : JSON.stringify(error))
+    toast.error(fallback || 'Network error')
   }
 
   return error

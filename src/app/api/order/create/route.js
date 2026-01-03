@@ -59,6 +59,12 @@ function validateItems(items) {
 
 export async function POST(request) {
   const body = await request.json().catch(() => null)
+  const hasClientIntentId =
+    typeof body?.clientIntentId === 'string' &&
+    body.clientIntentId.trim().length > 0
+  if (!hasClientIntentId) {
+    return buildResponse(400, INVALID_INPUT_CODE, 'clientIntentId 不可為空')
+  }
   const validationMessage = validateItems(body?.items)
 
   if (validationMessage) {

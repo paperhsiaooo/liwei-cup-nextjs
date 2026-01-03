@@ -2,6 +2,7 @@ import './index.css'
 
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { headers } from 'next/headers'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 import GlobalComponents from '@/components/global-components'
 import { AppProvider } from '@/provider'
@@ -205,11 +206,13 @@ async function RootLayout({ children }) {
       <body
         className={`${notoSansTC.className} ${notoSansJP.className} ${anton.className} ${antonio.className}`}
       >
-        <AppProvider>
-          <PostHogProvider>
-            <GlobalComponents>{children}</GlobalComponents>
-          </PostHogProvider>
-        </AppProvider>
+        <NuqsAdapter>
+          <AppProvider>
+            <PostHogProvider>
+              <GlobalComponents>{children}</GlobalComponents>
+            </PostHogProvider>
+          </AppProvider>
+        </NuqsAdapter>
         {process.env.NODE_ENV === 'production' &&
         process.env.NEXT_PUBLIC_GA_ID ? (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} nonce={nonce} />

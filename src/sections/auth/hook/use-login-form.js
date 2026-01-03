@@ -1,6 +1,7 @@
 /* eslint-disable import/no-named-as-default */
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
+import { parseAsString, useQueryState } from 'nuqs'
 import posthog from 'posthog-js'
 import { useCallback } from 'react'
 import { useForm as useReactHookForm } from 'react-hook-form'
@@ -13,6 +14,7 @@ import { defaultValues, loginSchema } from '../schema/login-schema'
 
 export default function useLoginForm() {
   const router = useRouter()
+  const [nextParam] = useQueryState('next', parseAsString)
   const loginSuccess = useUserContext(state => state.loginSuccess)
 
   const methods = useReactHookForm({
@@ -38,6 +40,12 @@ export default function useLoginForm() {
         method: 'email',
         email,
       })
+    }
+
+    const nextUrl = nextParam || undefined
+    if (nextUrl) {
+      router.push(nextUrl)
+      return
     }
 
     router.push(PATH.settings.profile)

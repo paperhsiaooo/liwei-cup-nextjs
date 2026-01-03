@@ -4,13 +4,15 @@ import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useCallback, useMemo, useTransition } from 'react'
+import { createSerializer, parseAsString } from 'nuqs'
+import { useCallback, useEffect, useMemo, useRef, useTransition } from 'react'
 import toast from 'react-hot-toast'
 
 import { useCreateOrder } from '@/apis/hook/use-order'
 import CheckoutProgress from '@/components/common/checkout-progress'
 import { Button } from '@/components/ui/button'
 import useCartStore from '@/store/cart-context'
+import useUserContext from '@/store/user-context'
 import { formatCurrencyNT } from '@/utils/currency'
 
 const toPositiveNumber = value => {
@@ -28,6 +30,26 @@ const toPositiveNumber = value => {
   return parsed
 }
 
+const checkoutQuerySerializer = createSerializer(
+  {
+    orderNumber: parseAsString,
+  },
+  { clearOnDefault: true },
+)
+
+const loginResumeSerializer = createSerializer(
+  {
+    next: parseAsString,
+    resume: parseAsString,
+  },
+  { clearOnDefault: true },
+)
+
+const toQueryString = qs => {
+  if (!qs) return ''
+  return qs.startsWith('?') ? qs : `?${qs}`
+}
+
 function CartPageClient() {
   const router = useRouter()
   const [isRouting, startRouting] = useTransition()
@@ -35,12 +57,15 @@ function CartPageClient() {
   const incrementItem = useCartStore(state => state.incrementItem)
   const decrementItem = useCartStore(state => state.decrementItem)
   const removeItem = useCartStore(state => state.removeItem)
+  const user = useUserContext(state => state.user)
+  const isResumingRef = useRef(false)
 
   const handleCreateOrderSuccess = useCallback(
     data => {
       const orderNumber = data?.orderNumber
       if (orderNumber) {
-        router.push(`/checkout?orderNumber=${encodeURIComponent(orderNumber)}`)
+        const qs = checkoutQuerySerializer({ orderNumber })
+        router.push(`/checkout${toQueryString(qs)}`)
         return
       }
 
@@ -58,56 +83,127 @@ function CartPageClient() {
     [items],
   )
 
-  const handleCheckout = useCallback(async () => {
-    if (items.length === 0) {
-      toast.error('購物車內沒有商品')
-      return
+  const generateIntentId = () => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID()
     }
+    return `intent-${Date.now()}-${Math.random().toString(16).slice(2)}`
+  }
 
-    const payloadItems = items
-      .map(item => {
-        const productId = toPositiveNumber(item.productId)
-        const variantId = toPositiveNumber(
-          item.variantId ?? item.productId ?? item.id,
-        )
-        const quantity = toPositiveNumber(item.quantity)
-
-        if (!productId || !variantId || !quantity) {
-          return null
-        }
-
-        return {
-          productId,
-          variantId,
-          quantity,
-        }
-      })
-      .filter(Boolean)
-
-    if (payloadItems.length !== items.length) {
-      toast.error('部分商品資訊缺失，請重新選擇商品')
-      return
-    }
-
+  const getPendingIntent = () => {
+    if (typeof window === 'undefined') return null
     try {
-      const result = await createOrder({ items: payloadItems })
-      // 建立成功後進入路由轉換，避免再次點擊
-      startRouting(() => {
-        if (result?.data?.orderNumber) {
-          router.push(
-            `/checkout?orderNumber=${encodeURIComponent(result.data.orderNumber)}`,
-          )
-        } else {
-          router.push('/checkout')
-        }
-      })
+      const raw = sessionStorage.getItem('pendingCheckoutIntent')
+      return raw ? JSON.parse(raw) : null
     } catch (error) {
-      if (error?.data?.retStatus?.code) {
+      return null
+    }
+  }
+
+  const savePendingIntent = intent => {
+    if (typeof window === 'undefined') return
+    try {
+      sessionStorage.setItem('pendingCheckoutIntent', JSON.stringify(intent))
+    } catch (error) {
+      // ignore storage errors
+    }
+  }
+
+  const clearPendingIntent = () => {
+    if (typeof window === 'undefined') return
+    sessionStorage.removeItem('pendingCheckoutIntent')
+  }
+
+  const handleCheckout = useCallback(
+    async existingIntentId => {
+      if (items.length === 0) {
+        toast.error('購物車內沒有商品')
         return
       }
-      toast.error('建立訂單失敗，請稍後再試')
-    }
-  }, [createOrder, items, router, startRouting])
+
+      const clientIntentId = (() => {
+        if (
+          typeof existingIntentId === 'string' &&
+          existingIntentId.trim().length > 0
+        ) {
+          return existingIntentId
+        }
+        return generateIntentId()
+      })()
+      const payloadItems = items
+        .map(item => {
+          const productId = toPositiveNumber(item.productId)
+          const variantId = toPositiveNumber(
+            item.variantId ?? item.productId ?? item.id,
+          )
+          const quantity = toPositiveNumber(item.quantity)
+
+          if (!productId || !variantId || !quantity) {
+            return null
+          }
+
+          return {
+            productId,
+            variantId,
+            quantity,
+          }
+        })
+        .filter(Boolean)
+
+      if (payloadItems.length !== items.length) {
+        toast.error('部分商品資訊缺失，請重新選擇商品')
+        return
+      }
+
+      try {
+        const result = await createOrder({
+          items: payloadItems,
+          clientIntentId,
+        })
+        // 建立成功後進入路由轉換，避免再次點擊
+        startRouting(() => {
+          clearPendingIntent()
+          if (result?.data?.orderNumber) {
+            const qs = checkoutQuerySerializer({
+              orderNumber: result.data.orderNumber,
+            })
+            router.push(`/checkout${toQueryString(qs)}`)
+          } else {
+            router.push('/checkout')
+          }
+        })
+      } catch (error) {
+        if (error?.response?.status === 401) {
+          savePendingIntent({
+            clientIntentId,
+            ts: Date.now(),
+            from: '/cart',
+          })
+          const qs = loginResumeSerializer({
+            next: '/cart',
+            resume: 'checkout',
+          })
+          router.push(`/auth/login${toQueryString(qs)}`)
+          return
+        }
+        if (error?.data?.retStatus?.code) {
+          return
+        }
+        // toast.error('建立訂單失敗，請稍後再試')
+      }
+    },
+    [createOrder, items, router, startRouting],
+  )
+
+  useEffect(() => {
+    if (!user?.isLogin) return
+    const pending = getPendingIntent()
+    if (!pending?.clientIntentId || isResumingRef.current) return
+    isResumingRef.current = true
+    handleCheckout(pending.clientIntentId).finally(() => {
+      isResumingRef.current = false
+    })
+  }, [handleCheckout, user?.isLogin])
 
   if (items.length === 0) {
     return (
@@ -373,7 +469,7 @@ function CartPageClient() {
             <Button
               className="w-full bg-green-primary text-blue-primary hover:bg-green-primary/90"
               disabled={isPending || isRouting}
-              onClick={handleCheckout}
+              onClick={() => handleCheckout()}
               type="button"
             >
               {isPending || isRouting ? (
