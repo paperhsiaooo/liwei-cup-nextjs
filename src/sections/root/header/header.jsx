@@ -66,7 +66,7 @@ function Header() {
                     </svg>
                   </button>
                 </DrawerTrigger>
-                <DrawerContent side="left">
+                <DrawerContent side="left" className="content-start gap-0">
                   <DrawerHeader className="p-0">
                     <DrawerTitle className="sr-only">主選單</DrawerTitle>
                     <div className="flex items-center justify-end border-b pb-3">
@@ -92,7 +92,7 @@ function Header() {
                       </DrawerClose>
                     </div>
                   </DrawerHeader>
-                  <nav className="flex flex-col gap-2 pt-4">
+                  <nav className="flex flex-col gap-2 pt-2">
                     <DrawerClose asChild>
                       <Link
                         href="/products"
