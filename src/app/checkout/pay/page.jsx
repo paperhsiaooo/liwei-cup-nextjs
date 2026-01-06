@@ -1,33 +1,66 @@
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 import AutoSubmitForm from './autoSubmitForm'
 
-export default async function CheckoutPayPage() {
-  const cookieStore = await cookies()
-  const cookie = cookieStore.get('order_intent')
+const ERROR_MESSAGES = {
+  117002: '訂單已付款完成',
+  117003: '訂單已取消',
+  117004: '訂單不存在',
+  117007: '您沒有權限存取此訂單',
+}
 
-  if (!cookie?.value) {
-    return <p>訂單資訊遺失，請回上一頁重試</p>
+export default async function CheckoutPayPage({ searchParams }) {
+  const params = await searchParams
+  const orderNumber = params?.orderNumber?.trim()
+
+  if (!orderNumber) {
+    redirect('/cart')
   }
 
-  const intent = JSON.parse(cookie.value)
-  console.log('[CheckoutPayPage] cookie: ', cookie)
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('acToken')?.value
 
-  const res = await fetch(process.env.BASE_URL + '/api/payment/create', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    // 後端會在 bizOrderId 未帶時自動生成並回傳
-    body: JSON.stringify(intent),
-    // 若同網域可帶 credentials，跨網域請設定 CORS
-    // credentials: "include",
-    cache: 'no-store',
-  })
+  if (!accessToken) {
+    const qs = new URLSearchParams({ orderNumber }).toString()
+    redirect(`/auth/login?next=/checkout/pay?${qs}`)
+  }
+
+  console.log('[CheckoutPayPage] orderNumber:', orderNumber)
+
+  const res = await fetch(
+    process.env.BASE_URL + '/api/private/v1/payment/create',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: `acToken=${accessToken}`,
+      },
+      body: JSON.stringify({ orderNumber }),
+      cache: 'no-store',
+    },
+  )
 
   const json = await res.json()
-  console.log('[CheckoutPayPage] json: ', json)
+  console.log('[CheckoutPayPage] response:', json)
 
   if (!res.ok || json?.retStatus?.code !== 10000) {
-    return <p>建立付款失敗，請回上一頁重試</p>
+    const code = json?.retStatus?.code
+    const errorMessage = ERROR_MESSAGES[code] || '建立付款失敗，請回上一頁重試'
+
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-slate-700">{errorMessage}</p>
+          <a
+            href="/cart"
+            className="mt-4 inline-block text-blue-primary underline"
+          >
+            返回購物車
+          </a>
+        </div>
+      </div>
+    )
   }
 
   const data = json.data
@@ -39,7 +72,6 @@ export default async function CheckoutPayPage() {
       tradeInfo={data.tradeInfo}
       tradeSha={data.tradeSha}
       version={data.version}
-      productId={intent.productId}
       bizOrderId={data.bizOrderId}
     />
   )

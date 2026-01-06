@@ -1,7 +1,7 @@
 'use client'
 
 import { format } from 'date-fns'
-import { notFound, useSearchParams } from 'next/navigation'
+import { notFound, useRouter, useSearchParams } from 'next/navigation'
 
 import { useOrderDetail } from '@/apis/hook/use-order'
 import CheckoutProgress from '@/components/common/checkout-progress'
@@ -35,11 +35,16 @@ function LoadingState() {
 }
 
 function ConfirmClient() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const orderNumber = (searchParams.get('orderNumber') || '').trim()
 
   if (!orderNumber) {
     notFound()
+  }
+
+  const handleGoToPayment = () => {
+    router.push(`/checkout/pay?orderNumber=${orderNumber}`)
   }
 
   const {
@@ -138,6 +143,7 @@ function ConfirmClient() {
               </p>
               <Button
                 type="button"
+                onClick={handleGoToPayment}
                 className="h-12 w-full bg-green-primary text-blue-primary hover:bg-green-primary/90 font-anton tracking-widest"
               >
                 前往付款
