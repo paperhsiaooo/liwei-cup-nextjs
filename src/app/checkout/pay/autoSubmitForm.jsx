@@ -1,6 +1,5 @@
 'use client'
 
-import { Skeleton } from '@mui/material'
 import { useEffect } from 'react'
 
 function AutoSubmitForm({
@@ -9,13 +8,12 @@ function AutoSubmitForm({
   tradeInfo,
   tradeSha,
   version,
-  productId,
   bizOrderId,
 }) {
   useEffect(() => {
     // 存下 bizOrderId 以便重試（同一業務訂單重用）
     try {
-      localStorage.setItem(`bizOrderId:${productId}`, bizOrderId)
+      localStorage.setItem(`lastBizOrderId`, bizOrderId)
     } catch {}
 
     const form = document.createElement('form')
@@ -38,26 +36,17 @@ function AutoSubmitForm({
 
     document.body.appendChild(form)
     form.submit()
-  }, [action, merchantId, tradeInfo, tradeSha, version, productId, bizOrderId])
+  }, [action, merchantId, tradeInfo, tradeSha, version, bizOrderId])
 
   return (
-    <>
-      <form action={action} method="post">
-        <input type="hidden" name="merchantId" value={merchantId} />
-        <input type="hidden" name="tradeInfo" value={tradeInfo} />
-        <input type="hidden" name="tradeSha" value={tradeSha} />
-        <input type="hidden" name="version" value={version} />
-        <input type="hidden" name="productId" value={productId} />
-        <input type="hidden" name="bizOrderId" value={bizOrderId} />
-      </form>
-
-      <div className="w-full h-dvh flex items-center justify-center">
-        <div className="text-2xl font-bold">
-          付款中...
-          <Skeleton />
+    <div className="w-full h-dvh flex items-center justify-center">
+      <div className="text-center">
+        <div className="text-2xl font-bold text-slate-700">付款中...</div>
+        <div className="mt-4 h-2 w-48 mx-auto rounded-full bg-slate-200 overflow-hidden">
+          <div className="h-full w-1/2 bg-blue-primary animate-pulse rounded-full" />
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
