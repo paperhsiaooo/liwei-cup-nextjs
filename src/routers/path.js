@@ -28,6 +28,7 @@ export const PATH = {
   checkout: {
     root: '/checkout',
     pay: '/checkout/pay',
+    result: '/checkout/result',
   },
   confirm: '/confirm',
 
