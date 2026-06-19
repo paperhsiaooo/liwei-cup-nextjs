@@ -1,7 +1,6 @@
 import './index.css'
 
 import { GoogleAnalytics } from '@next/third-parties/google'
-import { headers } from 'next/headers'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 import GlobalComponents from '@/components/global-components'
@@ -113,10 +112,7 @@ const antonio = Antonio({
   variable: '--font-antonio',
 })
 
-async function RootLayout({ children }) {
-  const headersList = await headers()
-  const nonce = headersList.get('x-nonce') || undefined
-
+function RootLayout({ children }) {
   // Structured Data (JSON-LD)
   const organizationSchema = {
     '@context': 'https://schema.org',
@@ -186,21 +182,18 @@ async function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationSchema),
           }}
-          nonce={nonce}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(websiteSchema),
           }}
-          nonce={nonce}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(eventSchema),
           }}
-          nonce={nonce}
         />
       </head>
       <body
@@ -215,7 +208,7 @@ async function RootLayout({ children }) {
         </NuqsAdapter>
         {process.env.NODE_ENV === 'production' &&
         process.env.NEXT_PUBLIC_GA_ID ? (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} nonce={nonce} />
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         ) : null}
       </body>
     </html>
