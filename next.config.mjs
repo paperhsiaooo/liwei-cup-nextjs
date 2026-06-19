@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // ponytail: 拿掉 output:'export' 改用 OpenNext SSR 部署到 Cloudflare Workers
   allowedDevOrigins: ['http://localhost:8081'],
   images: {
     unoptimized: true,
