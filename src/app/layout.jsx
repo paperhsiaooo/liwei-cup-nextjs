@@ -74,8 +74,8 @@ export const metadata = {
     },
   },
   icons: {
-    icon: '/icon.webp',
-    apple: '/icon.webp',
+    icon: '/icon.png',
+    apple: '/icon.png',
   },
 }
 
